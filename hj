@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContaIA — Agente Contable Inteligente</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0F1117;
+    --surface: #1C2030;
+    --surface2: #252A3A;
+    --border: #2E3450;
+    --green: #00C896;
+    --green-dim: rgba(0,200,150,0.12);
+    --amber: #F5A623;
+    --amber-dim: rgba(245,166,35,0.12);
+    --red: #E05252;
+    --red-dim: rgba(224,82,82,0.12);
+    --blue: #4A9EFF;
+    --text: #E8EAF0;
+    --text-dim: #6B7394;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* === ONBOARDING SCREEN === */
+  #onboarding {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .onboarding-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .onboarding-logo {
+    width: 64px;
+    height: 64px;
+    background: var(--green);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 22px;
+    color: #0F1117;
+    margin: 0 auto 24px;
+    letter-spacing: -1px;
+  }
+
+  .onboarding-title {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .onboarding-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .key-label {
+    text-align: left;
+    font-size: 11px;
+    font-family: var(--mono);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .key-input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .key-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 44px 13px 14px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .key-input:focus { border-color: var(--green); }
+  .key-input::placeholder { color: var(--text-dim); letter-spacing: 0; font-family: var(--sans); font-size: 13px; }
+
+  .key-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-dim);
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .key-toggle:hover { color: var(--text); }
+
+  .key-hint {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  .key-hint a {
+    color: var(--green);
+    text-decoration: none;
+  }
+  .key-hint a:hover { text-decoration: underline; }
+
+  .key-error {
+    background: var(--red-dim);
+    border: 1px solid rgba(224,82,82,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 16px;
+    display: none;
+    text-align: left;
+  }
+
+  .enter-btn {
+    width: 100%;
+    background: var(--green);
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0F1117;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .enter-btn:hover { background: #00e6ac; transform: translateY(-1px); }
+  .enter-btn:disabled { background: var(--border); color: var(--text-dim); transform: none; cursor: not-allowed; }
+
+  .privacy-note {
+    margin-top: 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .privacy-note strong { color: var(--text); }
+
+  .onboarding-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 28px;
+    text-align: left;
+  }
+
+  .feature-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Key indicator in header */
+  .key-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .key-indicator:hover { border-color: var(--green); color: var(--green); }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--green);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 14px;
+    color: #0F1117;
+    letter-spacing: -1px;
+  }
+
+  .logo-text {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--green);
+    letter-spacing: 1px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-text {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* TABS */
+  .tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+  }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: var(--sans);
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+
+  .tab-badge {
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-weight: 600;
+  }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* PANEL */
+  .panel {
+    display: none;
+    flex: 1;
+    overflow: hidden;
+  }
+  .panel.active { display: flex; }
+
+  /* ========= CHAT ========= */
+  #panel-chat {
+    flex-direction: column;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg {
+    display: flex;
+    gap: 12px;
+    max-width: 820px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+
+  .msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-weight: 600;
+  }
+
+  .msg.ai .msg-avatar { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,200,150,0.3); }
+  .msg.user .msg-avatar { background: var(--blue); color: white; font-family: var(--sans); }
+
+  .msg-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 680px;
+  }
+
+  .msg.user .msg-bubble {
+    background: var(--surface2);
+    border-color: var(--blue);
+    border-color: rgba(74,158,255,0.3);
+  }
+
+  .msg-bubble .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--green);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .msg.user .msg-bubble .label { color: var(--blue); }
+
+  /* Libro Mayor style entries */
+  .asiento {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .asiento-header {
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .asiento-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    padding: 3px 0;
+  }
+
+  .asiento-row .debe { color: var(--red); }
+  .asiento-row .haber { color: var(--green); }
+  .asiento-row .cuenta { color: var(--text); }
+
+  /* Highlight boxes */
+  .highlight-box {
+    background: var(--green-dim);
+    border: 1px solid rgba(0,200,150,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+
+  .highlight-box.warning {
+    background: var(--amber-dim);
+    border-color: rgba(245,166,35,0.3);
+  }
+
+  .highlight-box.danger {
+    background: var(--red-dim);
+    border-color: rgba(224,82,82,0.3);
+  }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-dim);
+  }
+
+  .chip:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-dim);
+  }
+
+  /* CHAT INPUT */
+  .chat-input-area {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+  }
+
+  .file-preview {
+    display: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+    align-items: center;
+    gap: 10px;
+  }
+
+  .file-preview.visible { display: flex; }
+
+  .file-preview .remove-file {
+    margin-left: auto;
+    cursor: pointer;
+    color: var(--red);
+    background: none;
+    border: none;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .input-attach {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dim);
+    font-size: 18px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .input-attach:hover { border-color: var(--green); color: var(--green); }
+
+  textarea.chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    min-height: 42px;
+    max-height: 120px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+
+  textarea.chat-input:focus { border-color: var(--green); }
+  textarea.chat-input::placeholder { color: var(--text-dim); }
+
+  .send-btn {
+    background: var(--green);
+    border: none;
+    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #0F1117;
+    font-size: 18px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: #00e6ac; transform: scale(1.05); }
+  .send-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+  /* ========= ARCHIVOS ========= */
+  #panel-archivos {
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--green);
+    background: var(--green-dim);
+  }
+
+  .drop-icon { font-size: 48px; margin-bottom: 12px; }
+  .drop-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .drop-sub { font-size: 13px; color: var(--text-dim); }
+
+  #file-input { display: none; }
+
+  .file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .file-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .file-item-icon { font-size: 24px; }
+
+  .file-item-info { flex: 1; }
+  .file-item-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .file-item-meta { font-size: 12px; color: var(--text-dim); font-family: var(--mono); }
+
+  .file-item-status {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .status-ready { background: var(--green-dim); color: var(--green); }
+  .status-processing { background: var(--amber-dim); color: var(--amber); }
+
+  .analyze-btn {
+    background: var(--green);
+    color: #0F1117;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--sans);
+  }
+
+  .analyze-btn:hover { background: #00e6ac; }
+
+  /* Quick analysis cards */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .analysis-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .analysis-card .card-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--mono);
+    margin-bottom: 8px;
+  }
+
+  .analysis-card .card-value {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .analysis-card .card-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ========= GRAFICOS ========= */
+  #panel-graficos {
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .chart-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .chart-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: all 0.2s;
+    font-family: var(--sans);
+  }
+
+  .chart-btn:hover, .chart-btn.active {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-dim);
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) { .chart-grid { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .chart-card.full { grid-column: 1 / -1; }
+
+  .chart-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .chart-wrap { position: relative; height: 200px; }
+  .chart-wrap.tall { height: 280px; }
+
+  /* ========= VENCIMIENTOS ========= */
+  #panel-vencimientos {
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .venc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .venc-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .venc-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .venc-stat .stat-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .venc-stat .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .venc-stat.danger .stat-num { color: var(--red); }
+  .venc-stat.warning .stat-num { color: var(--amber); }
+  .venc-stat.ok .stat-num { color: var(--green); }
+
+  .venc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .venc-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .venc-item:hover { border-color: var(--text-dim); }
+
+  .venc-date {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 90px;
+  }
+
+  .venc-urgency {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .urgency-red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  .urgency-amber { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .urgency-green { background: var(--green); }
+
+  .venc-info { flex: 1; }
+  .venc-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .venc-sub { font-size: 12px; color: var(--text-dim); }
+
+  .venc-dias {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .dias-red { color: var(--red); }
+  .dias-amber { color: var(--amber); }
+  .dias-green { color: var(--green); }
+
+  .venc-monto {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 110px;
+    text-align: right;
+  }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 4px 0;
+  }
+
+  .loading span {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+
+  .loading span:nth-child(2) { animation-delay: 0.2s; }
+  .loading span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* Scrollbar global */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Typing cursor */
+  .typing-cursor::after {
+    content: '▋';
+    animation: blink 1s infinite;
+    color: var(--green);
+    font-size: 12px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="onboarding-card">
+    <div class="onboarding-logo">CA</div>
+    <div class="onboarding-title">CONTA<span style="color:#fff">IA</span></div>
+    <div class="onboarding-sub">Tu asistente contable e impositivo con IA.<br>Analizá facturas, consultá impuestos argentinos y visualizá reportes.</div>
+
+    <div class="onboarding-features">
+      <div class="feature-pill">📄 Análisis de facturas PDF</div>
+      <div class="feature-pill">🧮 IVA · Ganancias · IIBB</div>
+      <div class="feature-pill">📊 Gráficos y reportes</div>
+      <div class="feature-pill">📅 Vencimientos AFIP</div>
+    </div>
+
+    <div class="key-label">Tu API Key de Anthropic</div>
+    <div class="key-input-wrap">
+      <input class="key-input" type="password" id="api-key-input" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter') tryEnter()" oninput="clearError()">
+      <button class="key-toggle" onclick="toggleKeyVisibility()" id="key-toggle-btn">👁️</button>
+    </div>
+    <div class="key-hint">
+      Obtené tu key gratis en <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> →<br>
+      La key se guarda solo en esta pestaña del navegador y nunca sale de tu dispositivo.
+    </div>
+
+    <div class="key-error" id="key-error">⚠️ La key no parece válida. Verificá que empiece con <code>sk-ant-</code> y que tenga crédito disponible.</div>
+
+    <button class="enter-btn" id="enter-btn" onclick="tryEnter()">
+      <span id="enter-text">Ingresar al agente →</span>
+    </button>
+
+    <div class="privacy-note">
+      🔒 <strong>Tu privacidad:</strong> la API key se almacena únicamente en <code>sessionStorage</code> de tu navegador. Al cerrar la pestaña se borra automáticamente. Este sitio no tiene backend ni registra datos.
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">CA</div>
+    <div>
+      <div class="logo-text">CONTA<span style="color:#fff">IA</span></div>
+      <div class="logo-sub">Agente Contable Inteligente</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span class="status-text">Agente activo</span>
+    <div class="key-indicator" onclick="changeKey()" title="Cambiar API Key">
+      🔑 <span id="key-display">sk-ant-···</span>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-panel="chat" onclick="switchTab('chat')">
+    💬 Chat IA
+  </button>
+  <button class="tab" data-panel="archivos" onclick="switchTab('archivos')">
+    📎 Archivos
+  </button>
+  <button class="tab" data-panel="graficos" onclick="switchTab('graficos')">
+    📊 Gráficos
+  </button>
+  <button class="tab" data-panel="vencimientos" onclick="switchTab('vencimientos')">
+    📅 Vencimientos AFIP <span class="tab-badge" id="venc-badge">3</span>
+  </button>
+</div>
+
+<div class="main">
+
+  <!-- CHAT -->
+  <div class="panel active" id="panel-chat">
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai">
+        <div class="msg-avatar">CA</div>
+        <div class="msg-bubble">
+          <div class="label">// ContaIA · Sistema</div>
+          <p>¡Hola! Soy tu asistente contable-impositivo con IA. Puedo ayudarte a:</p>
+          <ul style="margin: 10px 0 10px 20px; color: var(--text-dim); font-size: 13px; line-height: 2;">
+            <li>Analizar facturas, liquidaciones y balances que me subas</li>
+            <li>Interpretar retenciones de IVA, Ganancias e Ingresos Brutos</li>
+            <li>Explicar posiciones fiscales y armar comparativos</li>
+            <li>Detectar inconsistencias en declaraciones juradas</li>
+            <li>Generar reportes visuales de tu cartera de clientes</li>
+          </ul>
+          <div class="chips">
+            <span class="chip" onclick="sendChip('¿Cómo calculo el IVA de una factura de exportación?')">IVA exportación</span>
+            <span class="chip" onclick="sendChip('Explicame las retenciones de Ganancias para monotributistas')">Retenciones Ganancias</span>
+            <span class="chip" onclick="sendChip('¿Cuáles son los vencimientos de IVA para julio 2025?')">Vencimientos IVA</span>
+            <span class="chip" onclick="sendChip('¿Qué diferencia hay entre factura A y factura B en Argentina?')">Fact. A vs B</span>
+            <span class="chip" onclick="sendChip('Ayudame a armar un flujo de caja simple para un cliente')">Flujo de caja</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="file-preview" id="file-preview">
+        <span id="file-preview-name">archivo.pdf</span>
+        <button class="remove-file" onclick="removeAttachment()">✕</button>
+      </div>
+      <div class="input-row">
+        <div class="input-attach" onclick="document.getElementById('chat-file-input').click()" title="Adjuntar PDF o imagen">📎</div>
+        <input type="file" id="chat-file-input" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx" onchange="handleChatAttachment(event)">
+        <textarea class="chat-input" id="chat-input" placeholder="Consultá sobre impuestos, facturas, AFIP, flujos, retenciones..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHIVOS -->
+  <div class="panel" id="panel-archivos">
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <div class="drop-icon">📄</div>
+      <div class="drop-title">Arrastrá tus archivos acá</div>
+      <div class="drop-sub">PDF de facturas, Excel de liquidaciones, CSV de movimientos · Máx. 10MB por archivo</div>
+      <input type="file" id="file-input" multiple accept=".pdf,.csv,.xlsx,.xls,.png,.jpg" onchange="handleFiles(event)">
+    </div>
+
+    <div id="files-section" style="display:none;">
+      <div class="section-title">Archivos cargados</div>
+      <div class="file-list" id="file-list"></div>
+
+      <div id="analysis-section" style="display:none; margin-top: 20px;">
+        <div class="section-title">Análisis rápido</div>
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="card-label">Total IVA detectado</div>
+            <div class="card-value">$284.750</div>
+            <div class="card-sub">Estimado del último archivo</div>
+          </div>
+          <div class="analysis-card">
+            <div class="card-label">Facturas procesadas</div>
+            <div class="card-value" id="facturas-count">0</div>
+            <div class="card-sub">En esta sesión</div>
+          </div>
+          <div class="analysis-card">
+            <div class="card-label">Retenciones</div>
+            <div class="card-value" style="color:var(--amber)">$42.100</div>
+            <div class="card-sub">Sufridas en el período</div>
+          </div>
+          <div class="analysis-card">
+            <div class="card-label">Saldo IVA</div>
+            <div class="card-value" style="color:var(--red)">-$18.200</div>
+            <div class="card-sub">Saldo técnico a favor</div>
+          </div>
+        </div>
+        <div style="margin-top: 14px; display:flex; gap:10px;">
+          <button class="analyze-btn" onclick="sendToChat('Analizá los archivos que subí y dame un resumen impositivo detallado')">Analizar con IA →</button>
+          <button class="analyze-btn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border);" onclick="switchTab('graficos')">Ver en gráficos →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAFICOS -->
+  <div class="panel" id="panel-graficos">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div class="section-title">Panel Visual</div>
+      </div>
+      <div class="chart-controls">
+        <button class="chart-btn active" onclick="setChartPeriod('mensual', this)">Mensual</button>
+        <button class="chart-btn" onclick="setChartPeriod('trimestral', this)">Trimestral</button>
+        <button class="chart-btn" onclick="setChartPeriod('anual', this)">Anual</button>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card full">
+        <div class="chart-card-title">// Evolución de Ingresos vs Gastos</div>
+        <div class="chart-wrap tall">
+          <canvas id="chart-ingresos"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">// Composición IVA</div>
+        <div class="chart-wrap">
+          <canvas id="chart-iva"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">// Carga Impositiva</div>
+        <div class="chart-wrap">
+          <canvas id="chart-impuestos"></canvas>
+        </div>
+      </div>
+      <div class="chart-card full">
+        <div class="chart-card-title">// Retenciones Sufridas por Concepto</div>
+        <div class="chart-wrap">
+          <canvas id="chart-retenciones"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENCIMIENTOS -->
+  <div class="panel" id="panel-vencimientos">
+    <div class="venc-header">
+      <div>
+        <div class="section-title">Calendario Impositivo AFIP · Julio 2025</div>
+      </div>
+    </div>
+
+    <div class="venc-stats">
+      <div class="venc-stat danger">
+        <span class="stat-num">3</span>
+        <div class="stat-label">Vencen en 7 días</div>
+      </div>
+      <div class="venc-stat warning">
+        <span class="stat-num">5</span>
+        <div class="stat-label">Vencen este mes</div>
+      </div>
+      <div class="venc-stat ok">
+        <span class="stat-num">12</span>
+        <div class="stat-label">Al día</div>
+      </div>
+    </div>
+
+    <div class="venc-list" id="venc-list"></div>
+  </div>
+
+</div>
+
+<script>
+// === ACTUALIZACIONES NORMATIVAS (desde n8n) ===
+let contextoNormativo = '';
+
+async function cargarActualizacionesNormativas() {
+  try {
+    const res = await fetch('https://vps-6064485-x.dattaweb.com/webhook/fiscoia-actualizaciones');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.contextoParaIA && data.totalCambios > 0) {
+      contextoNormativo = `\n\nACTUALIZACIONES NORMATIVAS RECIENTES (detectadas automáticamente, priorizar esta info si es relevante a la consulta):\n${data.contextoParaIA}`;
+    }
+  } catch (e) {
+    // Si falla, el agente sigue funcionando con su conocimiento base
+    console.log('No se pudieron cargar actualizaciones normativas, usando conocimiento base.');
+  }
+}
+
+cargarActualizacionesNormativas();
+
+// === API KEY & ONBOARDING ===
+let USER_API_KEY = '';
+
+function toggleKeyVisibility() {
+  const input = document.getElementById('api-key-input');
+  const btn = document.getElementById('key-toggle-btn');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+function clearError() {
+  document.getElementById('key-error').style.display = 'none';
+}
+
+async function tryEnter() {
+  const input = document.getElementById('api-key-input');
+  const key = input.value.trim();
+  if (!key.startsWith('sk-ant-') || key.length < 30) {
+    document.getElementById('key-error').style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('enter-btn');
+  const txt = document.getElementById('enter-text');
+  btn.disabled = true;
+  txt.textContent = 'Verificando key...';
+
+  // Validate with a minimal API call
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'ok' }] })
+    });
+    if (res.status === 401 || res.status === 403) {
+      document.getElementById('key-error').style.display = 'block';
+      btn.disabled = false;
+      txt.textContent = 'Ingresar al agente →';
+      return;
+    }
+  } catch(e) {
+    // Network error — let them in anyway, will fail on first message
+  }
+
+  USER_API_KEY = key;
+  sessionStorage.setItem('contaia_key', key);
+
+  // Show masked key in header
+  document.getElementById('key-display').textContent = key.slice(0,10) + '···' + key.slice(-4);
+
+  btn.disabled = false;
+  txt.textContent = 'Ingresar al agente →';
+  document.getElementById('onboarding').style.display = 'none';
+}
+
+function changeKey() {
+  USER_API_KEY = '';
+  sessionStorage.removeItem('contaia_key');
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('onboarding').style.display = 'flex';
+}
+
+// Check session storage on load
+(function() {
+  const saved = sessionStorage.getItem('contaia_key');
+  if (saved && saved.startsWith('sk-ant-')) {
+    USER_API_KEY = saved;
+    document.getElementById('api-key-input').value = saved;
+    document.getElementById('key-display').textContent = saved.slice(0,10) + '···' + saved.slice(-4);
+    document.getElementById('onboarding').style.display = 'none';
+  }
+})();
+
+// === STATE ===
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+let conversationHistory = [];
+let attachedFile = null;
+let attachedFileBase64 = null;
+let attachedFileType = null;
+let uploadedFiles = [];
+let charts = {};
+let currentPeriod = 'mensual';
+
+// === SYSTEM PROMPT ===
+const SYSTEM_PROMPT = `Sos ContaIA, un asistente contable e impositivo argentino experto. Tu rol es ayudar a contadores públicos y profesionales de finanzas en su trabajo diario.
+
+CONOCIMIENTO ESPECIALIZADO:
+- Sistema tributario argentino: IVA, Ganancias, Bienes Personales, Ingresos Brutos, Monotributo, Autónomos
+- AFIP: Servicios, declaraciones juradas (F572, F931, F2002, etc.), SIPER, Domicilio Fiscal Electrónico
+- Facturación electrónica: Tipos A, B, C, M, E (exportación), FCE PYME
+- Liquidación de sueldos: SUSS, ART, sindicatos, cargas sociales
+- Estados contables: balance general, estado de resultados, flujo de caja, análisis de ratios
+- Retenciones y percepciones: IVA, Ganancias, IIBB por jurisdicción
+- Regímenes especiales: agropecuario, construcción, servicios eventuales
+- CITI Ventas/Compras: formato y carga
+
+ESTILO DE RESPUESTA:
+- Siempre en español rioplatense argentino (vos, etc.)
+- Estructurado y preciso: primero la respuesta directa, luego el detalle
+- Cuando corresponda, mostrá números en formato contable argentino (puntos para miles, coma para decimales)
+- Citá la normativa relevante cuando sea pertinente (resoluciones AFIP, leyes)
+- Si analizás un archivo, extraé datos concretos: montos, alícuotas, fechas
+- Proponé siempre una acción o siguiente paso
+- Usá ✅ ⚠️ ❌ para indicar estado/urgencia cuando sea útil
+
+Si el usuario sube un documento, analizalo en detalle: extraé todos los datos relevantes, calculá IVA, verificá alícuotas, detectá inconsistencias.`;
+
+// === TABS ===
+function switchTab(tabName) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + tabName).classList.add('active');
+  document.querySelector(`[data-panel="${tabName}"]`).classList.add('active');
+
+  if (tabName === 'graficos') initCharts();
+}
+
+// === CHAT ===
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function sendChip(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function sendToChat(text) {
+  switchTab('chat');
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function handleChatAttachment(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  processAttachment(file);
+}
+
+function processAttachment(file) {
+  attachedFile = file;
+  attachedFileType = file.type;
+  const preview = document.getElementById('file-preview');
+  document.getElementById('file-preview-name').textContent = `📎 ${file.name} (${(file.size/1024).toFixed(0)} KB)`;
+  preview.classList.add('visible');
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    attachedFileBase64 = e.target.result.split(',')[1];
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeAttachment() {
+  attachedFile = null;
+  attachedFileBase64 = null;
+  attachedFileType = null;
+  document.getElementById('file-preview').classList.remove('visible');
+  document.getElementById('chat-file-input').value = '';
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text && !attachedFile) return;
+
+  const sendBtn = document.getElementById('send-btn');
+  sendBtn.disabled = true;
+
+  // Build user message content
+  let userContent = [];
+
+  if (attachedFile && attachedFileBase64) {
+    const isImage = attachedFileType.startsWith('image/');
+    const isPDF = attachedFileType === 'application/pdf';
+
+    if (isImage) {
+      userContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: attachedFileType, data: attachedFileBase64 }
+      });
+    } else if (isPDF) {
+      userContent.push({
+        type: 'document',
+        source: { type: 'base64', media_type: 'application/pdf', data: attachedFileBase64 }
+      });
+    }
+  }
+
+  if (text) {
+    userContent.push({ type: 'text', text });
+  }
+
+  const userMsg = userContent.length === 1 && userContent[0].type === 'text'
+    ? text
+    : userContent;
+
+  // Show user bubble
+  const displayText = text || `[Archivo: ${attachedFile?.name}]`;
+  appendMsg('user', displayText, attachedFile?.name);
+
+  conversationHistory.push({
+    role: 'user',
+    content: Array.isArray(userMsg) ? userMsg : text
+  });
+
+  input.value = '';
+  input.style.height = 'auto';
+  removeAttachment();
+
+  // Typing indicator
+  const typingId = appendTyping();
+
+  try {
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': USER_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT + contextoNormativo,
+        messages: conversationHistory
+      })
+    });
+
+    const data = await response.json();
+    removeTyping(typingId);
+
+    if (data.content && data.content[0]) {
+      const aiText = data.content[0].text;
+      appendMsg('ai', aiText);
+      conversationHistory.push({ role: 'assistant', content: aiText });
+    } else {
+      appendMsg('ai', '⚠️ No pude procesar la respuesta. Intentá de nuevo.');
+    }
+  } catch (err) {
+    removeTyping(typingId);
+    appendMsg('ai', '❌ Error de conexión con el servicio IA. Verificá tu conexión.');
+  }
+
+  sendBtn.disabled = false;
+}
+
+function appendMsg(role, text, fileName) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'ai' ? 'CA' : 'U';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  const label = document.createElement('div');
+  label.className = 'label';
+  label.textContent = role === 'ai' ? '// ContaIA · Respuesta' : '// Tu consulta';
+  bubble.appendChild(label);
+
+  if (fileName) {
+    const filePill = document.createElement('div');
+    filePill.style.cssText = 'background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:12px; color:var(--text-dim); margin-bottom:8px; display:inline-block;';
+    filePill.textContent = `📎 ${fileName}`;
+    bubble.appendChild(filePill);
+  }
+
+  const content = document.createElement('div');
+  content.innerHTML = formatMessage(text);
+  bubble.appendChild(content);
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function formatMessage(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, `<code style="background:var(--bg); padding:2px 6px; border-radius:4px; font-family:var(--mono); font-size:12px; color:var(--green);">$1</code>`)
+    .replace(/✅/g, '<span style="color:var(--green)">✅</span>')
+    .replace(/⚠️/g, '<span style="color:var(--amber)">⚠️</span>')
+    .replace(/❌/g, '<span style="color:var(--red)">❌</span>')
+    .replace(/\n\n/g, '</p><p style="margin-top:8px">')
+    .replace(/\n/g, '<br>');
+}
+
+let typingCounter = 0;
+function appendTyping() {
+  const id = 'typing-' + (++typingCounter);
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = id;
+  div.innerHTML = `
+    <div class="msg-avatar">CA</div>
+    <div class="msg-bubble">
+      <div class="label">// ContaIA · Procesando</div>
+      <div class="loading"><span></span><span></span><span></span></div>
+    </div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// === ARCHIVOS ===
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  document.getElementById('drop-zone').classList.remove('dragover');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragover');
+  const files = Array.from(e.dataTransfer.files);
+  files.forEach(addFile);
+}
+
+function handleFiles(e) {
+  Array.from(e.target.files).forEach(addFile);
+}
+
+function addFile(file) {
+  uploadedFiles.push(file);
+  renderFileList();
+  document.getElementById('files-section').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('analysis-section').style.display = 'block';
+    document.getElementById('facturas-count').textContent = uploadedFiles.length;
+  }, 1200);
+}
+
+function getFileIcon(name) {
+  if (name.endsWith('.pdf')) return '📄';
+  if (name.endsWith('.csv')) return '📊';
+  if (name.match(/\.xlsx?/)) return '📈';
+  return '🖼️';
+}
+
+function renderFileList() {
+  const list = document.getElementById('file-list');
+  list.innerHTML = '';
+  uploadedFiles.forEach((file, i) => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `
+      <div class="file-item-icon">${getFileIcon(file.name)}</div>
+      <div class="file-item-info">
+        <div class="file-item-name">${file.name}</div>
+        <div class="file-item-meta">${(file.size/1024).toFixed(0)} KB · ${file.type || 'desconocido'}</div>
+      </div>
+      <div class="file-item-status status-ready">Listo</div>
+      <button class="analyze-btn" onclick="analyzeFile(${i})">Analizar</button>`;
+    list.appendChild(item);
+  });
+}
+
+function analyzeFile(index) {
+  const file = uploadedFiles[index];
+  switchTab('chat');
+  processAttachment(file);
+  document.getElementById('chat-input').value = `Analizá este archivo (${file.name}) y dame un informe contable detallado: importes, alícuotas, retenciones detectadas, y cualquier inconsistencia que veas.`;
+  sendMessage();
+}
+
+// === GRAFICOS ===
+const chartData = {
+  mensual: {
+    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
+    ingresos: [1250000, 1480000, 1320000, 1650000, 1890000, 1720000, 2100000],
+    gastos: [820000, 960000, 890000, 1100000, 1240000, 1150000, 1380000],
+  },
+  trimestral: {
+    labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'],
+    ingresos: [4050000, 5260000, 5100000, 6200000, 5800000],
+    gastos: [2670000, 3350000, 3240000, 4010000, 3760000],
+  },
+  anual: {
+    labels: ['2020', '2021', '2022', '2023', '2024'],
+    ingresos: [12000000, 18500000, 29000000, 45000000, 68000000],
+    gastos: [8500000, 12000000, 19500000, 30000000, 46000000],
+  }
+};
+
+function initCharts() {
+  const d = chartData[currentPeriod];
+  const defaults = {
+    color: '#6B7394',
+    borderColor: '#2E3450',
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  Chart.defaults.color = defaults.color;
+  Chart.defaults.borderColor = defaults.borderColor;
+
+  // Ingresos vs Gastos
+  if (charts.ingresos) charts.ingresos.destroy();
+  charts.ingresos = new Chart(document.getElementById('chart-ingresos'), {
+    type: 'line',
+    data: {
+      labels: d.labels,
+      datasets: [
+        {
+          label: 'Ingresos',
+          data: d.ingresos,
+          borderColor: '#00C896',
+          backgroundColor: 'rgba(0,200,150,0.08)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#00C896',
+          pointRadius: 4,
+        },
+        {
+          label: 'Gastos',
+          data: d.gastos,
+          borderColor: '#E05252',
+          backgroundColor: 'rgba(224,82,82,0.06)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#E05252',
+          pointRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 11 } } } },
+      scales: {
+        x: { grid: { color: '#1C2030' }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
+        y: {
+          grid: { color: '#1C2030' },
+          ticks: {
+            font: { family: 'IBM Plex Mono', size: 11 },
+            callback: v => '$' + (v/1000000).toFixed(1) + 'M'
+          }
+        }
+      }
+    }
+  });
+
+  // IVA Donut
+  if (charts.iva) charts.iva.destroy();
+  charts.iva = new Chart(document.getElementById('chart-iva'), {
+    type: 'doughnut',
+    data: {
+      labels: ['IVA Débito', 'IVA Crédito', 'Saldo Técnico'],
+      datasets: [{
+        data: [284750, 214200, 70550],
+        backgroundColor: ['#00C896', '#4A9EFF', '#F5A623'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 10 }, padding: 12 } }
+      }
+    }
+  });
+
+  // Carga Impositiva
+  if (charts.impuestos) charts.impuestos.destroy();
+  charts.impuestos = new Chart(document.getElementById('chart-impuestos'), {
+    type: 'bar',
+    data: {
+      labels: ['IVA', 'Gan.', 'IIBB', 'Aut.', 'ART'],
+      datasets: [{
+        label: 'Carga mensual',
+        data: [70550, 42100, 28400, 15200, 8900],
+        backgroundColor: ['#00C896','#4A9EFF','#F5A623','#C084FC','#E05252'],
+        borderRadius: 6,
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
+        y: {
+          grid: { color: '#1C2030' },
+          ticks: { font: { family: 'IBM Plex Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' }
+        }
+      }
+    }
+  });
+
+  // Retenciones
+  if (charts.retenciones) charts.retenciones.destroy();
+  charts.retenciones = new Chart(document.getElementById('chart-retenciones'), {
+    type: 'bar',
+    data: {
+      labels: d.labels,
+      datasets: [
+        { label: 'IVA', data: d.ingresos.map(v => Math.round(v * 0.021)), backgroundColor: '#00C896', borderRadius: 4, borderWidth: 0 },
+        { label: 'Ganancias', data: d.ingresos.map(v => Math.round(v * 0.015)), backgroundColor: '#4A9EFF', borderRadius: 4, borderWidth: 0 },
+        { label: 'IIBB', data: d.ingresos.map(v => Math.round(v * 0.009)), backgroundColor: '#F5A623', borderRadius: 4, borderWidth: 0 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 11 } } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
+        y: { stacked: true, grid: { color: '#1C2030' }, ticks: { font: { family: 'IBM Plex Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' } }
+      }
+    }
+  });
+}
+
+function setChartPeriod(period, btn) {
+  currentPeriod = period;
+  document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  initCharts();
+}
+
+// === VENCIMIENTOS ===
+const vencimientos = [
+  { fecha: '07/07/2025', titulo: 'IVA — DDJJ mensual', sub: 'CUIT terminación 0 y 1 · Período junio 2025', dias: 2, monto: '$284.750', urgencia: 'red' },
+  { fecha: '10/07/2025', titulo: 'Ganancias — Anticipo 6°', sub: 'Personas humanas y sucesiones · Período fiscal 2025', dias: 5, monto: '$98.200', urgencia: 'red' },
+  { fecha: '14/07/2025', titulo: 'SUSS — F931 Junio', sub: 'Cargas sociales y aportes · Todos los CUIT', dias: 9, monto: '$156.400', urgencia: 'red' },
+  { fecha: '18/07/2025', titulo: 'IIBB ARBA — Anticipo mensual', sub: 'Régimen general · Período junio 2025', dias: 13, monto: '$42.100', urgencia: 'amber' },
+  { fecha: '21/07/2025', titulo: 'Bienes Personales — Anticipo', sub: 'Período 2025 · Anticipo 5°', dias: 16, monto: '$35.800', urgencia: 'amber' },
+  { fecha: '25/07/2025', titulo: 'Monotributo — Cuota mensual', sub: 'Vencimiento general · Julio 2025', dias: 20, monto: '$18.500', urgencia: 'amber' },
+  { fecha: '31/07/2025', titulo: 'Ingresos Brutos CM — DDJJ', sub: 'Convenio multilateral · Período junio 2025', dias: 26, monto: '$67.300', urgencia: 'green' },
+  { fecha: '05/08/2025', titulo: 'Retenciones IVA — F2002', sub: 'Agentes de retención · Quincena julio', dias: 31, monto: '$29.400', urgencia: 'green' },
+];
+
+function renderVencimientos() {
+  const list = document.getElementById('venc-list');
+  list.innerHTML = '';
+  vencimientos.forEach(v => {
+    const item = document.createElement('div');
+    item.className = 'venc-item';
+    const diasText = v.dias <= 7 ? `En ${v.dias} días` : v.dias <= 15 ? `En ${v.dias} días` : `En ${v.dias} días`;
+    const diasClass = v.urgencia === 'red' ? 'dias-red' : v.urgencia === 'amber' ? 'dias-amber' : 'dias-green';
+    item.innerHTML = `
+      <div class="venc-date" style="color:var(--text-dim)">${v.fecha}</div>
+      <div class="venc-urgency urgency-${v.urgencia}"></div>
+      <div class="venc-info">
+        <div class="venc-title">${v.titulo}</div>
+        <div class="venc-sub">${v.sub}</div>
+      </div>
+      <div class="venc-dias ${diasClass}">${diasText}</div>
+      <div class="venc-monto">${v.monto}</div>`;
+    list.appendChild(item);
+  });
+}
+
+// === INIT ===
+renderVencimientos();
+</script>
+</body>
+</html>
