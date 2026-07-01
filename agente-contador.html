@@ -4,7 +4,134 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FiscoIA — Agente Contable Inteligente</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// === LECTURA DE EXCEL/CSV ===
+function leerExcelYActualizarGraficos(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+
+      // Buscar hoja "Movimientos" o tomar la primera
+      const sheetName = workbook.SheetNames.includes('Movimientos')
+        ? 'Movimientos'
+        : workbook.SheetNames[0];
+
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+      // Buscar fila de encabezados (la que tiene "Fecha" o "fecha")
+      let headerRow = -1;
+      for (let i = 0; i < Math.min(rows.length, 10); i++) {
+        const r = rows[i].map(c => String(c).toLowerCase());
+        if (r.some(c => c.includes('fecha'))) { headerRow = i; break; }
+      }
+
+      if (headerRow === -1) {
+        appendMsg('ai', '⚠️ No encontré los encabezados en el archivo. Verificá que la primera columna se llame "Fecha".');
+        return;
+      }
+
+      const headers = rows[headerRow].map(h => String(h).toLowerCase().trim());
+      const colFecha = headers.findIndex(h => h.includes('fecha'));
+      const colConcepto = headers.findIndex(h => h.includes('concepto'));
+      const colTipo = headers.findIndex(h => h.includes('tipo'));
+      const colNeto = headers.findIndex(h => h.includes('neto'));
+      const colIVA = headers.findIndex(h => h.includes('iva') && !h.includes('ret'));
+      const colTotal = headers.findIndex(h => h.includes('total'));
+      const colRetIVA = headers.findIndex(h => h.includes('ret') && h.includes('iva'));
+      const colRetGan = headers.findIndex(h => h.includes('ganancias') || (h.includes('ret') && h.includes('gan')));
+      const colRetIIBB = headers.findIndex(h => h.includes('iibb') || h.includes('ingresos brutos'));
+
+      // Procesar filas de datos
+      const movimientos = [];
+      for (let i = headerRow + 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row[colFecha] && !row[colNeto]) continue;
+
+        const fecha = row[colFecha] ? String(row[colFecha]) : '';
+        const tipo = colTipo >= 0 ? String(row[colTipo] || '').toLowerCase() : '';
+        const neto = parseFloat(row[colNeto]) || 0;
+        const iva = colIVA >= 0 ? parseFloat(row[colIVA]) || 0 : 0;
+        const total = colTotal >= 0 ? parseFloat(row[colTotal]) || neto + iva : neto + iva;
+        const retIVA = colRetIVA >= 0 ? parseFloat(row[colRetIVA]) || 0 : 0;
+        const retGan = colRetGan >= 0 ? parseFloat(row[colRetGan]) || 0 : 0;
+        const retIIBB = colRetIIBB >= 0 ? parseFloat(row[colRetIIBB]) || 0 : 0;
+
+        movimientos.push({ fecha, tipo, neto, iva, total, retIVA, retGan, retIIBB });
+      }
+
+      if (movimientos.length === 0) {
+        appendMsg('ai', '⚠️ El archivo no tiene datos de movimientos. Verificá que completaste la plantilla.');
+        return;
+      }
+
+      // Agrupar por mes
+      const porMes = {};
+      movimientos.forEach(m => {
+        // Extraer mes de la fecha (DD/MM/AAAA o Date)
+        let mes = 'Sin fecha';
+        const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        if (m.fecha) {
+          const partes = m.fecha.split('/');
+          if (partes.length >= 2) {
+            const mesNum = parseInt(partes[1]) - 1;
+            const anio = partes[2] ? partes[2].substring(2) : '26';
+            mes = `${meses[mesNum] || 'Mes'} ${anio}`;
+          }
+        }
+        if (!porMes[mes]) porMes[mes] = { ingresos: 0, gastos: 0, iva: 0, retIVA: 0, retGan: 0, retIIBB: 0 };
+
+        if (m.tipo.includes('ingreso')) {
+          porMes[mes].ingresos += m.total;
+          porMes[mes].iva += m.iva;
+        } else {
+          porMes[mes].gastos += m.total;
+        }
+        porMes[mes].retIVA += m.retIVA;
+        porMes[mes].retGan += m.retGan;
+        porMes[mes].retIIBB += m.retIIBB;
+      });
+
+      const mesesOrdenados = Object.keys(porMes);
+      const totalIVADebito = movimientos.filter(m => m.tipo.includes('ingreso')).reduce((s, m) => s + m.iva, 0);
+      const totalIVACredito = movimientos.filter(m => !m.tipo.includes('ingreso')).reduce((s, m) => s + m.iva, 0);
+      const totalRetIVA = movimientos.reduce((s, m) => s + m.retIVA, 0);
+      const totalRetGan = movimientos.reduce((s, m) => s + m.retGan, 0);
+      const totalRetIIBB = movimientos.reduce((s, m) => s + m.retIIBB, 0);
+
+      // Actualizar datos reales
+      datosReales = {
+        meses: mesesOrdenados,
+        ingresos: mesesOrdenados.map(m => porMes[m].ingresos),
+        gastos: mesesOrdenados.map(m => porMes[m].gastos),
+        ivaDebito: totalIVADebito,
+        ivaCredito: totalIVACredito,
+        retIva: totalRetIVA,
+        retGanancias: totalRetGan,
+        retIibb: totalRetIIBB,
+      };
+
+      // Actualizar gráficos
+      switchTab('graficos');
+      setTimeout(() => initCharts(), 100);
+
+      // Mensaje en el chat
+      const totalIngresos = Object.values(porMes).reduce((s, m) => s + m.ingresos, 0);
+      const totalGastos = Object.values(porMes).reduce((s, m) => s + m.gastos, 0);
+      const saldoIVA = totalIVADebito - totalIVACredito;
+
+      appendMsg('ai', `✅ **Archivo leído correctamente** — ${movimientos.length} movimientos procesados en ${mesesOrdenados.length} mes(es).\n\n**Resumen del período:**\n📈 Ingresos totales: $${totalIngresos.toLocaleString('es-AR')}\n📉 Gastos totales: $${totalGastos.toLocaleString('es-AR')}\n🧾 IVA Débito: $${totalIVADebito.toLocaleString('es-AR')}\n🧾 IVA Crédito: $${totalIVACredito.toLocaleString('es-AR')}\n${saldoIVA >= 0 ? '⚠️' : '✅'} Saldo IVA: $${Math.abs(saldoIVA).toLocaleString('es-AR')} ${saldoIVA >= 0 ? '(a pagar)' : '(a favor)'}\n\nLos gráficos se actualizaron con tus datos reales. ¿Querés que analice algo en particular?`);
+
+    } catch(err) {
+      appendMsg('ai', `❌ Error al leer el archivo: ${err.message}. Verificá que sea la plantilla FiscoIA en formato .xlsx`);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -1071,6 +1198,11 @@
       <input type="file" id="file-input" multiple accept=".pdf,.csv,.xlsx,.xls,.png,.jpg" onchange="handleFiles(event)">
     </div>
 
+    <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+      <a href="FiscoIA-Plantilla-Movimientos.xlsx" download style="background:var(--green); color:#0F1117; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">📥 Descargar plantilla Excel</a>
+      <div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center;">Completá la plantilla y subila acá — los gráficos se actualizan solos</div>
+    </div>
+
     <div id="files-section" style="display:none;">
       <div class="section-title">Archivos cargados</div>
       <div class="file-list" id="file-list"></div>
@@ -1450,6 +1582,16 @@ function sendToChat(text) {
 function handleChatAttachment(event) {
   const file = event.target.files[0];
   if (!file) return;
+
+  // Si es Excel o CSV → leer y actualizar gráficos automáticamente
+  const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+  const isCSV = file.name.endsWith('.csv');
+
+  if (isExcel || isCSV) {
+    leerExcelYActualizarGraficos(file);
+    return;
+  }
+
   processAttachment(file);
 }
 
