@@ -1616,36 +1616,9 @@ async function tryEnter() {
     return;
   }
 
-  const btn = document.getElementById('enter-btn');
-  const txt = document.getElementById('enter-text');
-  btn.disabled = true;
-  txt.textContent = 'Verificando key...';
-
-  // Validate with a minimal API call
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'ok' }] })
-    });
-    if (res.status === 401 || res.status === 403) {
-      document.getElementById('key-error').style.display = 'block';
-      btn.disabled = false;
-      txt.textContent = 'Ingresar al agente →';
-      return;
-    }
-  } catch(e) {
-    // Network error — let them in anyway, will fail on first message
-  }
-
   USER_API_KEY = key;
   sessionStorage.setItem('fiscoia_key', key);
-
-  // Show masked key in header
   document.getElementById('key-display').textContent = key.slice(0,10) + '···' + key.slice(-4);
-
-  btn.disabled = false;
-  txt.textContent = 'Ingresar al agente →';
   document.getElementById('onboarding').style.display = 'none';
 }
 
@@ -2049,3 +2022,218 @@ function analyzeFile(index) {
   switchTab('chat');
   processAttachment(file);
   document.getElementById('chat-input').value = `Analizá este archivo (${file.name}) y dame un informe contable detallado: importes, alícuotas, retenciones detectadas, y cualquier inconsistencia que veas.`;
+  sendMessage();
+}
+
+// === GRAFICOS ===
+const chartData = {
+  mensual: {
+    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
+    ingresos: [1250000, 1480000, 1320000, 1650000, 1890000, 1720000, 2100000],
+    gastos: [820000, 960000, 890000, 1100000, 1240000, 1150000, 1380000],
+  },
+  trimestral: {
+    labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'],
+    ingresos: [4050000, 5260000, 5100000, 6200000, 5800000],
+    gastos: [2670000, 3350000, 3240000, 4010000, 3760000],
+  },
+  anual: {
+    labels: ['2020', '2021', '2022', '2023', '2024'],
+    ingresos: [12000000, 18500000, 29000000, 45000000, 68000000],
+    gastos: [8500000, 12000000, 19500000, 30000000, 46000000],
+  }
+};
+
+function initCharts() {
+  const d = datosReales ? {
+    labels: datosReales.meses,
+    ingresos: datosReales.ingresos,
+    gastos: datosReales.gastos,
+  } : chartData[currentPeriod];
+  const defaults = {
+    color: '#6B7394',
+    borderColor: '#2E3450',
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  Chart.defaults.color = defaults.color;
+  Chart.defaults.borderColor = defaults.borderColor;
+
+  // Ingresos vs Gastos
+  if (charts.ingresos) charts.ingresos.destroy();
+  charts.ingresos = new Chart(document.getElementById('chart-ingresos'), {
+    type: 'line',
+    data: {
+      labels: d.labels,
+      datasets: [
+        {
+          label: 'Ingresos',
+          data: d.ingresos,
+          borderColor: '#00C896',
+          backgroundColor: 'rgba(0,200,150,0.08)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#00C896',
+          pointRadius: 4,
+        },
+        {
+          label: 'Gastos',
+          data: d.gastos,
+          borderColor: '#E05252',
+          backgroundColor: 'rgba(224,82,82,0.06)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#E05252',
+          pointRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 11 } } } },
+      scales: {
+        x: { grid: { color: '#1C2030' }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
+        y: {
+          grid: { color: '#1C2030' },
+          ticks: {
+            font: { family: 'IBM Plex Mono', size: 11 },
+            callback: v => '$' + (v/1000000).toFixed(1) + 'M'
+          }
+        }
+      }
+    }
+  });
+
+  // IVA Donut
+  if (charts.iva) charts.iva.destroy();
+  const ivaD = datosReales ? datosReales.ivaDebito : 284750;
+  const ivaC = datosReales ? datosReales.ivaCredito : 214200;
+  const ivaSaldo = Math.abs(ivaD - ivaC);
+  charts.iva = new Chart(document.getElementById('chart-iva'), {
+    type: 'doughnut',
+    data: {
+      labels: ['IVA Débito', 'IVA Crédito', 'Saldo Técnico'],
+      datasets: [{
+        data: [ivaD, ivaC, ivaSaldo],
+        backgroundColor: ['#00C896', '#4A9EFF', '#F5A623'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 10 }, padding: 12 } }
+      }
+    }
+  });
+
+  // Carga Impositiva
+  if (charts.impuestos) charts.impuestos.destroy();
+  charts.impuestos = new Chart(document.getElementById('chart-impuestos'), {
+    type: 'bar',
+    data: {
+      labels: ['IVA', 'Gan.', 'IIBB', 'Aut.', 'ART'],
+      datasets: [{
+        label: 'Carga mensual',
+        data: [70550, 42100, 28400, 15200, 8900],
+        backgroundColor: ['#00C896','#4A9EFF','#F5A623','#C084FC','#E05252'],
+        borderRadius: 6,
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
+        y: {
+          grid: { color: '#1C2030' },
+          ticks: { font: { family: 'IBM Plex Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' }
+        }
+      }
+    }
+  });
+
+  // Retenciones
+  if (charts.retenciones) charts.retenciones.destroy();
+  const retIvaData = datosReales 
+    ? d.labels.map(() => datosReales.retIva)
+    : d.ingresos.map(v => Math.round(v * 0.021));
+  const retGanData = datosReales
+    ? d.labels.map(() => datosReales.retGanancias)
+    : d.ingresos.map(v => Math.round(v * 0.015));
+  const retIibbData = datosReales
+    ? d.labels.map(() => datosReales.retIibb)
+    : d.ingresos.map(v => Math.round(v * 0.009));
+  charts.retenciones = new Chart(document.getElementById('chart-retenciones'), {
+    type: 'bar',
+    data: {
+      labels: d.labels,
+      datasets: [
+        { label: 'IVA', data: retIvaData, backgroundColor: '#00C896', borderRadius: 4, borderWidth: 0 },
+        { label: 'Ganancias', data: retGanData, backgroundColor: '#4A9EFF', borderRadius: 4, borderWidth: 0 },
+        { label: 'IIBB', data: retIibbData, backgroundColor: '#F5A623', borderRadius: 4, borderWidth: 0 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 11 } } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
+        y: { stacked: true, grid: { color: '#1C2030' }, ticks: { font: { family: 'IBM Plex Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' } }
+      }
+    }
+  });
+}
+
+function setChartPeriod(period, btn) {
+  currentPeriod = period;
+  document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  initCharts();
+}
+
+// === VENCIMIENTOS ===
+const vencimientos = [
+  { fecha: '07/07/2026', titulo: 'IVA — DDJJ mensual', sub: 'CUIT terminación 0 y 1 · Período junio 2026', dias: 2, monto: '$284.750', urgencia: 'red' },
+  { fecha: '10/07/2026', titulo: 'Ganancias — Anticipo 6°', sub: 'Personas humanas y sucesiones · Período fiscal 2026', dias: 5, monto: '$98.200', urgencia: 'red' },
+  { fecha: '14/07/2026', titulo: 'SUSS — F931 Junio', sub: 'Cargas sociales y aportes · Todos los CUIT', dias: 9, monto: '$156.400', urgencia: 'red' },
+  { fecha: '18/07/2026', titulo: 'IIBB ARBA — Anticipo mensual', sub: 'Régimen general · Período junio 2026', dias: 13, monto: '$42.100', urgencia: 'amber' },
+  { fecha: '21/07/2026', titulo: 'Bienes Personales — Anticipo', sub: 'Período 2026 · Anticipo 5°', dias: 16, monto: '$35.800', urgencia: 'amber' },
+  { fecha: '25/07/2026', titulo: 'Monotributo — Cuota mensual', sub: 'Vencimiento general · Julio 2026', dias: 20, monto: '$18.500', urgencia: 'amber' },
+  { fecha: '31/07/2026', titulo: 'Ingresos Brutos CM — DDJJ', sub: 'Convenio multilateral · Período junio 2026', dias: 26, monto: '$67.300', urgencia: 'green' },
+  { fecha: '05/08/2026', titulo: 'Retenciones IVA — F2002', sub: 'Agentes de retención · Quincena julio', dias: 31, monto: '$29.400', urgencia: 'green' },
+];
+
+function renderVencimientos() {
+  const list = document.getElementById('venc-list');
+  list.innerHTML = '';
+  vencimientos.forEach(v => {
+    const item = document.createElement('div');
+    item.className = 'venc-item';
+    const diasText = v.dias <= 7 ? `En ${v.dias} días` : v.dias <= 15 ? `En ${v.dias} días` : `En ${v.dias} días`;
+    const diasClass = v.urgencia === 'red' ? 'dias-red' : v.urgencia === 'amber' ? 'dias-amber' : 'dias-green';
+    item.innerHTML = `
+      <div class="venc-date" style="color:var(--text-dim)">${v.fecha}</div>
+      <div class="venc-urgency urgency-${v.urgencia}"></div>
+      <div class="venc-info">
+        <div class="venc-title">${v.titulo}</div>
+        <div class="venc-sub">${v.sub}</div>
+      </div>
+      <div class="venc-dias ${diasClass}">${diasText}</div>
+      <div class="venc-monto">${v.monto}</div>`;
+    list.appendChild(item);
+  });
+}
+
+// === INIT ===
+renderVencimientos();
+</script>
+</body>
+</html>
