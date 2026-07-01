@@ -112,6 +112,7 @@ function leerExcelYActualizarGraficos(file) {
         retIva: totalRetIVA,
         retGanancias: totalRetGan,
         retIibb: totalRetIIBB,
+        movimientos: movimientos, // Guardamos todos los movimientos para exportar a ARCA
       };
 
       // Actualizar gráficos
@@ -1200,6 +1201,7 @@ function leerExcelYActualizarGraficos(file) {
 
     <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
       <a href="FiscoIA-Plantilla-Movimientos.xlsx" download style="background:var(--green); color:#0F1117; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">📥 Descargar plantilla Excel</a>
+      <button onclick="exportarParaARCA()" style="background:var(--blue); border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📤 Exportar TXT para ARCA</button>
       <div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center;">Completá la plantilla y subila acá — los gráficos se actualizan solos</div>
     </div>
 
@@ -1355,7 +1357,220 @@ function leerExcelYActualizarGraficos(file) {
 </div>
 
 <script>
-// === ACTUALIZACIONES NORMATIVAS (desde n8n) ===
+// === GENERADOR TXT LIBRO IVA DIGITAL ARCA ===
+
+function formatNum(valor, enteros, decimales) {
+  // Convierte número a formato ARCA: sin punto decimal, ceros a izquierda
+  const total = enteros + decimales;
+  const num = Math.round(Math.abs(valor) * Math.pow(10, decimales));
+  return num.toString().padStart(total, '0');
+}
+
+function formatStr(str, largo) {
+  return String(str || '').substring(0, largo).padEnd(largo, ' ');
+}
+
+function formatNumRight(num, largo) {
+  return String(Math.round(num) || 0).padStart(largo, '0');
+}
+
+function generarTXTVentas(movimientos, cuitEmpresa) {
+  let lineaVentas = '';
+  let lineaAlicuotas = '';
+
+  const ventas = movimientos.filter(m => m.tipo === 'ingreso');
+
+  ventas.forEach((m, idx) => {
+    const nroComp = String(idx + 1).padStart(20, '0');
+    const ptaVenta = '00001';
+    const tipoComp = '001'; // Factura A
+    const fecha = m.fecha.split('/').reverse().join(''); // AAAAMMDD
+    const cuitComprador = (m.cuitComprador || '00000000000').replace(/[-]/g, '').padStart(20, '0');
+    const nombreComprador = formatStr(m.concepto || 'VARIOS', 30);
+    const total = formatNum(m.total || 0, 13, 2);
+    const noGravado = formatNum(0, 13, 2);
+    const percepNoCateg = formatNum(0, 13, 2);
+    const exento = formatNum(0, 13, 2);
+    const percepNac = formatNum(0, 13, 2);
+    const percepIIBB = formatNum(m.retIIBB || 0, 13, 2);
+    const percepMunic = formatNum(0, 13, 2);
+    const impInt = formatNum(0, 13, 2);
+    const moneda = 'PES';
+    const tipoCambio = '0001000000'; // 1.000000
+    const cantAlicuotas = m.iva > 0 ? '1' : '0';
+    const codOperacion = ' ';
+    const otrosTrib = formatNum(0, 13, 2);
+    const fechaVto = fecha;
+
+    // Línea cabecera ventas (266 chars)
+    const lineaCabecera =
+      fecha +           // 1-8
+      tipoComp +        // 9-11
+      ptaVenta +        // 12-16
+      nroComp +         // 17-36
+      nroComp +         // 37-56 (hasta = mismo)
+      '80' +            // 57-58 cod documento (CUIT)
+      cuitComprador +   // 59-78
+      nombreComprador + // 79-108
+      total +           // 109-123
+      noGravado +       // 124-138
+      percepNoCateg +   // 139-153
+      exento +          // 154-168
+      percepNac +       // 169-183
+      percepIIBB +      // 184-198
+      percepMunic +     // 199-213
+      impInt +          // 214-228
+      moneda +          // 229-231
+      tipoCambio +      // 232-241
+      cantAlicuotas +   // 242
+      codOperacion +    // 243
+      otrosTrib +       // 244-258
+      fechaVto;         // 259-266
+
+    lineaVentas += lineaCabecera + '\r\n';
+
+    // Línea alícuotas ventas (62 chars) — solo si tiene IVA
+    if (m.iva > 0) {
+      const neto = formatNum(m.neto || 0, 13, 2);
+      const alicuota = '0021'; // 21%
+      const ivaLiquidado = formatNum(m.iva || 0, 13, 2);
+
+      const lineaAlic =
+        tipoComp +    // 1-3
+        ptaVenta +    // 4-8
+        nroComp +     // 9-28
+        neto +        // 29-43
+        alicuota +    // 44-47
+        ivaLiquidado; // 48-62
+
+      lineaAlicuotas += lineaAlic + '\r\n';
+    }
+  });
+
+  return { ventas: lineaVentas, alicuotasVentas: lineaAlicuotas };
+}
+
+function generarTXTCompras(movimientos, cuitEmpresa) {
+  let lineaCompras = '';
+  let lineaAlicuotas = '';
+
+  const compras = movimientos.filter(m => m.tipo === 'gasto');
+
+  compras.forEach((m, idx) => {
+    const nroComp = String(idx + 1).padStart(20, '0');
+    const ptaVenta = '00001';
+    const tipoComp = '001'; // Factura A
+    const fecha = m.fecha.split('/').reverse().join('');
+    const cuitVendedor = (m.cuitVendedor || '00000000000').replace(/[-]/g, '').padStart(20, '0');
+    const nombreVendedor = formatStr(m.concepto || 'VARIOS', 30);
+    const total = formatNum(m.total || 0, 13, 2);
+    const noGravado = formatNum(0, 13, 2);
+    const exento = formatNum(0, 13, 2);
+    const percepIVA = formatNum(m.retIVA || 0, 13, 2);
+    const percepNac = formatNum(0, 13, 2);
+    const percepIIBB = formatNum(m.retIIBB || 0, 13, 2);
+    const percepMunic = formatNum(0, 13, 2);
+    const impInt = formatNum(0, 13, 2);
+    const moneda = 'PES';
+    const tipoCambio = '0001000000';
+    const cantAlicuotas = m.iva > 0 ? '1' : '0';
+    const codOperacion = ' ';
+    const creditoFiscal = formatNum(m.iva || 0, 13, 2);
+    const otrosTrib = formatNum(m.retGan || 0, 13, 2);
+    const cuitCorredor = '00000000000';
+    const nomCorredor = formatStr('', 30);
+    const ivaComision = formatNum(0, 13, 2);
+    const despacho = formatStr('', 16);
+
+    // Línea cabecera compras (325 chars)
+    const lineaCabecera =
+      fecha +           // 1-8
+      tipoComp +        // 9-11
+      ptaVenta +        // 12-16
+      nroComp +         // 17-36
+      despacho +        // 37-52
+      '80' +            // 53-54
+      cuitVendedor +    // 55-74
+      nombreVendedor +  // 75-104
+      total +           // 105-119
+      noGravado +       // 120-134
+      exento +          // 135-149
+      percepIVA +       // 150-164
+      percepNac +       // 165-179
+      percepIIBB +      // 180-194
+      percepMunic +     // 195-209
+      impInt +          // 210-224
+      moneda +          // 225-227
+      tipoCambio +      // 228-237
+      cantAlicuotas +   // 238
+      codOperacion +    // 239
+      creditoFiscal +   // 240-254
+      otrosTrib +       // 255-269
+      cuitCorredor +    // 270-280
+      nomCorredor +     // 281-310
+      ivaComision;      // 311-325
+
+    lineaCompras += lineaCabecera + '\r\n';
+
+    // Alícuotas compras (84 chars)
+    if (m.iva > 0) {
+      const cuitVend20 = cuitVendedor.substring(0, 20);
+      const neto = formatNum(m.neto || 0, 13, 2);
+      const alicuota = '0021';
+      const ivaLiq = formatNum(m.iva || 0, 13, 2);
+
+      const lineaAlic =
+        tipoComp +    // 1-3
+        ptaVenta +    // 4-8
+        nroComp +     // 9-28
+        '80' +        // 29-30
+        cuitVend20 +  // 31-50
+        neto +        // 51-65
+        alicuota +    // 66-69
+        ivaLiq;       // 70-84
+
+      lineaAlicuotas += lineaAlic + '\r\n';
+    }
+  });
+
+  return { compras: lineaCompras, alicuotasCompras: lineaAlicuotas };
+}
+
+function descargarTXT(contenido, nombre) {
+  // ANSI encoding (Latin-1)
+  const bytes = [];
+  for (let i = 0; i < contenido.length; i++) {
+    bytes.push(contenido.charCodeAt(i) & 0xff);
+  }
+  const blob = new Blob([new Uint8Array(bytes)], { type: 'text/plain;charset=ansi' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nombre;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportarParaARCA() {
+  if (!datosReales || !datosReales.movimientos || datosReales.movimientos.length === 0) {
+    appendMsg('ai', '⚠️ Primero subí tu planilla Excel con los movimientos para poder exportar los archivos para ARCA.');
+    switchTab('chat');
+    return;
+  }
+
+  const cuit = prompt('Ingresá el CUIT de tu empresa (solo números, sin guiones):') || '00000000000';
+  const { ventas, alicuotasVentas } = generarTXTVentas(datosReales.movimientos, cuit);
+  const { compras, alicuotasCompras } = generarTXTCompras(datosReales.movimientos, cuit);
+
+  if (ventas) descargarTXT(ventas, 'LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt');
+  if (alicuotasVentas) descargarTXT(alicuotasVentas, 'LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt');
+  if (compras) descargarTXT(compras, 'LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt');
+  if (alicuotasCompras) descargarTXT(alicuotasCompras, 'LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt');
+
+  switchTab('chat');
+  appendMsg('ai', `✅ **4 archivos TXT generados para ARCA — Libro IVA Digital**\n\n📄 LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt\n\n**Para importar en ARCA:**\n1. Entrás a arca.gob.ar → Servicios → Libro IVA Digital\n2. Seleccionás el período\n3. Importás cada archivo en el módulo correspondiente\n4. Los importes están en pesos, formato ANSI, longitud fija\n\n⚠️ **Importante:** Verificá los CUIT de tus clientes/proveedores antes de presentar. Los dejé en 00000000000 donde no estaban en la planilla — hay que completarlos manualmente.`);
+}
+
 let contextoNormativo = '';
 
 async function cargarActualizacionesNormativas() {
@@ -1834,218 +2049,3 @@ function analyzeFile(index) {
   switchTab('chat');
   processAttachment(file);
   document.getElementById('chat-input').value = `Analizá este archivo (${file.name}) y dame un informe contable detallado: importes, alícuotas, retenciones detectadas, y cualquier inconsistencia que veas.`;
-  sendMessage();
-}
-
-// === GRAFICOS ===
-const chartData = {
-  mensual: {
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
-    ingresos: [1250000, 1480000, 1320000, 1650000, 1890000, 1720000, 2100000],
-    gastos: [820000, 960000, 890000, 1100000, 1240000, 1150000, 1380000],
-  },
-  trimestral: {
-    labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'],
-    ingresos: [4050000, 5260000, 5100000, 6200000, 5800000],
-    gastos: [2670000, 3350000, 3240000, 4010000, 3760000],
-  },
-  anual: {
-    labels: ['2020', '2021', '2022', '2023', '2024'],
-    ingresos: [12000000, 18500000, 29000000, 45000000, 68000000],
-    gastos: [8500000, 12000000, 19500000, 30000000, 46000000],
-  }
-};
-
-function initCharts() {
-  const d = datosReales ? {
-    labels: datosReales.meses,
-    ingresos: datosReales.ingresos,
-    gastos: datosReales.gastos,
-  } : chartData[currentPeriod];
-  const defaults = {
-    color: '#6B7394',
-    borderColor: '#2E3450',
-    responsive: true,
-    maintainAspectRatio: false,
-  };
-
-  Chart.defaults.color = defaults.color;
-  Chart.defaults.borderColor = defaults.borderColor;
-
-  // Ingresos vs Gastos
-  if (charts.ingresos) charts.ingresos.destroy();
-  charts.ingresos = new Chart(document.getElementById('chart-ingresos'), {
-    type: 'line',
-    data: {
-      labels: d.labels,
-      datasets: [
-        {
-          label: 'Ingresos',
-          data: d.ingresos,
-          borderColor: '#00C896',
-          backgroundColor: 'rgba(0,200,150,0.08)',
-          borderWidth: 2,
-          tension: 0.4,
-          fill: true,
-          pointBackgroundColor: '#00C896',
-          pointRadius: 4,
-        },
-        {
-          label: 'Gastos',
-          data: d.gastos,
-          borderColor: '#E05252',
-          backgroundColor: 'rgba(224,82,82,0.06)',
-          borderWidth: 2,
-          tension: 0.4,
-          fill: true,
-          pointBackgroundColor: '#E05252',
-          pointRadius: 4,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 11 } } } },
-      scales: {
-        x: { grid: { color: '#1C2030' }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
-        y: {
-          grid: { color: '#1C2030' },
-          ticks: {
-            font: { family: 'IBM Plex Mono', size: 11 },
-            callback: v => '$' + (v/1000000).toFixed(1) + 'M'
-          }
-        }
-      }
-    }
-  });
-
-  // IVA Donut
-  if (charts.iva) charts.iva.destroy();
-  const ivaD = datosReales ? datosReales.ivaDebito : 284750;
-  const ivaC = datosReales ? datosReales.ivaCredito : 214200;
-  const ivaSaldo = Math.abs(ivaD - ivaC);
-  charts.iva = new Chart(document.getElementById('chart-iva'), {
-    type: 'doughnut',
-    data: {
-      labels: ['IVA Débito', 'IVA Crédito', 'Saldo Técnico'],
-      datasets: [{
-        data: [ivaD, ivaC, ivaSaldo],
-        backgroundColor: ['#00C896', '#4A9EFF', '#F5A623'],
-        borderWidth: 0,
-        hoverOffset: 4
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 10 }, padding: 12 } }
-      }
-    }
-  });
-
-  // Carga Impositiva
-  if (charts.impuestos) charts.impuestos.destroy();
-  charts.impuestos = new Chart(document.getElementById('chart-impuestos'), {
-    type: 'bar',
-    data: {
-      labels: ['IVA', 'Gan.', 'IIBB', 'Aut.', 'ART'],
-      datasets: [{
-        label: 'Carga mensual',
-        data: [70550, 42100, 28400, 15200, 8900],
-        backgroundColor: ['#00C896','#4A9EFF','#F5A623','#C084FC','#E05252'],
-        borderRadius: 6,
-        borderWidth: 0,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
-        y: {
-          grid: { color: '#1C2030' },
-          ticks: { font: { family: 'IBM Plex Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' }
-        }
-      }
-    }
-  });
-
-  // Retenciones
-  if (charts.retenciones) charts.retenciones.destroy();
-  const retIvaData = datosReales 
-    ? d.labels.map(() => datosReales.retIva)
-    : d.ingresos.map(v => Math.round(v * 0.021));
-  const retGanData = datosReales
-    ? d.labels.map(() => datosReales.retGanancias)
-    : d.ingresos.map(v => Math.round(v * 0.015));
-  const retIibbData = datosReales
-    ? d.labels.map(() => datosReales.retIibb)
-    : d.ingresos.map(v => Math.round(v * 0.009));
-  charts.retenciones = new Chart(document.getElementById('chart-retenciones'), {
-    type: 'bar',
-    data: {
-      labels: d.labels,
-      datasets: [
-        { label: 'IVA', data: retIvaData, backgroundColor: '#00C896', borderRadius: 4, borderWidth: 0 },
-        { label: 'Ganancias', data: retGanData, backgroundColor: '#4A9EFF', borderRadius: 4, borderWidth: 0 },
-        { label: 'IIBB', data: retIibbData, backgroundColor: '#F5A623', borderRadius: 4, borderWidth: 0 },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: '#6B7394', font: { family: 'IBM Plex Mono', size: 11 } } }
-      },
-      scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'IBM Plex Mono', size: 11 } } },
-        y: { stacked: true, grid: { color: '#1C2030' }, ticks: { font: { family: 'IBM Plex Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' } }
-      }
-    }
-  });
-}
-
-function setChartPeriod(period, btn) {
-  currentPeriod = period;
-  document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  initCharts();
-}
-
-// === VENCIMIENTOS ===
-const vencimientos = [
-  { fecha: '07/07/2026', titulo: 'IVA — DDJJ mensual', sub: 'CUIT terminación 0 y 1 · Período junio 2026', dias: 2, monto: '$284.750', urgencia: 'red' },
-  { fecha: '10/07/2026', titulo: 'Ganancias — Anticipo 6°', sub: 'Personas humanas y sucesiones · Período fiscal 2026', dias: 5, monto: '$98.200', urgencia: 'red' },
-  { fecha: '14/07/2026', titulo: 'SUSS — F931 Junio', sub: 'Cargas sociales y aportes · Todos los CUIT', dias: 9, monto: '$156.400', urgencia: 'red' },
-  { fecha: '18/07/2026', titulo: 'IIBB ARBA — Anticipo mensual', sub: 'Régimen general · Período junio 2026', dias: 13, monto: '$42.100', urgencia: 'amber' },
-  { fecha: '21/07/2026', titulo: 'Bienes Personales — Anticipo', sub: 'Período 2026 · Anticipo 5°', dias: 16, monto: '$35.800', urgencia: 'amber' },
-  { fecha: '25/07/2026', titulo: 'Monotributo — Cuota mensual', sub: 'Vencimiento general · Julio 2026', dias: 20, monto: '$18.500', urgencia: 'amber' },
-  { fecha: '31/07/2026', titulo: 'Ingresos Brutos CM — DDJJ', sub: 'Convenio multilateral · Período junio 2026', dias: 26, monto: '$67.300', urgencia: 'green' },
-  { fecha: '05/08/2026', titulo: 'Retenciones IVA — F2002', sub: 'Agentes de retención · Quincena julio', dias: 31, monto: '$29.400', urgencia: 'green' },
-];
-
-function renderVencimientos() {
-  const list = document.getElementById('venc-list');
-  list.innerHTML = '';
-  vencimientos.forEach(v => {
-    const item = document.createElement('div');
-    item.className = 'venc-item';
-    const diasText = v.dias <= 7 ? `En ${v.dias} días` : v.dias <= 15 ? `En ${v.dias} días` : `En ${v.dias} días`;
-    const diasClass = v.urgencia === 'red' ? 'dias-red' : v.urgencia === 'amber' ? 'dias-amber' : 'dias-green';
-    item.innerHTML = `
-      <div class="venc-date" style="color:var(--text-dim)">${v.fecha}</div>
-      <div class="venc-urgency urgency-${v.urgencia}"></div>
-      <div class="venc-info">
-        <div class="venc-title">${v.titulo}</div>
-        <div class="venc-sub">${v.sub}</div>
-      </div>
-      <div class="venc-dias ${diasClass}">${diasText}</div>
-      <div class="venc-monto">${v.monto}</div>`;
-    list.appendChild(item);
-  });
-}
-
-// === INIT ===
-renderVencimientos();
-</script>
-</body>
-</html>
