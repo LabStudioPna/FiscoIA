@@ -956,7 +956,7 @@
 <div id="onboarding">
   <div class="onboarding-card">
     <div class="onboarding-logo">F</div>
-    <div class="onboarding-title">FISCO<span style="color:#fff">IA</span></div>
+    <div class="onboarding-title">CONTA<span style="color:#fff">IA</span></div>
     <div class="onboarding-sub">Tu asistente contable e impositivo con IA.<br>Analizá facturas, consultá impuestos argentinos y visualizá reportes.</div>
 
     <div class="onboarding-features">
@@ -992,7 +992,7 @@
   <div class="logo">
     <div class="logo-icon">F</div>
     <div>
-      <div class="logo-text">FISCO<span style="color:#fff">IA</span></div>
+      <div class="logo-text">CONTA<span style="color:#fff">IA</span></div>
       <div class="logo-sub">Agente Contable Inteligente</div>
     </div>
   </div>
@@ -1107,16 +1107,62 @@
     </div>
   </div>
 
+  <!-- MODAL CARGAR DATOS -->
+  <div id="modal-datos" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div style="font-family:var(--mono); font-size:13px; color:var(--green); letter-spacing:1px;">// CARGAR MIS DATOS REALES</div>
+        <button onclick="cerrarModal()" style="background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer;">✕</button>
+      </div>
+      <div style="font-size:13px; color:var(--text-dim); margin-bottom:20px; line-height:1.6;">Ingresá tus ingresos y gastos mensuales. Los gráficos se actualizan al instante con tus datos reales.</div>
+      
+      <div id="filas-datos"></div>
+      
+      <button onclick="agregarFila()" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 16px; color:var(--text-dim); font-size:13px; cursor:pointer; margin-bottom:20px; font-family:var(--sans); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">+ Agregar mes</button>
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-family:var(--mono); letter-spacing:1px;">IVA DÉBITO ($)</div>
+          <input id="iva-debito" type="number" placeholder="284750" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-family:var(--mono); font-size:13px; outline:none;">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-family:var(--mono); letter-spacing:1px;">IVA CRÉDITO ($)</div>
+          <input id="iva-credito" type="number" placeholder="214200" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-family:var(--mono); font-size:13px; outline:none;">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-family:var(--mono); letter-spacing:1px;">RET. IVA ($)</div>
+          <input id="ret-iva" type="number" placeholder="42000" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-family:var(--mono); font-size:13px; outline:none;">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-family:var(--mono); letter-spacing:1px;">RET. GANANCIAS ($)</div>
+          <input id="ret-ganancias" type="number" placeholder="28000" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-family:var(--mono); font-size:13px; outline:none;">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-family:var(--mono); letter-spacing:1px;">RET. IIBB ($)</div>
+          <input id="ret-iibb" type="number" placeholder="15000" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-family:var(--mono); font-size:13px; outline:none;">
+        </div>
+      </div>
+
+      <button onclick="aplicarDatos()" style="width:100%; background:var(--green); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:600; color:#0F1117; cursor:pointer; font-family:var(--sans); transition:all 0.2s;">Actualizar gráficos →</button>
+    </div>
+  </div>
+
   <!-- GRAFICOS -->
   <div class="panel" id="panel-graficos">
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
       <div>
         <div class="section-title">Panel Visual</div>
       </div>
-      <div class="chart-controls">
-        <button class="chart-btn active" onclick="setChartPeriod('mensual', this)">Mensual</button>
-        <button class="chart-btn" onclick="setChartPeriod('trimestral', this)">Trimestral</button>
-        <button class="chart-btn" onclick="setChartPeriod('anual', this)">Anual</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <button onclick="abrirModal()" style="background:var(--green); border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:600; color:#0F1117; cursor:pointer; font-family:var(--sans); display:flex; align-items:center; gap:6px;">📥 Cargar mis datos</button>
+        <div class="chart-controls">
+          <button class="chart-btn active" onclick="setChartPeriod('mensual', this)">Mensual</button>
+          <button class="chart-btn" onclick="setChartPeriod('trimestral', this)">Trimestral</button>
+          <button class="chart-btn" onclick="setChartPeriod('anual', this)">Anual</button>
+        </div>
       </div>
     </div>
 
@@ -1246,7 +1292,7 @@ async function tryEnter() {
   }
 
   USER_API_KEY = key;
-  sessionStorage.setItem('contaia_key', key);
+  sessionStorage.setItem('fiscoia_key', key);
 
   // Show masked key in header
   document.getElementById('key-display').textContent = key.slice(0,10) + '···' + key.slice(-4);
@@ -1258,14 +1304,14 @@ async function tryEnter() {
 
 function changeKey() {
   USER_API_KEY = '';
-  sessionStorage.removeItem('contaia_key');
+  sessionStorage.removeItem('fiscoia_key');
   document.getElementById('api-key-input').value = '';
   document.getElementById('onboarding').style.display = 'flex';
 }
 
 // Check session storage on load
 (function() {
-  const saved = sessionStorage.getItem('contaia_key');
+  const saved = sessionStorage.getItem('fiscoia_key');
   if (saved && saved.startsWith('sk-ant-')) {
     USER_API_KEY = saved;
     document.getElementById('api-key-input').value = saved;
@@ -1273,6 +1319,62 @@ function changeKey() {
     document.getElementById('onboarding').style.display = 'none';
   }
 })();
+
+// === MODAL DATOS REALES ===
+let datosReales = null;
+
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function abrirModal() {
+  const modal = document.getElementById('modal-datos');
+  modal.style.display = 'flex';
+  if (document.getElementById('filas-datos').children.length === 0) {
+    // Agregar 3 filas de ejemplo
+    agregarFila('Ene 2026', '', '');
+    agregarFila('Feb 2026', '', '');
+    agregarFila('Mar 2026', '', '');
+  }
+}
+
+function cerrarModal() {
+  document.getElementById('modal-datos').style.display = 'none';
+}
+
+function agregarFila(mes='', ingresos='', gastos='') {
+  const container = document.getElementById('filas-datos');
+  const idx = container.children.length;
+  const mesSugerido = mes || (MESES[idx % 12] + ' 2026');
+  
+  const row = document.createElement('div');
+  row.style.cssText = 'display:grid; grid-template-columns:2fr 3fr 3fr auto; gap:8px; margin-bottom:8px; align-items:center;';
+  row.innerHTML = `
+    <input type="text" placeholder="${mesSugerido}" value="${mes}" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 10px; color:var(--text); font-family:var(--mono); font-size:12px; outline:none;" class="dato-mes">
+    <input type="number" placeholder="Ingresos $" value="${ingresos}" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 10px; color:var(--green); font-family:var(--mono); font-size:12px; outline:none;" class="dato-ingreso">
+    <input type="number" placeholder="Gastos $" value="${gastos}" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 10px; color:var(--red); font-family:var(--mono); font-size:12px; outline:none;" class="dato-gasto">
+    <button onclick="this.parentElement.remove()" style="background:var(--red-dim); border:1px solid rgba(224,82,82,0.3); border-radius:6px; padding:8px; color:var(--red); cursor:pointer; font-size:12px;">✕</button>
+  `;
+  container.appendChild(row);
+}
+
+function aplicarDatos() {
+  const meses = [...document.querySelectorAll('.dato-mes')].map(el => el.value || 'Mes');
+  const ingresos = [...document.querySelectorAll('.dato-ingreso')].map(el => parseFloat(el.value) || 0);
+  const gastos = [...document.querySelectorAll('.dato-gasto')].map(el => parseFloat(el.value) || 0);
+  
+  const ivaDebito = parseFloat(document.getElementById('iva-debito').value) || 0;
+  const ivaCredito = parseFloat(document.getElementById('iva-credito').value) || 0;
+  const retIva = parseFloat(document.getElementById('ret-iva').value) || 0;
+  const retGanancias = parseFloat(document.getElementById('ret-ganancias').value) || 0;
+  const retIibb = parseFloat(document.getElementById('ret-iibb').value) || 0;
+
+  datosReales = { meses, ingresos, gastos, ivaDebito, ivaCredito, retIva, retGanancias, retIibb };
+  
+  cerrarModal();
+  initCharts();
+
+  // Mostrar badge "datos reales"
+  document.querySelector('.section-title').textContent = '📊 Panel Visual — Datos Reales';
+}
 
 // === STATE ===
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
@@ -1613,7 +1715,11 @@ const chartData = {
 };
 
 function initCharts() {
-  const d = chartData[currentPeriod];
+  const d = datosReales ? {
+    labels: datosReales.meses,
+    ingresos: datosReales.ingresos,
+    gastos: datosReales.gastos,
+  } : chartData[currentPeriod];
   const defaults = {
     color: '#6B7394',
     borderColor: '#2E3450',
@@ -1673,12 +1779,15 @@ function initCharts() {
 
   // IVA Donut
   if (charts.iva) charts.iva.destroy();
+  const ivaD = datosReales ? datosReales.ivaDebito : 284750;
+  const ivaC = datosReales ? datosReales.ivaCredito : 214200;
+  const ivaSaldo = Math.abs(ivaD - ivaC);
   charts.iva = new Chart(document.getElementById('chart-iva'), {
     type: 'doughnut',
     data: {
       labels: ['IVA Débito', 'IVA Crédito', 'Saldo Técnico'],
       datasets: [{
-        data: [284750, 214200, 70550],
+        data: [ivaD, ivaC, ivaSaldo],
         backgroundColor: ['#00C896', '#4A9EFF', '#F5A623'],
         borderWidth: 0,
         hoverOffset: 4
@@ -1721,14 +1830,23 @@ function initCharts() {
 
   // Retenciones
   if (charts.retenciones) charts.retenciones.destroy();
+  const retIvaData = datosReales 
+    ? d.labels.map(() => datosReales.retIva)
+    : d.ingresos.map(v => Math.round(v * 0.021));
+  const retGanData = datosReales
+    ? d.labels.map(() => datosReales.retGanancias)
+    : d.ingresos.map(v => Math.round(v * 0.015));
+  const retIibbData = datosReales
+    ? d.labels.map(() => datosReales.retIibb)
+    : d.ingresos.map(v => Math.round(v * 0.009));
   charts.retenciones = new Chart(document.getElementById('chart-retenciones'), {
     type: 'bar',
     data: {
       labels: d.labels,
       datasets: [
-        { label: 'IVA', data: d.ingresos.map(v => Math.round(v * 0.021)), backgroundColor: '#00C896', borderRadius: 4, borderWidth: 0 },
-        { label: 'Ganancias', data: d.ingresos.map(v => Math.round(v * 0.015)), backgroundColor: '#4A9EFF', borderRadius: 4, borderWidth: 0 },
-        { label: 'IIBB', data: d.ingresos.map(v => Math.round(v * 0.009)), backgroundColor: '#F5A623', borderRadius: 4, borderWidth: 0 },
+        { label: 'IVA', data: retIvaData, backgroundColor: '#00C896', borderRadius: 4, borderWidth: 0 },
+        { label: 'Ganancias', data: retGanData, backgroundColor: '#4A9EFF', borderRadius: 4, borderWidth: 0 },
+        { label: 'IIBB', data: retIibbData, backgroundColor: '#F5A623', borderRadius: 4, borderWidth: 0 },
       ]
     },
     options: {
