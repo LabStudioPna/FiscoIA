@@ -1452,6 +1452,20 @@ function leerExcelYActualizarGraficos(file) {
       </div>
     </div>
 
+    <!-- IIBB POR PROVINCIA -->
+    <div>
+      <div class="section-title" style="margin-bottom:12px;">🗺️ Ingresos Brutos por Provincia — Alícuotas 2026</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+        <select id="iibb-actividad" onchange="filtrarIIBB()" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 14px; color:var(--text); font-family:var(--sans); font-size:13px; outline:none; cursor:pointer; flex:1; min-width:200px;">
+          <option value="servicios">Servicios profesionales</option>
+          <option value="comercio">Comercio</option>
+          <option value="industria">Industria</option>
+          <option value="financiero">Servicios financieros</option>
+        </select>
+      </div>
+      <div id="iibb-tabla" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px;"></div>
+    </div>
+
     <!-- CONVERSOR -->
     <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px;">
       <div class="section-title" style="margin-bottom:16px;">🔢 Conversor Rápido</div>
@@ -2511,7 +2525,105 @@ function getCotizacionesContexto() {
 - Euro (EUR): $${c.eur ? formatCotiz(c.eur) : 'N/D'}`;
 }
 
-// === COTIZACIONES EN TIEMPO REAL ===
+// === IIBB POR PROVINCIA 2026 ===
+const IIBB_DATA = {
+  servicios: [
+    { provincia: 'Buenos Aires', organismo: 'ARBA', min: 3.5, max: 6.5, nota: 'Ley 15.558/2026' },
+    { provincia: 'CABA', organismo: 'AGIP', min: 4.5, max: 6.0, nota: 'Ley 6927/2026' },
+    { provincia: 'Córdoba', organismo: 'DGR', min: 3.0, max: 4.75, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Santa Fe', organismo: 'API', min: 3.0, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Entre Ríos', organismo: 'ATER', min: 2.5, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Mendoza', organismo: 'ATM', min: 3.0, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Tucumán', organismo: 'DGR', min: 3.0, max: 5.0, nota: 'Alta presión fiscal' },
+    { provincia: 'Salta', organismo: 'DGR', min: 2.5, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Corrientes', organismo: 'DGR', min: 2.5, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Misiones', organismo: 'DGR', min: 2.5, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Chaco', organismo: 'DGR', min: 2.5, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Neuquén', organismo: 'DGR', min: 2.0, max: 4.0, nota: 'Provincia patagónica' },
+    { provincia: 'Río Negro', organismo: 'ART', min: 2.0, max: 4.0, nota: 'Provincia patagónica' },
+    { provincia: 'La Pampa', organismo: 'DGR', min: 2.5, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Jujuy', organismo: 'DGR', min: 2.5, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Formosa', organismo: 'DGR', min: 2.0, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Santiago del Estero', organismo: 'DGR', min: 2.5, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Catamarca', organismo: 'DGR', min: 2.5, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'San Juan', organismo: 'DPIP', min: 2.5, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'San Luis', organismo: 'DGR', min: 2.0, max: 4.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'La Rioja', organismo: 'DGR', min: 2.0, max: 4.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Chubut', organismo: 'DGR', min: 2.0, max: 4.0, nota: 'Provincia patagónica' },
+    { provincia: 'Santa Cruz', organismo: 'ATR', min: 1.5, max: 3.5, nota: 'Baja presión fiscal' },
+    { provincia: 'Tierra del Fuego', organismo: 'DGR', min: 1.0, max: 3.0, nota: 'Zona franca' },
+  ],
+  comercio: [
+    { provincia: 'Buenos Aires', organismo: 'ARBA', min: 3.5, max: 5.5, nota: 'Ley 15.558/2026' },
+    { provincia: 'CABA', organismo: 'AGIP', min: 3.0, max: 5.0, nota: 'Ley 6927/2026' },
+    { provincia: 'Córdoba', organismo: 'DGR', min: 3.0, max: 4.75, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Santa Fe', organismo: 'API', min: 3.0, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Entre Ríos', organismo: 'ATER', min: 2.5, max: 4.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Mendoza', organismo: 'ATM', min: 3.0, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Tucumán', organismo: 'DGR', min: 3.0, max: 5.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Salta', organismo: 'DGR', min: 2.5, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Corrientes', organismo: 'DGR', min: 2.5, max: 4.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Misiones', organismo: 'DGR', min: 2.5, max: 4.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Neuquén', organismo: 'DGR', min: 2.0, max: 3.5, nota: 'Provincia patagónica' },
+    { provincia: 'Río Negro', organismo: 'ART', min: 2.0, max: 3.5, nota: 'Provincia patagónica' },
+    { provincia: 'Tierra del Fuego', organismo: 'DGR', min: 1.0, max: 2.5, nota: 'Zona franca' },
+  ],
+  industria: [
+    { provincia: 'Buenos Aires', organismo: 'ARBA', min: 1.5, max: 2.5, nota: 'Alícuota reducida industria' },
+    { provincia: 'CABA', organismo: 'AGIP', min: 1.0, max: 2.0, nota: 'Promoción industrial' },
+    { provincia: 'Córdoba', organismo: 'DGR', min: 1.5, max: 3.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Santa Fe', organismo: 'API', min: 1.5, max: 2.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Entre Ríos', organismo: 'ATER', min: 1.0, max: 2.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Mendoza', organismo: 'ATM', min: 1.5, max: 2.5, nota: 'Vitivinicultura exenta' },
+    { provincia: 'Neuquén', organismo: 'DGR', min: 0.75, max: 1.5, nota: 'Provincia patagónica' },
+    { provincia: 'Tierra del Fuego', organismo: 'DGR', min: 0.0, max: 1.0, nota: 'Zona franca — exenciones amplias' },
+  ],
+  financiero: [
+    { provincia: 'Buenos Aires', organismo: 'ARBA', min: 5.0, max: 7.0, nota: 'Alta alícuota financiero' },
+    { provincia: 'CABA', organismo: 'AGIP', min: 5.5, max: 6.0, nota: 'Ley 6927/2026' },
+    { provincia: 'Córdoba', organismo: 'DGR', min: 4.5, max: 6.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Santa Fe', organismo: 'API', min: 4.5, max: 6.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Entre Ríos', organismo: 'ATER', min: 4.0, max: 5.5, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Mendoza', organismo: 'ATM', min: 4.5, max: 6.0, nota: 'Ley Impositiva 2026' },
+    { provincia: 'Neuquén', organismo: 'DGR', min: 4.0, max: 5.5, nota: 'Provincia patagónica' },
+  ],
+};
+
+function filtrarIIBB() {
+  const actividad = document.getElementById('iibb-actividad').value;
+  const datos = IIBB_DATA[actividad] || IIBB_DATA['servicios'];
+  renderIIBB(datos);
+}
+
+function renderIIBB(datos) {
+  const container = document.getElementById('iibb-tabla');
+  if (!container) return;
+
+  container.innerHTML = datos.map(p => {
+    const color = p.min >= 4.5 ? 'var(--red)' : p.min >= 3.0 ? 'var(--amber)' : 'var(--green)';
+    return `
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:600; color:var(--text);">${p.provincia}</div>
+            <div style="font-size:11px; color:var(--text-dim); font-family:var(--mono);">${p.organismo}</div>
+          </div>
+          <div style="font-family:var(--mono); font-size:18px; font-weight:700; color:${color};">${p.min}%</div>
+        </div>
+        <div style="font-size:11px; color:var(--text-dim);">Rango: ${p.min}% – ${p.max}%</div>
+        <div style="font-size:10px; color:var(--text-dim); margin-top:4px; font-style:italic;">${p.nota}</div>
+      </div>`;
+  }).join('');
+}
+
+// Inicializar IIBB al cargar cotizaciones
+const _cargarCotizOriginal = cargarCotizaciones;
+async function cargarCotizaciones() {
+  await _cargarCotizOriginal();
+  filtrarIIBB();
+}
+
+// === IIBB POR PROVINCIA 2026 ===
 let cotizacionesCache = {};
 
 async function cargarCotizaciones() {
