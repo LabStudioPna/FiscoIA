@@ -85,6 +85,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-
 .fc:nth-child(4)::before{background:linear-gradient(90deg,var(--amber),#F97316)}
 .fc:nth-child(5)::before{background:linear-gradient(90deg,#10B981,#2563EB)}
 .fc:nth-child(6)::before{background:linear-gradient(90deg,#2563EB,#8B5CF6)}
+.fc:nth-child(7)::before{background:linear-gradient(90deg,#8B5CF6,#EC4899)}
 .fc:hover{border-color:var(--green);box-shadow:0 10px 40px rgba(16,185,129,.15);transform:translateY(-4px)}
 .ficon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px}
 .fc:nth-child(1) .ficon{background:rgba(16,185,129,.12)}
@@ -296,6 +297,17 @@ footer{background:var(--navy);padding:36px 32px;display:flex;align-items:center;
         </ul>
       </div>
       <div class="fc">
+        <div class="ficon">🗺️</div>
+        <div class="ftitle">IIBB por Provincia</div>
+        <div class="fdesc">Alícuotas de Ingresos Brutos de las 24 provincias, actualizadas a 2026, filtradas por actividad.</div>
+        <ul class="flist">
+          <li>Servicios, Comercio, Industria y Financiero</li>
+          <li>Organismo recaudador por provincia (ARBA, AGIP, ATER, etc.)</li>
+          <li>Rango de alícuotas mínima y máxima</li>
+          <li>Fuente normativa — Ley Impositiva 2026 de cada provincia</li>
+        </ul>
+      </div>
+      <div class="fc">
         <div class="ficon">💱</div>
         <div class="ftitle">Cotizaciones en Tiempo Real</div>
         <div class="fdesc">Tipo de cambio actualizado al instante, integrado al análisis de facturas en moneda extranjera.</div>
@@ -460,15 +472,3 @@ function toggleFaq(el){
   if(!isOpen)item.classList.add('open');
 }
 const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}
-  });
-},{threshold:0.1});
-document.querySelectorAll('.fc,.step,.pc').forEach(el=>{
-  el.style.opacity='0';el.style.transform='translateY(20px)';
-  el.style.transition='opacity 0.5s ease,transform 0.5s ease';
-  obs.observe(el);
-});
-</script>
-</body>
-</html>
