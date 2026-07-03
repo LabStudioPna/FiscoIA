@@ -1059,8 +1059,68 @@ function leerExcelYActualizarGraficos(file) {
     50% { transform: translateY(-6px); opacity: 1; }
   }
 
-  /* Scrollbar global */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  .cotiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: all 0.2s;
+  }
+
+  .cotiz-card:hover { border-color: var(--green); }
+
+  .cotiz-nombre {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: var(--mono);
+    margin-bottom: 8px;
+  }
+
+  .cotiz-compra {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+  }
+
+  .cotiz-venta {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .cotiz-skeleton {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    height: 80px;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .cotiz-regional {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cotiz-flag { font-size: 28px; }
+
+  .cotiz-info { flex: 1; }
+  .cotiz-info .nombre { font-size: 13px; font-weight: 600; color: var(--text); }
+  .cotiz-info .valor { font-family: var(--mono); font-size: 15px; color: var(--green); font-weight: 600; }
+  .cotiz-info .sub { font-size: 11px; color: var(--text-dim); font-family: var(--mono); }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
@@ -1145,6 +1205,9 @@ function leerExcelYActualizarGraficos(file) {
   </button>
   <button class="tab" data-panel="vencimientos" onclick="switchTab('vencimientos')">
     📅 Vencimientos ARCA <span class="tab-badge" id="venc-badge">3</span>
+  </button>
+  <button class="tab" data-panel="cotizaciones" onclick="switchTab('cotizaciones'); cargarCotizaciones()">
+    💱 Cotizaciones
   </button>
 </div>
 
@@ -1326,6 +1389,69 @@ function leerExcelYActualizarGraficos(file) {
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- COTIZACIONES -->
+  <div class="panel" id="panel-cotizaciones" style="flex-direction:column; padding:24px; gap:20px; overflow-y:auto;">
+    
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div class="section-title">Cotizaciones en Tiempo Real</div>
+        <div style="font-size:12px; color:var(--text-dim); margin-top:4px;" id="cotiz-hora">Actualizando...</div>
+      </div>
+      <button onclick="cargarCotizaciones()" style="background:var(--green); border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:600; color:#0F1117; cursor:pointer; font-family:var(--sans);">🔄 Actualizar</button>
+    </div>
+
+    <!-- DÓLAR ARGENTINA -->
+    <div>
+      <div class="section-title" style="margin-bottom:12px;">🇺🇸 Dólar — Argentina</div>
+      <div id="cotiz-dolar-ar" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:10px;">
+        <div class="cotiz-skeleton"></div>
+        <div class="cotiz-skeleton"></div>
+        <div class="cotiz-skeleton"></div>
+        <div class="cotiz-skeleton"></div>
+        <div class="cotiz-skeleton"></div>
+      </div>
+    </div>
+
+    <!-- MONEDAS REGIONALES -->
+    <div>
+      <div class="section-title" style="margin-bottom:12px;">🌎 Monedas Regionales vs Peso Argentino</div>
+      <div id="cotiz-regionales" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px;">
+        <div class="cotiz-skeleton"></div>
+        <div class="cotiz-skeleton"></div>
+        <div class="cotiz-skeleton"></div>
+        <div class="cotiz-skeleton"></div>
+      </div>
+    </div>
+
+    <!-- CONVERSOR -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px;">
+      <div class="section-title" style="margin-bottom:16px;">🔢 Conversor Rápido</div>
+      <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; flex-wrap:wrap;">
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-family:var(--mono); letter-spacing:1px;">MONTO</div>
+          <input type="number" id="conv-monto" placeholder="1000" oninput="convertir()" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-family:var(--mono); font-size:16px; outline:none;">
+        </div>
+        <div style="text-align:center; padding-top:20px;">
+          <select id="conv-moneda" onchange="convertir()" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-family:var(--sans); font-size:13px; outline:none; cursor:pointer;">
+            <option value="oficial">USD Oficial</option>
+            <option value="blue">USD Blue</option>
+            <option value="mep">USD MEP</option>
+            <option value="ccl">USD CCL</option>
+            <option value="brl">Real Brasileño</option>
+            <option value="uyu">Peso Uruguayo</option>
+            <option value="clp">Peso Chileno</option>
+            <option value="eur">Euro</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-family:var(--mono); letter-spacing:1px;">PESOS ARGENTINOS</div>
+          <div id="conv-resultado" style="background:var(--surface2); border:1px solid var(--green); border-radius:8px; padding:10px; color:var(--green); font-family:var(--mono); font-size:16px; font-weight:600; min-height:42px; display:flex; align-items:center;">—</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- VENCIMIENTOS -->
@@ -1742,6 +1868,7 @@ function switchTab(tabName) {
   document.querySelector(`[data-panel="${tabName}"]`).classList.add('active');
 
   if (tabName === 'graficos') initCharts();
+  if (tabName === 'cotizaciones') cargarCotizaciones();
 }
 
 // === CHAT ===
@@ -1890,7 +2017,7 @@ async function sendMessage() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: SYSTEM_PROMPT + contextoNormativo,
+        system: SYSTEM_PROMPT + contextoNormativo + getCotizacionesContexto(),
         messages: conversationHistory
       })
     });
@@ -2251,6 +2378,132 @@ function renderVencimientos() {
       <div class="venc-monto">${v.monto}</div>`;
     list.appendChild(item);
   });
+}
+
+function getCotizacionesContexto() {
+  if (Object.keys(cotizacionesCache).length === 0) return '';
+  const c = cotizacionesCache;
+  return `\n\nCOTIZACIONES DEL DÍA (actualizadas en tiempo real — usalas si el usuario pregunta sobre tipo de cambio):
+- USD Oficial: $${c.oficial ? formatCotiz(c.oficial) : 'N/D'}
+- USD Blue: $${c.blue ? formatCotiz(c.blue) : 'N/D'}
+- USD MEP: $${c.bolsa ? formatCotiz(c.bolsa) : 'N/D'}
+- USD CCL: $${c.contadoconliqui ? formatCotiz(c.contadoconliqui) : 'N/D'}
+- Real Brasileño (BRL): $${c.brl ? formatCotiz(c.brl) : 'N/D'}
+- Peso Uruguayo (UYU): $${c.uyu ? formatCotiz(c.uyu) : 'N/D'}
+- Peso Chileno (CLP): $${c.clp ? formatCotiz(c.clp) : 'N/D'}
+- Euro (EUR): $${c.eur ? formatCotiz(c.eur) : 'N/D'}`;
+}
+
+// === COTIZACIONES EN TIEMPO REAL ===
+let cotizacionesCache = {};
+
+async function cargarCotizaciones() {
+  document.getElementById('cotiz-hora').textContent = 'Actualizando...';
+
+  try {
+    // Dólar Argentina — todos los tipos
+    const resDolar = await fetch('https://dolarapi.com/v1/ar/dolares');
+    const dolares = await resDolar.json();
+
+    const nombres = {
+      oficial: '🏦 Oficial',
+      blue: '💵 Blue',
+      bolsa: '📈 MEP',
+      contadoconliqui: '🔄 CCL',
+      mayorista: '🏢 Mayorista',
+      cripto: '₿ Cripto',
+      tarjeta: '💳 Tarjeta',
+    };
+
+    let htmlDolar = '';
+    dolares.forEach(d => {
+      const key = d.casa?.toLowerCase() || '';
+      const nombre = nombres[key] || d.nombre || key;
+      cotizacionesCache[key] = d.venta;
+      htmlDolar += `
+        <div class="cotiz-card">
+          <div class="cotiz-nombre">${nombre}</div>
+          <div class="cotiz-compra">Compra: $${formatCotiz(d.compra)}</div>
+          <div class="cotiz-venta">$${formatCotiz(d.venta)}</div>
+        </div>`;
+    });
+    document.getElementById('cotiz-dolar-ar').innerHTML = htmlDolar;
+
+    // Monedas regionales — usamos la API de tipo de cambio de cada país en ARS
+    const regionales = await Promise.allSettled([
+      fetch('https://dolarapi.com/v1/br/cotizaciones').then(r => r.json()).catch(() => null),
+      fetch('https://dolarapi.com/v1/uy/cotizaciones').then(r => r.json()).catch(() => null),
+      fetch('https://dolarapi.com/v1/cl/cotizaciones').then(r => r.json()).catch(() => null),
+    ]);
+
+    // Calculamos desde el dólar oficial como pivot
+    const dolarOficial = dolares.find(d => d.casa === 'oficial')?.venta || 1;
+    
+    // Fetch tasas internacionales via exchangerate-api (gratuita)
+    const resRates = await fetch('https://open.er-api.com/v6/latest/USD').catch(() => null);
+    const rates = resRates ? await resRates.json() : null;
+
+    let htmlRegionales = '';
+
+    if (rates && rates.rates) {
+      const monedas = [
+        { code: 'BRL', nombre: 'Real Brasileño', flag: '🇧🇷', key: 'brl' },
+        { code: 'UYU', nombre: 'Peso Uruguayo', flag: '🇺🇾', key: 'uyu' },
+        { code: 'CLP', nombre: 'Peso Chileno', flag: '🇨🇱', key: 'clp' },
+        { code: 'EUR', nombre: 'Euro', flag: '🇪🇺', key: 'eur' },
+      ];
+
+      monedas.forEach(m => {
+        const tasaUSD = rates.rates[m.code];
+        if (!tasaUSD) return;
+        // Cuántos ARS vale 1 unidad de la moneda extranjera
+        const enARS = dolarOficial / tasaUSD;
+        cotizacionesCache[m.key] = enARS;
+        htmlRegionales += `
+          <div class="cotiz-regional">
+            <div class="cotiz-flag">${m.flag}</div>
+            <div class="cotiz-info">
+              <div class="nombre">${m.nombre}</div>
+              <div class="valor">$${formatCotiz(enARS)} ARS</div>
+              <div class="sub">1 ${m.code} = $${formatCotiz(enARS)}</div>
+            </div>
+          </div>`;
+      });
+    } else {
+      htmlRegionales = '<div style="color:var(--text-dim); font-size:13px;">No se pudieron cargar las cotizaciones regionales. Intentá de nuevo.</div>';
+    }
+
+    document.getElementById('cotiz-regionales').innerHTML = htmlRegionales;
+    
+    const ahora = new Date();
+    document.getElementById('cotiz-hora').textContent = `Actualizado: ${ahora.toLocaleTimeString('es-AR')} · Fuente: DolarApi.com + ExchangeRate API`;
+
+    // Actualizar conversor
+    convertir();
+
+  } catch(e) {
+    document.getElementById('cotiz-hora').textContent = 'Error al cargar cotizaciones. Verificá tu conexión.';
+    console.error('Error cotizaciones:', e);
+  }
+}
+
+function formatCotiz(valor) {
+  if (!valor) return '—';
+  return parseFloat(valor).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function convertir() {
+  const monto = parseFloat(document.getElementById('conv-monto').value) || 0;
+  const moneda = document.getElementById('conv-moneda').value;
+  const tasa = cotizacionesCache[moneda] || cotizacionesCache['oficial'];
+  
+  if (!tasa || monto === 0) {
+    document.getElementById('conv-resultado').textContent = '—';
+    return;
+  }
+
+  const resultado = monto * tasa;
+  document.getElementById('conv-resultado').textContent = '$' + formatCotiz(resultado);
 }
 
 // === INIT ===
