@@ -1979,9 +1979,9 @@ async function sendMessage() {
     const isPDF = attachedFileType === 'application/pdf';
     const isImage = attachedFileType && attachedFileType.startsWith('image/');
     if (isPDF) {
-      userContent.push({ type: 'text', text: 'Analizá esta factura o documento contable. Extraé todos los datos relevantes: tipo de comprobante, fecha, CUIT emisor y receptor, importes, IVA, retenciones, CAE y cualquier información fiscal importante. Indicá si hay inconsistencias.' });
+      userContent.push({ type: 'text', text: 'Analizá esta factura o documento contable. Extraé todos los datos relevantes: tipo de comprobante, fecha, CUIT emisor y receptor, importes, IVA, retenciones, CAE y cualquier información fiscal importante. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' });
     } else if (isImage) {
-      userContent.push({ type: 'text', text: 'Analizá esta imagen de factura o comprobante. Extraé todos los datos: tipo, fecha, CUIT, importes, IVA, retenciones y CAE. Indicá si hay inconsistencias.' });
+      userContent.push({ type: 'text', text: 'Analizá esta imagen de factura o comprobante. Extraé todos los datos: tipo, fecha, CUIT, importes, IVA, retenciones y CAE. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' });
     }
   }
 
