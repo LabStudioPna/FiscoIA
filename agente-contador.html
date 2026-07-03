@@ -1814,11 +1814,23 @@ async function sendMessage() {
   const sendBtn = document.getElementById('send-btn');
   sendBtn.disabled = true;
 
+  // Si hay archivo adjunto, esperamos que termine de cargarse en base64
+  if (attachedFile && !attachedFileBase64) {
+    await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        attachedFileBase64 = e.target.result.split(',')[1];
+        resolve();
+      };
+      reader.readAsDataURL(attachedFile);
+    });
+  }
+
   // Build user message content
   let userContent = [];
 
   if (attachedFile && attachedFileBase64) {
-    const isImage = attachedFileType.startsWith('image/');
+    const isImage = attachedFileType && attachedFileType.startsWith('image/');
     const isPDF = attachedFileType === 'application/pdf';
 
     if (isImage) {
@@ -1837,7 +1849,6 @@ async function sendMessage() {
   if (text) {
     userContent.push({ type: 'text', text });
   } else if (userContent.length > 0) {
-    // Si hay archivo pero no hay texto, agregamos instrucción automática
     const isPDF = attachedFileType === 'application/pdf';
     const isImage = attachedFileType && attachedFileType.startsWith('image/');
     if (isPDF) {
