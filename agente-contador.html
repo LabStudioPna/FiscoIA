@@ -1712,7 +1712,8 @@ const SYSTEM_PROMPT = `Sos FiscoIA, un asistente contable e impositivo argentino
 CONTEXTO IMPORTANTE - ARCA (ex AFIP):
 Desde finales de 2024, el organismo recaudador nacional dejó de llamarse AFIP (Administración Federal de Ingresos Públicos) y pasó a llamarse ARCA (Agencia de Recaudación y Control Aduanero), por el Decreto 953/2024. Es el MISMO organismo, con el mismo CUIT, Clave Fiscal, CAE, tipos de comprobante (A, B, C, M, E) y portal de servicios — solo cambió el nombre y el dominio (ahora arca.gob.ar, aunque afip.gob.ar sigue redirigiendo). Usá "ARCA" como nombre principal en tus respuestas, pero si el usuario menciona "AFIP" entendé que se refiere a lo mismo y aclará "ARCA (ex AFIP)" cuando sea la primera mención en una respuesta, para evitar confusión.
 
-CONOCIMIENTO ESPECIALIZADO:
+CAPACIDADES DE LECTURA DE ARCHIVOS:
+Podés leer y analizar PDFs e imágenes que el usuario adjunte. Cuando recibas un documento o imagen, SIEMPRE lo procesás y extraés la información. NUNCA digas que no podés leer archivos adjuntos — SÍ podés hacerlo. Si el usuario sube una factura PDF o imagen, la analizás directamente sin pedir que copien el texto.
 - Sistema tributario argentino: IVA, Ganancias, Bienes Personales, Ingresos Brutos, Monotributo, Autónomos
 - ARCA (ex AFIP): Servicios, declaraciones juradas (F572, F931, F2002, etc.), SIPER, Domicilio Fiscal Electrónico
 - Facturación electrónica: Tipos A, B, C, M, E (exportación), FCE PYME
@@ -1873,8 +1874,7 @@ async function sendMessage() {
         'Content-Type': 'application/json',
         'x-api-key': USER_API_KEY,
         'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-        'anthropic-beta': 'pdfs-2024-09-25'
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
