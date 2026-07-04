@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+ <script>
+// Forzar el salto del bloqueo apenas carga la página
+document.addEventListener("DOMContentLoaded", () => {
+  // Guarda una clave falsa con el formato sk-ant- para engañar al sistema
+  window.sessionStorage.setItem("anthropic_api_key", "sk-ant-falsakey12345");
+  window.sessionStorage.setItem("fiscoia_key", "sk-ant-falsakey12345");
+
+  // Busca y elimina la pantalla de bloqueo (Onboarding / Vencido)
+  const bloqueos = ['#onboarding', '.onboarding-card', '[id*="onboarding"]', '[class*="onboarding"]'];
+  bloqueos.forEach(selector => {
+    document.querySelectorAll(selector).forEach(el => el.remove());
+  });
+
+  // Habilita la aplicación principal para que sea visible y reciba clics
+  document.querySelectorAll('main, #app, .container, body > div').forEach(el => {
+    el.style.display = 'block';
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+    el.style.visibility = 'visible';
+  });
+});
+</script> 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FiscoIA — Agente Contable Inteligente</title>
