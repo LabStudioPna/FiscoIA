@@ -1482,6 +1482,11 @@ function leerExcelYActualizarGraficos(file) {
         <div style="font-size:28px; font-weight:700; color:var(--green);" id="modal-count">0</div>
       </div>
 
+      <label style="display:flex; align-items:center; gap:10px; cursor:pointer; margin-bottom:24px; padding:10px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:8px;">
+        <input type="checkbox" id="sync-sheets-toggle" onchange="toggleSyncSheets()" style="cursor:pointer;">
+        <span style="font-size:13px; color:var(--text);">🔄 Sincronizar automáticamente con Google Sheets</span>
+      </label>
+
       <div style="margin-bottom:24px;">
         <div style="font-size:11px; color:var(--text-dim); font-family:var(--mono); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Agrupar por:</div>
         <div style="display:flex; flex-direction:column; gap:8px;">
@@ -2150,6 +2155,9 @@ function appendMsg(role, text, fileName) {
       datos: datos,
       respuesta: text
     });
+
+    // Sincronizar con Google Sheets (no bloqueante, silencioso si falla)
+    sincronizarConGoogleSheets(datos, fileName);
 
     // Actualizar contador en el modal
     const modalCount = document.getElementById('modal-count');
@@ -3007,12 +3015,47 @@ function extraerDatosDelAnalisis(texto) {
   return datos;
 }
 
+// === SINCRONIZACIÓN CON GOOGLE SHEETS ===
+let syncSheetsEnabled = localStorage.getItem('fiscoia_sync_sheets') === 'true';
+
+function toggleSyncSheets() {
+  syncSheetsEnabled = document.getElementById('sync-sheets-toggle').checked;
+  localStorage.setItem('fiscoia_sync_sheets', syncSheetsEnabled);
+}
+
+async function sincronizarConGoogleSheets(datos, fileName) {
+  if (!syncSheetsEnabled) return;
+  try {
+    await fetch('https://vps-6064485-x.dattaweb.com/webhook/fiscoia-sync-sheets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fecha: datos.fecha !== 'N/A' ? datos.fecha : new Date().toLocaleDateString('es-AR'),
+        cliente: datos.emisor,
+        cuit: datos.cuitEmisor,
+        tipo: datos.tipo,
+        neto: datos.neto,
+        iva: datos.iva,
+        retIva: datos.retIva,
+        retGan: datos.retGan,
+        percIIBB: datos.percIIBB,
+        total: datos.total,
+        estado: datos.estado,
+        observaciones: fileName || ''
+      })
+    });
+  } catch (e) {
+    console.warn('Sincronización con Google Sheets falló (silencioso):', e);
+  }
+}
+
 // === MODAL REPORTES ===
 function abrirModalReportes() {
   if (analisisAcumulados.length === 0) {
     alert('⚠️ Necesitás cargar al menos una factura para generar un reporte consolidado.');
     return;
   }
+  document.getElementById('sync-sheets-toggle').checked = syncSheetsEnabled;
   document.getElementById('modal-reportes').style.display = 'flex';
 }
 
