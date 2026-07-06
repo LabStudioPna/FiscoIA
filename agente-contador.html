@@ -1488,14 +1488,14 @@ function leerExcelYActualizarGraficos(file) {
           <button onclick="document.getElementById('modal-instrucciones-sheets').style.display='flex'" style="background:none; border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:11px; color:var(--text-dim); cursor:pointer; font-family:var(--sans);">¿Cómo configuro esto?</button>
         </div>
         <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
-          Los datos van directo de tu navegador a tu propia hoja de cálculo — nunca pasan por servidores de LABStudio.
+          Facturas analizadas, consultas al chat, cotizaciones, reportes y exportaciones — todo va directo de tu navegador a tu propia hoja, nunca por servidores de LABStudio.
         </div>
         <input type="text" id="sheets-webhook-url" placeholder="Pegá acá tu URL de Google Apps Script..."
           style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:9px 12px; color:var(--text); font-family:var(--mono); font-size:12px; outline:none; margin-bottom:10px;"
           onchange="guardarUrlSheets()">
         <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
           <input type="checkbox" id="sync-sheets-toggle" onchange="toggleSyncSheets()" style="cursor:pointer;">
-          <span style="font-size:13px; color:var(--text);">Sincronizar automáticamente cada análisis</span>
+          <span style="font-size:13px; color:var(--text);">Registrar automáticamente cada acción</span>
         </label>
         <div id="sync-status-msg" style="font-size:11px; color:var(--text-dim); margin-top:6px;"></div>
       </div>
@@ -1534,7 +1534,7 @@ function leerExcelYActualizarGraficos(file) {
             <button onclick="document.getElementById('modal-instrucciones-sheets').style.display='none'" style="background:none; border:none; color:var(--text-dim); font-size:24px; cursor:pointer; line-height:1;">✕</button>
           </div>
           <div style="font-size:13px; color:var(--text-dim); margin-bottom:16px; line-height:1.7;">
-            Tus facturas analizadas se guardan en una hoja de cálculo que <strong style="color:var(--text);">vos creás y controlás</strong>. LABStudio nunca ve ni recibe esos datos. Tarda unos 5 minutos:
+            Tus facturas analizadas <strong style="color:var(--text);">y también cada consulta que hagas</strong> (chat, cotizaciones, reportes, exportaciones ARCA) se guardan en una hoja de cálculo que <strong style="color:var(--text);">vos creás y controlás</strong>. LABStudio nunca ve ni recibe esos datos. Tarda unos 5 minutos:
           </div>
           <ol style="font-size:13px; color:var(--text); line-height:2; padding-left:20px; margin-bottom:16px;">
             <li>Creá una hoja nueva en <a href="https://sheets.new" target="_blank" style="color:var(--green);">sheets.new</a></li>
@@ -1551,13 +1551,21 @@ function leerExcelYActualizarGraficos(file) {
             <pre id="codigo-apps-script" style="background:#0a0a0f; border:1px solid var(--border); border-radius:8px; padding:16px; padding-top:44px; font-size:10px; color:#a0e0c0; overflow-x:auto; max-height:280px; font-family:var(--mono); line-height:1.5;">function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
-    const sheet = obtenerOCrearHoja();
-    sheet.appendRow([
-      data.fecha || new Date().toLocaleDateString('es-AR'),
-      data.cliente || 'N/A', data.cuit || 'N/A', data.tipo || 'N/A',
-      data.neto || 0, data.iva || 0, data.retIva || 0, data.retGan || 0,
-      data.percIIBB || 0, data.total || 0, data.estado || 'N/A', data.observaciones || ''
-    ]);
+    if (data.evento) {
+      const sheetActividad = obtenerOCrearHojaActividad();
+      sheetActividad.appendRow([
+        data.fechaHora || new Date().toLocaleString('es-AR'),
+        data.evento, data.detalle || ''
+      ]);
+    } else {
+      const sheet = obtenerOCrearHoja();
+      sheet.appendRow([
+        data.fecha || new Date().toLocaleDateString('es-AR'),
+        data.cliente || 'N/A', data.cuit || 'N/A', data.tipo || 'N/A',
+        data.neto || 0, data.iva || 0, data.retIva || 0, data.retGan || 0,
+        data.percIIBB || 0, data.total || 0, data.estado || 'N/A', data.observaciones || ''
+      ]);
+    }
     return ContentService.createTextOutput(JSON.stringify({status:'ok', guardado:true}))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
@@ -1575,6 +1583,20 @@ function obtenerOCrearHoja() {
     sheet.appendRow(['Fecha','Cliente','CUIT','Tipo','Neto','IVA','Ret. IVA','Ret. Ganancias','Perc. IIBB','Total','Estado','Observaciones']);
     sheet.getRange(1,1,1,12).setFontWeight('bold').setBackground('#1B3A6B').setFontColor('#FFFFFF');
     sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function obtenerOCrearHojaActividad() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const nombreHoja = 'FiscoIA_Actividad';
+  let sheet = ss.getSheetByName(nombreHoja);
+  if (!sheet) {
+    sheet = ss.insertSheet(nombreHoja);
+    sheet.appendRow(['Fecha y Hora','Tipo de Evento','Detalle']);
+    sheet.getRange(1,1,1,3).setFontWeight('bold').setBackground('#00C896').setFontColor('#0F1117');
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(3, 500);
   }
   return sheet;
 }</pre>
@@ -1873,6 +1895,7 @@ function exportarParaARCA() {
 
   switchTab('chat');
   appendMsg('ai', `✅ **4 archivos TXT generados para ARCA — Libro IVA Digital**\n\n📄 LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt\n\n**Para importar en ARCA:**\n1. Entrás a arca.gob.ar → Servicios → Libro IVA Digital\n2. Seleccionás el período\n3. Importás cada archivo en el módulo correspondiente\n4. Los importes están en pesos, formato ANSI, longitud fija\n\n⚠️ **Importante:** Verificá los CUIT de tus clientes/proveedores antes de presentar. Los dejé en 00000000000 donde no estaban en la planilla — hay que completarlos manualmente.`);
+  registrarActividad('Exportación ARCA', `Libro IVA Digital generado — CUIT empresa: ${cuit} — ${datosReales.movimientos.length} movimientos procesados`);
 }
 
 let contextoNormativo = '';
@@ -2174,6 +2197,7 @@ async function sendMessage() {
       const aiText = data.content[0].text;
       appendMsg('ai', aiText);
       conversationHistory.push({ role: 'assistant', content: aiText });
+      registrarActividad('Consulta Chat', `Pregunta: ${text || '[archivo adjunto]'} | Respuesta: ${aiText.substring(0, 150)}...`);
     } else {
       appendMsg('ai', '⚠️ No pude procesar la respuesta. Intentá de nuevo.');
     }
@@ -2750,6 +2774,7 @@ async function convertirMonedaFactura() {
         <span style="font-size:20px; font-weight:700; color:var(--green);">$${formatCotiz(totalARS)} ARS</span>
         <span style="color:var(--text-dim);">= ${monto} ${nombreMoneda} × $${formatCotiz(valorARS)} (${nombreTC})</span>
       </div>`;
+    registrarActividad('Convertidor de Moneda', `${monto} ${nombreMoneda} → $${formatCotiz(totalARS)} ARS (${nombreTC})`);
   } catch(e) {
     resultEl.innerHTML = '⚠️ Error al convertir. Verificá tu conexión e intentá de nuevo.';
     console.error('Error conversión:', e);
@@ -2785,6 +2810,7 @@ async function consultarHistoricoCotizacion() {
         <span style="color:var(--text-dim);">Dólar ${nombreCasa} · ${fechaLegible} · Compra: $${formatCotiz(data.compra)}</span>
       </div>
       <div style="margin-top:6px; font-size:12px; color:var(--text-dim);">💡 Útil para convertir facturas antiguas al tipo de cambio vigente en esa fecha.</div>`;
+    registrarActividad('Histórico de Cotizaciones', `Consultó dólar ${nombreCasa} del ${fechaLegible}: $${formatCotiz(data.venta)}`);
   } catch(e) {
     resultEl.innerHTML = `⚠️ No hay datos disponibles para esa fecha/casa. Probá con otra fecha (los fines de semana y feriados no suelen tener cotización registrada).`;
     console.error('Error histórico:', e);
@@ -3165,6 +3191,26 @@ async function sincronizarConGoogleSheets(datos, fileName) {
   }
 }
 
+// === REGISTRO DE ACTIVIDAD GENÉRICO (chat, cotizaciones, reportes, exportaciones, etc) ===
+// Va a la MISMA hoja del contador, pero a una pestaña distinta ("FiscoIA_Actividad")
+// para no mezclar el log de acciones con el detalle de facturas analizadas.
+async function registrarActividad(tipo, detalle) {
+  if (!syncSheetsEnabled || !sheetsWebhookUrl) return;
+  try {
+    await fetch(sheetsWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        evento: tipo, // la presencia de "evento" le indica al Apps Script que es un log de actividad, no una factura
+        fechaHora: new Date().toLocaleString('es-AR'),
+        detalle: detalle || ''
+      })
+    });
+  } catch (e) {
+    console.warn('Registro de actividad falló (silencioso):', e);
+  }
+}
+
 // === MODAL REPORTES ===
 function abrirModalReportes() {
   if (analisisAcumulados.length === 0) {
@@ -3303,6 +3349,7 @@ function generarReporteExcel() {
 
   cerrarModalReportes();
   appendMsg('ai', `✅ **Reporte Excel generado** — ${resumen.totalFacturas} facturas analizadas, agrupadas por ${criterio}. Archivo listo para descargar.`);
+  registrarActividad('Reporte Excel', `Reporte consolidado generado — ${resumen.totalFacturas} facturas, agrupado por ${criterio}`);
 }
 
 // === GENERAR PDF CONSOLIDADO ===
@@ -3511,6 +3558,7 @@ function generarReportePDF() {
 
   cerrarModalReportes();
   appendMsg('ai', `✅ **Reporte PDF generado** — ${resumen.totalFacturas} facturas agrupadas por ${criterio}. Descargando archivo...`);
+  registrarActividad('Reporte PDF', `Reporte consolidado generado — ${resumen.totalFacturas} facturas, agrupado por ${criterio}`);
 }
 
 // === REPORTE DE ANOMALÍAS ===
@@ -3582,6 +3630,7 @@ function generarReporteAnomalias() {
   html2pdf().set(opt).from(html).save();
   cerrarModalReportes();
   appendMsg('ai', `⚠️ **Reporte de Anomalías generado** — ${anomalias.length} facturas con observaciones detectadas de ${analisisAcumulados.length} analizadas.`);
+  registrarActividad('Reporte Anomalías', `${anomalias.length} facturas con observaciones de ${analisisAcumulados.length} analizadas`);
 }
 
 // === COMPARACIÓN PERÍODO VS PERÍODO ===
@@ -3652,6 +3701,7 @@ function ejecutarComparacionPeriodos() {
   `;
 
   document.getElementById('comp-resultado').innerHTML = html;
+  registrarActividad('Comparación de Períodos', `Comparó ${periodoA} vs ${periodoB}`);
 }
 
 // === ANÁLISIS DE TENDENCIAS ===
@@ -3716,6 +3766,7 @@ function mostrarAnalisisTendencias() {
   document.getElementById('tendencias-alertas').innerHTML = alertas.length > 0
     ? alertas.join('')
     : '<div style="color:var(--text-dim); font-size:13px;">No se detectaron variaciones significativas (≥15%) entre los últimos dos períodos.</div>';
+  registrarActividad('Análisis de Tendencias', `Analizados ${periodos.length} períodos — ${alertas.length} alertas de variación`);
 }
 </script>
 </body>
