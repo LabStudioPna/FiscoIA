@@ -1482,10 +1482,23 @@ function leerExcelYActualizarGraficos(file) {
         <div style="font-size:28px; font-weight:700; color:var(--green);" id="modal-count">0</div>
       </div>
 
-      <label style="display:flex; align-items:center; gap:10px; cursor:pointer; margin-bottom:24px; padding:10px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:8px;">
-        <input type="checkbox" id="sync-sheets-toggle" onchange="toggleSyncSheets()" style="cursor:pointer;">
-        <span style="font-size:13px; color:var(--text);">🔄 Sincronizar automáticamente con Google Sheets</span>
-      </label>
+      <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:24px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <span style="font-size:13px; font-weight:600; color:var(--text);">🔄 Sincronizar con TU Google Sheets</span>
+          <button onclick="document.getElementById('modal-instrucciones-sheets').style.display='flex'" style="background:none; border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:11px; color:var(--text-dim); cursor:pointer; font-family:var(--sans);">¿Cómo configuro esto?</button>
+        </div>
+        <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
+          Los datos van directo de tu navegador a tu propia hoja de cálculo — nunca pasan por servidores de LABStudio.
+        </div>
+        <input type="text" id="sheets-webhook-url" placeholder="Pegá acá tu URL de Google Apps Script..."
+          style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:9px 12px; color:var(--text); font-family:var(--mono); font-size:12px; outline:none; margin-bottom:10px;"
+          onchange="guardarUrlSheets()">
+        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+          <input type="checkbox" id="sync-sheets-toggle" onchange="toggleSyncSheets()" style="cursor:pointer;">
+          <span style="font-size:13px; color:var(--text);">Sincronizar automáticamente cada análisis</span>
+        </label>
+        <div id="sync-status-msg" style="font-size:11px; color:var(--text-dim); margin-top:6px;"></div>
+      </div>
 
       <div style="margin-bottom:24px;">
         <div style="font-size:11px; color:var(--text-dim); font-family:var(--mono); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Agrupar por:</div>
@@ -1510,6 +1523,65 @@ function leerExcelYActualizarGraficos(file) {
             <input type="radio" name="agrupar" value="estado" style="margin-right:10px; cursor:pointer;">
             <span style="font-size:13px; color:var(--text);">Estado de Validación</span>
           </label>
+        </div>
+      </div>
+
+      <!-- MODAL DE INSTRUCCIONES: CONECTAR GOOGLE SHEETS PROPIO -->
+      <div id="modal-instrucciones-sheets" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:6000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; max-width:640px; width:100%; max-height:85vh; overflow-y:auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-size:20px; font-weight:700; color:var(--text); margin:0;">📋 Conectá tu propia hoja de Google Sheets</h3>
+            <button onclick="document.getElementById('modal-instrucciones-sheets').style.display='none'" style="background:none; border:none; color:var(--text-dim); font-size:24px; cursor:pointer; line-height:1;">✕</button>
+          </div>
+          <div style="font-size:13px; color:var(--text-dim); margin-bottom:16px; line-height:1.7;">
+            Tus facturas analizadas se guardan en una hoja de cálculo que <strong style="color:var(--text);">vos creás y controlás</strong>. LABStudio nunca ve ni recibe esos datos. Tarda unos 5 minutos:
+          </div>
+          <ol style="font-size:13px; color:var(--text); line-height:2; padding-left:20px; margin-bottom:16px;">
+            <li>Creá una hoja nueva en <a href="https://sheets.new" target="_blank" style="color:var(--green);">sheets.new</a></li>
+            <li>Andá a <strong>Extensiones → Apps Script</strong></li>
+            <li>Borrá el código de ejemplo y pegá el código de abajo (botón "Copiar")</li>
+            <li>Guardá el proyecto (Ctrl+S)</li>
+            <li>Hacé clic en <strong>Implementar → Nueva implementación</strong></li>
+            <li>Tipo: <strong>Aplicación web</strong> — Ejecutar como: <strong>Yo</strong> — Acceso: <strong>Cualquier usuario</strong></li>
+            <li>Aceptá los permisos que te pida Google</li>
+            <li>Copiá la URL que te da y pegala en el campo de FiscoIA</li>
+          </ol>
+          <div style="position:relative;">
+            <button onclick="copiarCodigoAppsScript()" id="btn-copiar-script" style="position:absolute; top:8px; right:8px; background:var(--green); color:#0F1117; border:none; border-radius:6px; padding:6px 12px; font-size:11px; font-weight:600; cursor:pointer; font-family:var(--sans);">Copiar código</button>
+            <pre id="codigo-apps-script" style="background:#0a0a0f; border:1px solid var(--border); border-radius:8px; padding:16px; padding-top:44px; font-size:10px; color:#a0e0c0; overflow-x:auto; max-height:280px; font-family:var(--mono); line-height:1.5;">function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const sheet = obtenerOCrearHoja();
+    sheet.appendRow([
+      data.fecha || new Date().toLocaleDateString('es-AR'),
+      data.cliente || 'N/A', data.cuit || 'N/A', data.tipo || 'N/A',
+      data.neto || 0, data.iva || 0, data.retIva || 0, data.retGan || 0,
+      data.percIIBB || 0, data.total || 0, data.estado || 'N/A', data.observaciones || ''
+    ]);
+    return ContentService.createTextOutput(JSON.stringify({status:'ok', guardado:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({status:'error', mensaje: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function obtenerOCrearHoja() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const nombreHoja = 'FiscoIA_Analisis';
+  let sheet = ss.getSheetByName(nombreHoja);
+  if (!sheet) {
+    sheet = ss.insertSheet(nombreHoja);
+    sheet.appendRow(['Fecha','Cliente','CUIT','Tipo','Neto','IVA','Ret. IVA','Ret. Ganancias','Perc. IIBB','Total','Estado','Observaciones']);
+    sheet.getRange(1,1,1,12).setFontWeight('bold').setBackground('#1B3A6B').setFontColor('#FFFFFF');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}</pre>
+          </div>
+          <div style="font-size:11px; color:var(--text-dim); margin-top:12px;">
+            💬 ¿Te trabaste en algún paso? Escribinos por <a href="https://wa.me/5493435344597" target="_blank" style="color:var(--green);">WhatsApp</a> y te ayudamos.
+          </div>
         </div>
       </div>
 
@@ -3015,20 +3087,64 @@ function extraerDatosDelAnalisis(texto) {
   return datos;
 }
 
-// === SINCRONIZACIÓN CON GOOGLE SHEETS ===
+// === SINCRONIZACIÓN CON GOOGLE SHEETS (URL PROPIA DEL CONTADOR) ===
 let syncSheetsEnabled = localStorage.getItem('fiscoia_sync_sheets') === 'true';
+let sheetsWebhookUrl = localStorage.getItem('fiscoia_sheets_url') || '';
 
 function toggleSyncSheets() {
-  syncSheetsEnabled = document.getElementById('sync-sheets-toggle').checked;
+  const checked = document.getElementById('sync-sheets-toggle').checked;
+  if (checked && !sheetsWebhookUrl) {
+    alert('⚠️ Primero configurá tu propia URL de Google Apps Script.\n\nHacé clic en "¿Cómo configuro esto?" para ver las instrucciones.');
+    document.getElementById('sync-sheets-toggle').checked = false;
+    return;
+  }
+  syncSheetsEnabled = checked;
   localStorage.setItem('fiscoia_sync_sheets', syncSheetsEnabled);
+  actualizarEstadoSync();
+}
+
+function guardarUrlSheets() {
+  const url = document.getElementById('sheets-webhook-url').value.trim();
+  sheetsWebhookUrl = url;
+  localStorage.setItem('fiscoia_sheets_url', url);
+  actualizarEstadoSync();
+}
+
+function actualizarEstadoSync() {
+  const msg = document.getElementById('sync-status-msg');
+  if (!msg) return;
+  if (!sheetsWebhookUrl) {
+    msg.textContent = 'Sin configurar — pegá tu URL de Apps Script arriba.';
+    msg.style.color = 'var(--text-dim)';
+  } else if (syncSheetsEnabled) {
+    msg.textContent = '✅ Conectado a tu hoja propia. Sincronizando cada análisis.';
+    msg.style.color = 'var(--green)';
+  } else {
+    msg.textContent = 'URL configurada, pero la sincronización está apagada.';
+    msg.style.color = 'var(--text-dim)';
+  }
+}
+
+function copiarCodigoAppsScript() {
+  const codigo = document.getElementById('codigo-apps-script').textContent;
+  navigator.clipboard.writeText(codigo).then(() => {
+    const btn = document.getElementById('btn-copiar-script');
+    const original = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.textContent = original; }, 2000);
+  }).catch(() => {
+    alert('No se pudo copiar automáticamente. Seleccioná el texto manualmente.');
+  });
 }
 
 async function sincronizarConGoogleSheets(datos, fileName) {
-  if (!syncSheetsEnabled) return;
+  if (!syncSheetsEnabled || !sheetsWebhookUrl) return;
   try {
-    await fetch('https://vps-6064485-x.dattaweb.com/webhook/fiscoia-sync-sheets', {
+    // Esto va DIRECTO del navegador del contador a SU PROPIA hoja de Google Sheets.
+    // LABStudio nunca recibe ni ve estos datos — no hay ningún servidor de LAB en el medio.
+    await fetch(sheetsWebhookUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' }, // evita preflight CORS con Apps Script
       body: JSON.stringify({
         fecha: datos.fecha !== 'N/A' ? datos.fecha : new Date().toLocaleDateString('es-AR'),
         cliente: datos.emisor,
@@ -3045,7 +3161,7 @@ async function sincronizarConGoogleSheets(datos, fileName) {
       })
     });
   } catch (e) {
-    console.warn('Sincronización con Google Sheets falló (silencioso):', e);
+    console.warn('Sincronización con tu Google Sheets falló (silencioso):', e);
   }
 }
 
@@ -3055,7 +3171,9 @@ function abrirModalReportes() {
     alert('⚠️ Necesitás cargar al menos una factura para generar un reporte consolidado.');
     return;
   }
+  document.getElementById('sheets-webhook-url').value = sheetsWebhookUrl;
   document.getElementById('sync-sheets-toggle').checked = syncSheetsEnabled;
+  actualizarEstadoSync();
   document.getElementById('modal-reportes').style.display = 'flex';
 }
 
