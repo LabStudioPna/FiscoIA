@@ -2643,7 +2643,7 @@ async function cargarCotizaciones() {
   document.getElementById('cotiz-hora').textContent = 'Actualizando...';
 
   try {
-    const resDolar = await fetch('https://dolarapi.com/v1/ar/dolares');
+    const resDolar = await fetch('https://dolarapi.com/v1/dolares');
     const dolares = await resDolar.json();
 
     const nombres = {
