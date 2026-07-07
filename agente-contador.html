@@ -1253,7 +1253,9 @@ function leerExcelYActualizarGraficos(file) {
 
     <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
       <a href="FiscoIA-Plantilla-Movimientos.xlsx" download style="background:var(--green); color:#0F1117; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">📥 Descargar plantilla Excel</a>
-      <button onclick="exportarParaARCA()" style="background:var(--blue); border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📤 Exportar TXT para ARCA</button>
+      <button onclick="exportarParaExcel()" style="background:#10B981; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📊 Exportar a Excel (3 hojas)</button>
+      <button onclick="exportarParaTXT()" style="background:#8B5CF6; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📄 Exportar TXT pipe-delimited</button>
+      <button onclick="exportarParaARCA()" style="background:var(--blue); border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📤 Exportar para ARCA</button>
       <div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center;">Completá la plantilla y subila acá — los gráficos se actualizan solos</div>
     </div>
 
@@ -1877,6 +1879,85 @@ function descargarTXT(contenido, nombre) {
   a.download = nombre;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function exportarParaExcel() {
+  if (!datosReales || !datosReales.movimientos || datosReales.movimientos.length === 0) {
+    appendMsg('ai', '⚠️ Primero subí tu planilla Excel con los movimientos para poder exportar.');
+    switchTab('chat');
+    return;
+  }
+
+  // Separar ventas y compras
+  const ventas = datosReales.movimientos.filter(m => m.tipo && m.tipo.toLowerCase().includes('ingreso'));
+  const compras = datosReales.movimientos.filter(m => !m.tipo || !m.tipo.toLowerCase().includes('ingreso'));
+
+  // Crear workbook
+  const ws_ventas = XLSX.utils.json_to_sheet(ventas.map(v => ({
+    'Fecha': v.fecha,
+    'Comprobante': v.comprobante || '',
+    'Descripción': v.concepto || v.descripcion || '',
+    'Neto': v.neto || v.total || 0,
+    'IVA': v.iva || 0,
+    'Total': v.total || 0
+  })), { header: 1 });
+
+  const ws_compras = XLSX.utils.json_to_sheet(compras.map(c => ({
+    'Fecha': c.fecha,
+    'Comprobante': c.comprobante || '',
+    'Descripción': c.concepto || c.descripcion || '',
+    'Neto': c.neto || c.total || 0,
+    'IVA': c.iva || 0,
+    'Total': c.total || 0
+  })), { header: 1 });
+
+  // Resumen por mes
+  const resumen = {};
+  datosReales.movimientos.forEach(m => {
+    const mes = m.fecha ? m.fecha.substring(0, 7) : 'Sin fecha';
+    if (!resumen[mes]) resumen[mes] = { Mes: mes, Ventas: 0, Compras: 0, IVA: 0, Total: 0 };
+    if (m.tipo && m.tipo.toLowerCase().includes('ingreso')) {
+      resumen[mes].Ventas += m.total || 0;
+    } else {
+      resumen[mes].Compras += m.total || 0;
+    }
+    resumen[mes].IVA += m.iva || 0;
+    resumen[mes].Total += m.total || 0;
+  });
+
+  const ws_resumen = XLSX.utils.json_to_sheet(Object.values(resumen));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws_ventas, 'Ventas');
+  XLSX.utils.book_append_sheet(wb, ws_compras, 'Compras');
+  XLSX.utils.book_append_sheet(wb, ws_resumen, 'Resumen');
+
+  XLSX.writeFile(wb, 'FiscoIA_Liquidacion.xlsx');
+  appendMsg('ai', '✅ Excel descargado: FiscoIA_Liquidacion.xlsx\n\n📊 3 hojas incluidas:\n- **Ventas**: Detalle de facturas de venta\n- **Compras**: Detalle de facturas de compra\n- **Resumen**: Totales por período');
+}
+
+function exportarParaTXT() {
+  if (!datosReales || !datosReales.movimientos || datosReales.movimientos.length === 0) {
+    appendMsg('ai', '⚠️ Primero subí tu planilla Excel con los movimientos para poder exportar.');
+    switchTab('chat');
+    return;
+  }
+
+  let txtContent = 'Fecha|Comprobante|Descripción|Monto|IVA|Total\n';
+  txtContent += '---|---|---|---|---|---\n';
+
+  datosReales.movimientos.forEach(m => {
+    const fecha = m.fecha || '';
+    const comprobante = m.comprobante || '';
+    const descripcion = (m.concepto || m.descripcion || '').replace(/\|/g, '-');
+    const monto = (m.neto || m.total || 0).toFixed(2);
+    const iva = (m.iva || 0).toFixed(2);
+    const total = (m.total || 0).toFixed(2);
+    txtContent += `${fecha}|${comprobante}|${descripcion}|${monto}|${iva}|${total}\n`;
+  });
+
+  descargarTXT(txtContent, 'FiscoIA_Liquidacion_Pipe.txt');
+  appendMsg('ai', '✅ TXT descargado: FiscoIA_Liquidacion_Pipe.txt\n\n📄 Formato pipe-delimited (|):\n- Separador: |\n- Importable en Excel\n- Compatible con cualquier editor');
 }
 
 function exportarParaARCA() {
