@@ -207,6 +207,7 @@ footer{background:#0E0E12;color:#fff;padding:50px 32px;text-align:center;border-
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Precios</a></li>
     <li><a href="#faq">FAQ</a></li>
+    <li><a href="guia-completa.html" target="_blank">📚 Guía Completa</a></li>
   </ul>
   <a href="agente-contador.html" class="nav-cta">Ir al Agente →</a>
 </nav>
@@ -447,46 +448,3 @@ footer{background:#0E0E12;color:#fff;padding:50px 32px;text-align:center;border-
       <div class="faqitem">
         <div class="faqq" onclick="toggleFaq(this)">¿Funciona en el celular?<span class="faqico">+</span></div>
         <div class="faqa">Sí, completamente responsive. Funciona perfecto en smartphone y tablet sin instalar ninguna app.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="cta" id="contacto">
-  <h2>Probalo ahora, gratis</h2>
-  <p>Sin registro, sin tarjeta. Solo tu API key y listo.</p>
-  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px">
-    <a href="agente-contador.html" class="btn-g">Abrir FiscoIA →</a>
-    <a href="https://wa.me/5493435344597?text=Hola,%20quiero%20info%20sobre%20FiscoIA" class="btn-w">💬 Consultar por WhatsApp</a>
-  </div>
-  <p style="margin-top:28px;font-size:13px;opacity:.8">Para planes Estudio o White Label contactanos directamente.</p>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="fbrand">Fisco<em>IA</em></div>
-  <div class="fcopy">© 2026 FiscoIA · Todos los derechos reservados</div>
-  <div class="fby">Desarrollado por <a href="https://labstudiopna.github.io" target="_blank">LABStudio.pna</a></div>
-</footer>
-
-<script>
-function toggleFaq(el){
-  const item=el.parentElement;
-  const isOpen=item.classList.contains('open');
-  document.querySelectorAll('.faqitem').forEach(i=>i.classList.remove('open'));
-  if(!isOpen)item.classList.add('open');
-}
-const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}
-  });
-},{threshold:0.1});
-document.querySelectorAll('.fc,.step,.pc,.hl-card').forEach(el=>{
-  el.style.opacity='0';el.style.transform='translateY(20px)';
-  el.style.transition='opacity 0.5s ease,transform 0.5s ease';
-  obs.observe(el);
-});
-</script>
-</body>
-</html>
