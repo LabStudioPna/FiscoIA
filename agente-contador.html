@@ -1197,6 +1197,9 @@ function leerExcelYActualizarGraficos(file) {
   <button class="tab" data-panel="resumen" onclick="switchTab('resumen')">
     📈 Resumen
   </button>
+  <a href="guia-completa.html" target="_blank" style="display:flex; align-items:center; gap:8px; padding:12px 16px; border:none; background:none; color:var(--text); text-decoration:none; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s;">
+    📚 Guía
+  </a>
   <button class="tab" data-panel="graficos" onclick="switchTab('graficos')">
     📊 Gráficos
   </button>
@@ -1321,7 +1324,8 @@ function leerExcelYActualizarGraficos(file) {
     </div>
   </div>
 
-  <!-- RESUMEN / DASHBOARD -->
+
+  <!-- RESUMEN -->
   <div class="panel" id="panel-resumen" style="padding:24px; overflow-y:auto;">
     <div class="section-title">📈 Resumen Visual</div>
     
@@ -1937,7 +1941,6 @@ function descargarTXT(contenido, nombre) {
   URL.revokeObjectURL(url);
 }
 
-async function exportarAnalisisPDF() {
   const chatBody = document.querySelector('.chat-body');
   if (!chatBody) {
     appendMsg('ai', '⚠️ No hay análisis para exportar.');
@@ -4093,6 +4096,3 @@ function mostrarAnalisisTendencias() {
   const periodos = Object.keys(grupos).filter(p => p !== 'Sin fecha').sort();
 
   if (periodos.length < 2) {
-    alert('⚠️ Necesitás datos de al menos 2 períodos distintos para calcular tendencias. Identificá el mes/año en las facturas cargadas.');
-    return;
-  }
