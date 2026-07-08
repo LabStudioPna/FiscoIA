@@ -5,6 +5,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FiscoIA — Agente Contable Inteligente</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1177,6 +1178,9 @@ function leerExcelYActualizarGraficos(file) {
   <div class="header-right">
     <div class="status-dot"></div>
     <span class="status-text">Agente activo</span>
+    <button onclick="toggleTema()" style="background:none; border:none; font-size:20px; cursor:pointer; margin-left:12px; padding:4px 8px; border-radius:6px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'" title="Toggle tema oscuro/claro">
+      <span id="tema-icon">🌙</span>
+    </button>
     <div class="key-indicator" onclick="changeKey()" title="Cambiar API Key">
       🔑 <span id="key-display">sk-ant-···</span>
     </div>
@@ -1189,6 +1193,9 @@ function leerExcelYActualizarGraficos(file) {
   </button>
   <button class="tab" data-panel="archivos" onclick="switchTab('archivos')">
     📎 Archivos
+  </button>
+  <button class="tab" data-panel="resumen" onclick="switchTab('resumen')">
+    📈 Resumen
   </button>
   <button class="tab" data-panel="graficos" onclick="switchTab('graficos')">
     📊 Gráficos
@@ -1253,11 +1260,19 @@ function leerExcelYActualizarGraficos(file) {
     </div>
 
     <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
-      <a href="FiscoIA-Plantilla-Movimientos.xlsx" download style="background:var(--green); color:#0F1117; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">📥 Descargar plantilla Excel</a>
-      <button onclick="exportarParaExcel()" style="background:#10B981; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📊 Exportar a Excel (3 hojas)</button>
+      <a href="FiscoIA-Plantilla-Movimientos.xlsx" download style="background:var(--green); color:#0F1117; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">📥 Plantilla: Movimientos</a>
+      <button onclick="descargarPlantillaSueldos()" style="background:#10B981; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">💰 Plantilla: Sueldos</button>
+      <button onclick="descargarPlantillaIngresosБrutos()" style="background:#F59E0B; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📊 Plantilla: IIBB</button>
+      <button onclick="descargarPlantillaRetenciones()" style="background:#EF4444; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">🔗 Plantilla: Retenciones</button>
+      <div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center;">Descargá plantillas y completalas con tus datos</div>
+    </div>
+    
+    <div style="margin-top:12px; display:flex; gap:12px; flex-wrap:wrap;">
+      <button onclick="exportarParaExcel()" style="background:#06B6D4; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📊 Exportar a Excel (3 hojas)</button>
       <button onclick="exportarParaTXT()" style="background:#8B5CF6; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📄 Exportar TXT pipe-delimited</button>
       <button onclick="exportarParaARCA()" style="background:var(--blue); border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📤 Exportar para ARCA</button>
-      <div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center;">Completá la plantilla y subila acá — los gráficos se actualizan solos</div>
+      <button onclick="mostrarHistorial()" style="background:#6B7280; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📋 Ver Historial</button>
+      <button onclick="descargarTodosLosAnalisisZIP()" style="background:#EC4899; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📦 Descargar Historial ZIP</button>
     </div>
 
     <div id="files-section" style="display:none;">
@@ -1302,6 +1317,46 @@ function leerExcelYActualizarGraficos(file) {
           <button class="analyze-btn" onclick="sendToChat('Analizá los archivos que subí y dame un resumen impositivo detallado')">Analizar con IA →</button>
           <button class="analyze-btn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border);" onclick="switchTab('graficos')">Ver en gráficos →</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUMEN / DASHBOARD -->
+  <div class="panel" id="panel-resumen" style="padding:24px; overflow-y:auto;">
+    <div class="section-title">📈 Resumen Visual</div>
+    
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-top:16px;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px;">
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:8px;">📊 Total Análisis Guardados</div>
+        <div style="font-size:28px; font-weight:bold; color:var(--green);" id="resumen-total-analisis">0</div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">En esta sesión</div>
+      </div>
+      
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px;">
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:8px;">💰 Monto Total Procesado</div>
+        <div style="font-size:28px; font-weight:bold; color:var(--blue);" id="resumen-monto-total">$0</div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">De todos los análisis</div>
+      </div>
+      
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px;">
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:8px;">📋 Archivos Subidos</div>
+        <div style="font-size:28px; font-weight:bold; color:var(--amber);" id="resumen-archivos">0</div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">En esta sesión</div>
+      </div>
+      
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px;">
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:8px;">🕐 Última Actualización</div>
+        <div style="font-size:14px; font-weight:bold; color:var(--green);" id="resumen-ultima-actualizacion">Nunca</div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">de datos</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px; padding:16px; background:var(--surface); border-radius:12px; border:1px solid var(--border);">
+      <div class="section-title" style="margin-bottom:12px;">🎯 Acciones Rápidas</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button onclick="mostrarHistorial()" style="background:var(--blue); border:none; border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">Ver Historial</button>
+        <button onclick="descargarTodosLosAnalisisZIP()" style="background:var(--green); border:none; border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; color:#0F1117; cursor:pointer; font-family:var(--sans);">Descargar ZIP</button>
+        <button onclick="limpiarHistorial()" style="background:var(--red); border:none; border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">Limpiar Historial</button>
       </div>
     </div>
   </div>
@@ -2012,6 +2067,193 @@ function exportarParaTXT() {
   descargarTXT(txtContent, 'FiscoIA_Liquidacion_Pipe.txt');
   appendMsg('ai', '✅ TXT descargado: FiscoIA_Liquidacion_Pipe.txt\n\n📄 Formato pipe-delimited (|):\n- Separador: |\n- Importable en Excel\n- Compatible con cualquier editor');
 }
+
+// === PLANTILLAS EXCEL DESCARGABLES ===
+function descargarPlantillaSueldos() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['PLANTILLA LIQUIDACIÓN DE SUELDOS', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['Fecha', 'Empleado', 'CUIT', 'Básico', 'Antigüedad', 'Bonificación', 'Total Bruto'],
+    ['DD/MM/AAAA', 'Nombre Apellido', 'XX-XXXXXXXX-X', 2000, 500, 0, 2500],
+    ['', '', '', '', '', '', ''],
+    ['DESCUENTOS', '', '', '', '', '', ''],
+    ['Aporte AFIP', 'Aporte Obra Social', 'Aporte Sindicato', 'Descuentos Varios', '', '', ''],
+    ['120.00', '150.00', '0.00', '0.00', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['CARGAS SOCIALES (Empleador)', '', '', '', '', '', ''],
+    ['Aporte Patronal AFIP', 'ART', 'Sindicato', '', '', '', ''],
+    ['480.00', '60.00', '0.00', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['Completá los datos con tus empleados. Las fórmulas se calculan automáticamente.', '', '', '', '', '', ''],
+  ]);
+  
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sueldos');
+  XLSX.writeFile(wb, 'FiscoIA_Plantilla_Sueldos.xlsx');
+  appendMsg('ai', '📥 Descargado: FiscoIA_Plantilla_Sueldos.xlsx\n\nCompletá los datos de tus empleados y subila para análisis.');
+}
+
+function descargarPlantillaIngresosБrutos() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['PLANTILLA INGRESOS BRUTOS POR JURISDICCIÓN', '', '', '', ''],
+    ['', '', '', '', ''],
+    ['Fecha', 'Concepto', 'Monto', 'Jurisdicción', 'Alícuota %'],
+    ['DD/MM/AAAA', 'Venta de productos', 10000, 'Buenos Aires', 4.5],
+    ['DD/MM/AAAA', 'Venta de servicios', 5000, 'Córdoba', 3.0],
+    ['DD/MM/AAAA', 'Comisiones', 3000, 'Entre Ríos', 2.5],
+    ['', '', '', '', ''],
+    ['ALÍCUOTAS POR PROVINCIA', '', '', '', ''],
+    ['Buenos Aires', '4.50%', '', '', ''],
+    ['CABA', '3.05%', '', '', ''],
+    ['Córdoba', '3.00%', '', '', ''],
+    ['Entre Ríos', '2.50%', '', '', ''],
+    ['Santa Fe', '3.00%', '', '', ''],
+    ['Mendoza', '1.50%', '', '', ''],
+  ]);
+  
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Ingresos Brutos');
+  XLSX.writeFile(wb, 'FiscoIA_Plantilla_IngresoBrutos.xlsx');
+  appendMsg('ai', '📥 Descargado: FiscoIA_Plantilla_IngresoBrutos.xlsx\n\nIngresá tus movimientos por jurisdicción para cálculo de IIBB.');
+}
+
+function descargarPlantillaRetenciones() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['PLANTILLA RETENCIONES', '', '', '', ''],
+    ['', '', '', '', ''],
+    ['Fecha', 'Proveedor/Cliente', 'Monto', 'Tipo de Retención', 'Alícuota %'],
+    ['DD/MM/AAAA', 'Empresa XYZ', 10000, 'Retención IVA', 9],
+    ['DD/MM/AAAA', 'Consultora ABC', 5000, 'Retención Ganancias', 17],
+    ['DD/MM/AAAA', 'Distribuidor DEF', 3000, 'Retención IIBB', 3],
+    ['', '', '', '', ''],
+    ['TIPOS DE RETENCIÓN', 'Alícuota Estándar', '', '', ''],
+    ['Retención IVA', '9%', '', '', ''],
+    ['Retención Ganancias', '17%', '', '', ''],
+    ['Retención IIBB (CABA)', '3.05%', '', '', ''],
+    ['Retención IIBB (Buenos Aires)', '1.5-4.5%', '', '', ''],
+  ]);
+  
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Retenciones');
+  XLSX.writeFile(wb, 'FiscoIA_Plantilla_Retenciones.xlsx');
+  appendMsg('ai', '📥 Descargado: FiscoIA_Plantilla_Retenciones.xlsx\n\nRegistrá las retenciones sufridas para auditoría.');
+}
+
+// === HISTORIAL DE ANÁLISIS (localStorage) ===
+let historialAnalisis = JSON.parse(localStorage.getItem('fiscoia_historial')) || [];
+
+function guardarAnalisisEnHistorial(datos) {
+  const analisis = {
+    id: Date.now(),
+    fecha: new Date().toLocaleString('es-AR'),
+    tipo: datos.tipo || 'General',
+    monto: datos.total || datos.monto || 0,
+    datos: datos
+  };
+  historialAnalisis.unshift(analisis);
+  if (historialAnalisis.length > 50) historialAnalisis.pop();
+  localStorage.setItem('fiscoia_historial', JSON.stringify(historialAnalisis));
+  actualizarResumen();
+}
+
+function mostrarHistorial() {
+  if (historialAnalisis.length === 0) {
+    appendMsg('ai', '📭 No hay análisis guardados aún. Cuando analices una factura, aparecerá aquí.');
+    return;
+  }
+
+  let msg = '📋 **Historial de Análisis Guardados**\n\n';
+  historialAnalisis.slice(0, 10).forEach((a, i) => {
+    msg += `${i + 1}. ${a.tipo} - $${formatCotiz(a.monto)} (${a.fecha})\n`;
+  });
+  msg += `\n**Total guardados:** ${historialAnalisis.length}`;
+  appendMsg('ai', msg);
+}
+
+function descargarTodosLosAnalisisZIP() {
+  if (historialAnalisis.length === 0) {
+    appendMsg('ai', '⚠️ No hay análisis para descargar.');
+    return;
+  }
+
+  const zip = new JSZip();
+  
+  historialAnalisis.forEach((a, index) => {
+    const json = JSON.stringify(a.datos, null, 2);
+    zip.file(`Analisis_${index + 1}_${a.fecha.split(' ')[0]}.json`, json);
+  });
+
+  zip.generateAsync({ type: 'blob' }).then(content => {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = `FiscoIA_Historial_${new Date().toISOString().split('T')[0]}.zip`;
+    link.click();
+  });
+
+  appendMsg('ai', `✅ ZIP descargado: FiscoIA_Historial_${new Date().toISOString().split('T')[0]}.zip\n\n${historialAnalisis.length} análisis guardados en JSON.`);
+}
+
+function limpiarHistorial() {
+  if (confirm('¿Seguro que querés borrar TODO el historial? No se puede deshacer.')) {
+    historialAnalisis = [];
+    localStorage.removeItem('fiscoia_historial');
+    appendMsg('ai', '🗑️ Historial borrado completamente.');
+  }
+}
+
+// === MODO OSCURO/CLARO ===
+let modoOscuro = localStorage.getItem('fiscoia_tema') === 'oscuro';
+
+function toggleTema() {
+  modoOscuro = !modoOscuro;
+  localStorage.setItem('fiscoia_tema', modoOscuro ? 'oscuro' : 'claro');
+  aplicarTema();
+  const temaIcon = document.getElementById('tema-icon');
+  if (temaIcon) temaIcon.textContent = modoOscuro ? '☀️' : '🌙';
+}
+
+function aplicarTema() {
+  const root = document.documentElement;
+  const temaIcon = document.getElementById('tema-icon');
+  
+  if (modoOscuro) {
+    root.style.setProperty('--bg', '#0F1117');
+    root.style.setProperty('--surface', '#1a1f2e');
+    root.style.setProperty('--text', '#e6e6e6');
+    document.body.style.background = '#0F1117';
+    document.body.style.color = '#e6e6e6';
+    if (temaIcon) temaIcon.textContent = '☀️';
+  } else {
+    root.style.setProperty('--bg', '#ffffff');
+    root.style.setProperty('--surface', '#f5f5f5');
+    root.style.setProperty('--text', '#1a1a1a');
+    document.body.style.background = '#ffffff';
+    document.body.style.color = '#1a1a1a';
+    if (temaIcon) temaIcon.textContent = '🌙';
+  }
+}
+
+function actualizarResumen() {
+  const totalAnalisis = historialAnalisis.length;
+  let montoTotal = 0;
+  
+  historialAnalisis.forEach(a => {
+    montoTotal += a.monto || 0;
+  });
+
+  const totalAnalisisEl = document.getElementById('resumen-total-analisis');
+  const montoTotalEl = document.getElementById('resumen-monto-total');
+  const ultimaActEl = document.getElementById('resumen-ultima-actualizacion');
+
+  if (totalAnalisisEl) totalAnalisisEl.textContent = totalAnalisis;
+  if (montoTotalEl) montoTotalEl.textContent = '$' + formatCotiz(montoTotal);
+  if (ultimaActEl) ultimaActEl.textContent = new Date().toLocaleTimeString('es-AR').split(':').slice(0, 2).join(':');
+}
+
+(function() {
+  aplicarTema();
+  actualizarResumen();
+})();
 
 function exportarParaARCA() {
   if (!datosReales || !datosReales.movimientos || datosReales.movimientos.length === 0) {
