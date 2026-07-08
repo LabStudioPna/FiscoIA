@@ -2248,12 +2248,14 @@ async function sendMessage() {
       appendMsg('ai', aiText);
       conversationHistory.push({ role: 'assistant', content: aiText });
       registrarActividad('Consulta Chat', `Pregunta: ${text || '[archivo adjunto]'} | Respuesta: ${aiText.substring(0, 150)}...`);
+    } else if (data.error) {
+      appendMsg('ai', `⚠️ Error de la API de Anthropic: ${data.error.message || data.error.type || 'desconocido'}`);
     } else {
-      appendMsg('ai', '⚠️ No pude procesar la respuesta. Intentá de nuevo.');
+      appendMsg('ai', `⚠️ No pude procesar la respuesta. Intentá de nuevo.\n\nDetalle técnico: ${JSON.stringify(data).substring(0, 300)}`);
     }
   } catch (err) {
     removeTyping(typingId);
-    appendMsg('ai', '❌ Error de conexión con el servicio IA. Verificá tu conexión.');
+    appendMsg('ai', `❌ Error de conexión con el servicio IA: ${err.message}`);
   }
 
   sendBtn.disabled = false;
