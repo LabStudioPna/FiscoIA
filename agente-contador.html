@@ -2198,10 +2198,11 @@ async function sendMessage() {
   } else if (userContent.length > 0) {
     const isPDF = attachedFileType === 'application/pdf';
     const isImage = attachedFileType && attachedFileType.startsWith('image/');
+    const instruccionDatos = ' Al FINAL de tu respuesta, después de todo el análisis en texto, agregá SIEMPRE un bloque con esta forma exacta (sin nada más adentro, valores numéricos sin signo $ ni puntos de miles, usá 0 si un campo no aplica o no lo encontrás, y "N/A" para campos de texto que no encuentres):\n\n```DATOS_FISCOIA\n{"tipo":"Factura A/B/C o Ticket/Recibo","numero":"...","fecha":"DD/MM/AAAA","cuitEmisor":"...","emisor":"...","neto":0,"iva":0,"total":0,"retIva":0,"retGan":0,"percIIBB":0}\n```';
     if (isPDF) {
-      userContent.push({ type: 'text', text: 'Analizá esta factura o documento contable. Extraé todos los datos relevantes: tipo de comprobante, fecha, CUIT emisor y receptor, importes, IVA, retenciones, CAE y cualquier información fiscal importante. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' });
+      userContent.push({ type: 'text', text: 'Analizá esta factura o documento contable. Extraé todos los datos relevantes: tipo de comprobante, fecha, CUIT emisor y receptor, importes, IVA, retenciones, CAE y cualquier información fiscal importante. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' + instruccionDatos });
     } else if (isImage) {
-      userContent.push({ type: 'text', text: 'Analizá esta imagen de factura o comprobante. Extraé todos los datos: tipo, fecha, CUIT, importes, IVA, retenciones y CAE. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' });
+      userContent.push({ type: 'text', text: 'Analizá esta imagen de factura o comprobante. Extraé todos los datos: tipo, fecha, CUIT, importes, IVA, retenciones y CAE. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' + instruccionDatos });
     }
   }
 
@@ -2335,7 +2336,8 @@ function appendMsg(role, text, fileName) {
 }
 
 function formatMessage(text) {
-  return text
+  const textoVisible = text.replace(/```DATOS_FISCOIA[\s\S]*?```/g, '').trim();
+  return textoVisible
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, `<code style="background:var(--bg); padding:2px 6px; border-radius:4px; font-family:var(--mono); font-size:12px; color:var(--green);">$1</code>`)
@@ -3114,6 +3116,35 @@ function exportarPDF() {
 function extraerDatosDelAnalisis(texto) {
   if (!texto) return {};
 
+  // Prioridad 1: bloque estructurado que le pedimos a la IA
+  const bloqueMatch = texto.match(/```DATOS_FISCOIA\s*([\s\S]*?)```/);
+  if (bloqueMatch) {
+    try {
+      const json = JSON.parse(bloqueMatch[1].trim());
+      const datos = {
+        tipo: json.tipo || 'N/A',
+        numero: json.numero || 'N/A',
+        fecha: json.fecha || 'N/A',
+        cuitEmisor: json.cuitEmisor || 'N/A',
+        emisor: json.emisor || 'N/A',
+        neto: Number(json.neto) || 0,
+        iva: Number(json.iva) || 0,
+        total: Number(json.total) || 0,
+        retIva: Number(json.retIva) || 0,
+        retGan: Number(json.retGan) || 0,
+        percIIBB: Number(json.percIIBB) || 0
+      };
+      const textoLimpio = texto.replace(/```DATOS_FISCOIA[\s\S]*?```/g, '').trim();
+      datos.hallazgos = textoLimpio.includes('✅') ? 'Formato válido' : 'Revisar';
+      datos.inconsistencias = textoLimpio.includes('⚠️') ? 'Detectadas' : 'Ninguna';
+      datos.estado = textoLimpio.includes('❌') ? 'Error' : (textoLimpio.includes('⚠️') ? 'Con observaciones' : 'Válido');
+      datos.observaciones = textoLimpio.substring(0, 500);
+      return datos;
+    } catch (e) {
+      // si el JSON viene mal formado, cae al parseo por regex de abajo
+    }
+  }
+
   const datos = {};
 
   // Tipo de factura
@@ -3792,34 +3823,3 @@ function mostrarAnalisisTendencias() {
     },
     options: {
       responsive: true,
-      plugins: { legend: { labels: { color: '#94A3B8' } } },
-      scales: {
-        x: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-      }
-    }
-  });
-
-  // Alertas de variación entre el último y el anteúltimo período
-  const alertas = [];
-  const chequear = (arr, nombre) => {
-    const prev = arr[arr.length - 2], last = arr[arr.length - 1];
-    if (!prev) return;
-    const variacion = ((last - prev) / prev * 100);
-    if (Math.abs(variacion) >= 15) {
-      const flecha = variacion >= 0 ? '📈 subieron' : '📉 bajaron';
-      alertas.push(`<div style="background:var(--surface2); border-left:3px solid ${variacion >= 0 ? '#EF4444' : '#00C896'}; border-radius:6px; padding:10px 14px; font-size:13px; color:var(--text);">⚠️ <strong>${nombre}</strong> ${flecha} un <strong>${Math.abs(variacion).toFixed(1)}%</strong> de ${periodos[periodos.length-2]} a ${periodos[periodos.length-1]}</div>`);
-    }
-  };
-  chequear(netos, 'Los ingresos netos');
-  chequear(ivas, 'El IVA');
-  chequear(retenciones, 'Las retenciones');
-
-  document.getElementById('tendencias-alertas').innerHTML = alertas.length > 0
-    ? alertas.join('')
-    : '<div style="color:var(--text-dim); font-size:13px;">No se detectaron variaciones significativas (≥15%) entre los últimos dos períodos.</div>';
-  registrarActividad('Análisis de Tendencias', `Analizados ${periodos.length} períodos — ${alertas.length} alertas de variación`);
-}
-</script>
-</body>
-</html>
