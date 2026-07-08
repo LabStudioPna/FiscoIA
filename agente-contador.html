@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script> 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FiscoIA — Agente Contable Inteligente</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1879,6 +1880,58 @@ function descargarTXT(contenido, nombre) {
   a.download = nombre;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+async function exportarAnalisisPDF() {
+  const chatBody = document.querySelector('.chat-body');
+  if (!chatBody) {
+    appendMsg('ai', '⚠️ No hay análisis para exportar.');
+    return;
+  }
+
+  try {
+    // Crear un elemento temporal para capturar
+    const temp = document.createElement('div');
+    temp.style.cssText = 'position:absolute; left:-9999px; width:800px; background:#fff; padding:20px; font-family:Arial;';
+    
+    // Copiar los mensajes del chat
+    const mensajes = chatBody.querySelectorAll('.message');
+    if (mensajes.length === 0) {
+      appendMsg('ai', '⚠️ No hay mensajes para capturar.');
+      return;
+    }
+
+    // Tomar el último análisis (probablemente sea el de la factura)
+    const ultimoMensaje = mensajes[mensajes.length - 1];
+    const contenido = ultimoMensaje.cloneNode(true);
+    contenido.style.cssText = 'margin:0; padding:10px; font-size:12px;';
+    temp.appendChild(contenido);
+    document.body.appendChild(temp);
+
+    // Capturar como imagen
+    const canvas = await html2canvas(temp, { backgroundColor: '#ffffff', scale: 2 });
+    document.body.removeChild(temp);
+
+    // Crear PDF
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const imgWidth = 190;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const imgData = canvas.toDataURL('image/png');
+
+    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+    pdf.save('FiscoIA_Analisis_Factura.pdf');
+
+    appendMsg('ai', '✅ PDF generado: FiscoIA_Analisis_Factura.pdf\n\nEl documento incluye el análisis completo de la factura.');
+  } catch (err) {
+    console.error('Error generando PDF:', err);
+    appendMsg('ai', '⚠️ Error al generar PDF. Probá nuevamente.');
+  }
 }
 
 function exportarParaExcel() {
@@ -3801,56 +3854,3 @@ function mostrarAnalisisTendencias() {
     alert('⚠️ Necesitás datos de al menos 2 períodos distintos para calcular tendencias. Identificá el mes/año en las facturas cargadas.');
     return;
   }
-
-  const resumenes = periodos.map(p => calcularResumen(grupos[p]));
-  const netos = resumenes.map(r => r.totalNeto);
-  const ivas = resumenes.map(r => r.totalIVA);
-  const retenciones = resumenes.map(r => r.totalRetIVA + r.totalRetGan);
-
-  document.getElementById('modal-tendencias').style.display = 'flex';
-
-  const canvas = document.getElementById('chart-tendencias');
-  if (charts.tendencias) charts.tendencias.destroy();
-  charts.tendencias = new Chart(canvas, {
-    type: 'line',
-    data: {
-      labels: periodos,
-      datasets: [
-        { label: 'Neto', data: netos, borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,0.1)', tension: 0.3 },
-        { label: 'IVA', data: ivas, borderColor: '#4A9EFF', backgroundColor: 'rgba(74,158,255,0.1)', tension: 0.3 },
-        { label: 'Retenciones', data: retenciones, borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.3 },
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#94A3B8' } } },
-      scales: {
-        x: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-      }
-    }
-  });
-
-  // Alertas de variación entre el último y el anteúltimo período
-  const alertas = [];
-  const chequear = (arr, nombre) => {
-    const prev = arr[arr.length - 2], last = arr[arr.length - 1];
-    if (!prev) return;
-    const variacion = ((last - prev) / prev * 100);
-    if (Math.abs(variacion) >= 15) {
-      const flecha = variacion >= 0 ? '📈 subieron' : '📉 bajaron';
-      alertas.push(`<div style="background:var(--surface2); border-left:3px solid ${variacion >= 0 ? '#EF4444' : '#00C896'}; border-radius:6px; padding:10px 14px; font-size:13px; color:var(--text);">⚠️ <strong>${nombre}</strong> ${flecha} un <strong>${Math.abs(variacion).toFixed(1)}%</strong> de ${periodos[periodos.length-2]} a ${periodos[periodos.length-1]}</div>`);
-    }
-  };
-  chequear(netos, 'Los ingresos netos');
-  chequear(ivas, 'El IVA');
-  chequear(retenciones, 'Las retenciones');
-
-  document.getElementById('tendencias-alertas').innerHTML = alertas.length > 0
-    ? alertas.join('')
-    : '<div style="color:var(--text-dim); font-size:13px;">No se detectaron variaciones significativas (≥15%) entre los últimos dos períodos.</div>';
-  registrarActividad('Análisis de Tendencias', `Analizados ${periodos.length} períodos — ${alertas.length} alertas de variación`);
-}
-</script>
-</body>
-</html>
