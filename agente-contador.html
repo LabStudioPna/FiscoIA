@@ -873,6 +873,250 @@ function leerExcelYActualizarGraficos(file) {
     gap: 16px;
   }
 
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .chart-card.full { grid-column: 1 / -1; }
+
+  .chart-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .chart-wrap { position: relative; height: 200px; }
+  .chart-wrap.tall { height: 280px; }
+
+  /* ========= VENCIMIENTOS ========= */
+  #panel-vencimientos {
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .venc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .venc-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .venc-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .venc-stat .stat-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .venc-stat .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .venc-stat.danger .stat-num { color: var(--red); }
+  .venc-stat.warning .stat-num { color: var(--teal); }
+  .venc-stat.ok .stat-num { color: var(--green); }
+
+  .venc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .venc-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s;
+  }
+
+  .venc-item:hover { 
+    border-color: var(--text-dim);
+    background: var(--surface2);
+  }
+
+  .venc-date {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 90px;
+  }
+
+  .venc-urgency {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .urgency-red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  .urgency-amber { background: var(--teal); box-shadow: 0 0 8px var(--teal); }
+  .urgency-green { background: var(--green); }
+
+  .venc-info { flex: 1; }
+  .venc-title { 
+    font-size: 14px; 
+    font-weight: 600; 
+    margin-bottom: 3px;
+    color: var(--text);
+  }
+  .venc-sub { 
+    font-size: 12px; 
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  .venc-dias {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .dias-red { color: var(--red); }
+  .dias-amber { color: var(--teal); }
+  .dias-green { color: var(--green); }
+
+  .venc-monto {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 110px;
+    text-align: right;
+  }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 4px 0;
+  }
+
+  .loading span {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+
+  .loading span:nth-child(2) { animation-delay: 0.2s; }
+  .loading span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .cotiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: all 0.2s;
+  }
+
+  .cotiz-card:hover { border-color: var(--green); }
+
+  .cotiz-nombre {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: var(--mono);
+    margin-bottom: 8px;
+  }
+
+  .cotiz-compra {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+  }
+
+  .cotiz-venta {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .cotiz-skeleton {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    height: 80px;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .cotiz-regional {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cotiz-flag { font-size: 28px; }
+
+  .cotiz-info { flex: 1; }
+  .cotiz-info .nombre { font-size: 13px; font-weight: 600; color: var(--text); }
+  .cotiz-info .valor { font-family: var(--mono); font-size: 15px; color: var(--green); font-weight: 600; }
+  .cotiz-info .sub { font-size: 11px; color: var(--text-dim); font-family: var(--mono); }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Typing cursor */
+  .typing-cursor::after {
+    content: '▋';
+    animation: blink 1s infinite;
+    color: var(--green);
+    font-size: 12px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
   /* ===== RESPONSIVE MOBILE - TODOS LOS BREAKPOINTS ===== */
 
   @media (max-width: 1024px) {
@@ -883,97 +1127,174 @@ function leerExcelYActualizarGraficos(file) {
     .onboarding-card { padding: 32px 20px; max-width: 90vw; border-radius: 16px; }
     .onboarding-title { font-size: 18px; }
     .onboarding-logo { width: 56px; height: 56px; font-size: 20px; }
+    .onboarding-sub { font-size: 14px; }
     .key-input { font-size: 13px; padding: 12px 40px 12px 14px; }
+    .key-label { font-size: 10px; margin-bottom: 6px; }
+    .key-hint { font-size: 12px; margin-bottom: 18px; }
+    .key-error { font-size: 12px; padding: 10px 12px; }
     .enter-btn { padding: 12px 24px; font-size: 14px; }
-    
-    .app-header { flex-direction: column; gap: 10px; padding: 10px 12px; }
-    .header-title { font-size: 16px; }
-    .header-nav { width: 100%; gap: 6px; }
-    .nav-btn { font-size: 11px; padding: 7px 10px; }
-    
-    .chat-messages { padding: 14px; }
-    .msg-avatar { width: 28px; height: 28px; }
-    .msg-bubble { padding: 11px 13px; font-size: 13px; }
-    
+
+    .app-header { flex-direction: column; gap: 10px; padding: 10px 12px; height: auto; flex-wrap: wrap; }
+    .header-top { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .header-title { font-size: 16px; font-weight: 600; }
+    .header-nav { width: 100%; gap: 6px; overflow-x: auto; padding-bottom: 8px; }
+    .nav-btn { font-size: 11px; padding: 7px 10px; flex-shrink: 0; white-space: nowrap; border-radius: 6px; }
+
+    .chat-messages { padding: 14px; gap: 10px; }
+    .msg { max-width: 95%; }
+    .msg-avatar { width: 28px; height: 28px; font-size: 12px; }
+    .msg-bubble { padding: 11px 13px; font-size: 13px; border-radius: 10px; }
+    .msg-bubble .label { font-size: 9px; margin-bottom: 6px; }
+
     .chat-input-area { padding: 10px 12px; }
-    .input-attach, .send-btn { width: 36px; height: 36px; }
-    textarea.chat-input { font-size: 12px; min-height: 36px; padding: 8px 10px; }
-    
-    .chart-grid { grid-template-columns: 1fr !important; }
-    .chart-card { padding: 12px; }
-    .chart-wrap { min-height: 220px !important; }
-    .chart-wrap.tall { min-height: 260px !important; }
-    
+    .file-preview { padding: 8px 10px; font-size: 11px; margin-bottom: 8px; }
+    .input-row { gap: 6px; }
+    .input-attach, .send-btn { width: 36px; height: 36px; font-size: 14px; border-radius: 8px; flex-shrink: 0; }
+    textarea.chat-input { font-size: 12px; min-height: 36px; max-height: 100px; padding: 8px 10px; border-radius: 8px; }
+
+    .chips { gap: 6px; margin-top: 10px; }
+    .chip { font-size: 11px; padding: 5px 11px; }
+
+    .section-title { font-size: 10px; margin-bottom: 10px; }
+
+    #panel-archivos { gap: 14px; }
+    .drop-zone { padding: 32px 12px; border-radius: 12px; }
+    .drop-icon { font-size: 36px; margin-bottom: 8px; }
+    .drop-title { font-size: 15px; }
+    .drop-sub { font-size: 11px; }
+
+    .file-item { padding: 10px 12px; gap: 10px; border-radius: 10px; }
+    .file-item-icon { font-size: 20px; }
+    .file-item-name { font-size: 13px; }
+    .file-item-meta { font-size: 11px; }
+
+    .analyze-btn { font-size: 12px; padding: 8px 14px; border-radius: 7px; }
+
     .analysis-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .analysis-card { padding: 12px; }
-    
-    .drop-zone { padding: 32px 12px; }
-    .file-item { padding: 10px 12px; }
+    .analysis-card { padding: 12px; border-radius: 10px; }
+    .card-label { font-size: 10px; }
+    .card-value { font-size: 20px; }
+    .card-sub { font-size: 10px; }
+
+    #panel-graficos { padding: 12px; gap: 10px; }
+    .chart-grid { grid-template-columns: 1fr; gap: 12px; }
+    .chart-card { padding: 12px; border-radius: 10px; }
+    .chart-card-title { font-size: 11px; margin-bottom: 10px; }
+    .chart-wrap { min-height: 220px; }
+    .chart-wrap.tall { min-height: 260px; }
+    .chart-controls { flex-direction: row; justify-content: flex-start; gap: 6px; width: 100%; }
+    .chart-btn { font-size: 11px; padding: 6px 12px; }
+
+    .venc-grid { grid-template-columns: 1fr; gap: 10px; }
+    .venc-card { padding: 12px; border-radius: 10px; }
+    .venc-title { font-size: 13px; }
+    .venc-desc { font-size: 11px; }
   }
 
   @media (max-width: 640px) {
-    .onboarding-card { padding: 24px 16px; }
-    .onboarding-logo { width: 48px; height: 48px; font-size: 18px; }
-    .onboarding-title { font-size: 16px; }
-    .key-input { font-size: 12px; padding: 10px 38px 10px 12px; }
+    .onboarding-card { padding: 24px 16px; border-radius: 14px; }
+    .onboarding-logo { width: 48px; height: 48px; font-size: 18px; margin-bottom: 16px; }
+    .onboarding-title { font-size: 16px; letter-spacing: 1px; margin-bottom: 6px; }
+    .onboarding-sub { font-size: 13px; margin-bottom: 20px; }
+    .key-label { font-size: 9px; }
+    .key-input { font-size: 12px; padding: 10px 38px 10px 12px; border-radius: 8px; }
+    .key-hint { font-size: 11px; margin-bottom: 16px; }
+    .key-toggle { right: 10px; font-size: 14px; }
+    .key-error { font-size: 11px; padding: 8px 10px; margin-bottom: 12px; }
     .enter-btn { padding: 10px 18px; font-size: 13px; }
-    
-    .app-header { padding: 8px 10px; gap: 8px; }
+
+    .app-header { flex-direction: column; padding: 8px 10px; gap: 8px; }
+    .header-top { width: 100%; }
     .header-title { font-size: 14px; }
-    .header-nav { gap: 4px; }
+    .header-nav { gap: 4px; padding-bottom: 6px; }
     .nav-btn { font-size: 10px; padding: 6px 9px; }
-    
-    .chat-messages { padding: 12px; }
-    .msg-avatar { width: 26px; height: 26px; }
+
+    .chat-messages { padding: 12px; gap: 8px; }
+    .msg { max-width: 100%; }
+    .msg-avatar { width: 26px; height: 26px; font-size: 11px; }
     .msg-bubble { padding: 10px 12px; font-size: 12px; }
-    
+    .msg-bubble .label { font-size: 8px; margin-bottom: 4px; }
+
     .chat-input-area { padding: 8px 10px; }
+    .file-preview { padding: 7px 10px; font-size: 10px; }
+    .input-row { gap: 4px; }
     .input-attach, .send-btn { width: 34px; height: 34px; font-size: 12px; }
-    textarea.chat-input { font-size: 11px; min-height: 34px; padding: 7px 9px; }
-    
-    .chart-grid { gap: 10px !important; }
-    .chart-card { padding: 10px; }
-    .chart-wrap { min-height: 200px !important; }
-    .chart-wrap.tall { min-height: 240px !important; }
-    
-    .analysis-grid { grid-template-columns: 1fr !important; gap: 8px; }
-    .analysis-card { padding: 10px; }
-    
-    .drop-zone { padding: 24px 10px; }
-    .file-item { padding: 9px 10px; }
+    textarea.chat-input { font-size: 11px; min-height: 34px; max-height: 80px; padding: 7px 9px; }
+
+    .chips { gap: 5px; }
+    .chip { font-size: 10px; padding: 4px 10px; }
+
+    .section-title { font-size: 9px; margin-bottom: 8px; }
+
+    #panel-archivos { gap: 12px; }
+    .drop-zone { padding: 24px 10px; border-radius: 10px; }
+    .drop-icon { font-size: 32px; margin-bottom: 8px; }
+    .drop-title { font-size: 14px; margin-bottom: 6px; }
+    .drop-sub { font-size: 10px; }
+
+    .file-item { padding: 9px 10px; gap: 8px; border-radius: 8px; }
+    .file-item-icon { font-size: 18px; }
+    .file-item-name { font-size: 12px; }
+    .file-item-meta { font-size: 10px; }
+
+    .analyze-btn { font-size: 11px; padding: 7px 12px; }
+
+    .analysis-grid { grid-template-columns: 1fr; gap: 8px; }
+    .analysis-card { padding: 10px; border-radius: 8px; }
+    .card-label { font-size: 9px; }
+    .card-value { font-size: 18px; }
+    .card-sub { font-size: 9px; }
+
+    #panel-graficos { padding: 10px; gap: 8px; }
+    .chart-grid { gap: 10px; }
+    .chart-card { padding: 10px; border-radius: 8px; }
+    .chart-card-title { font-size: 10px; margin-bottom: 8px; }
+    .chart-wrap { min-height: 200px; }
+    .chart-wrap.tall { min-height: 240px; }
+    .chart-controls { gap: 4px; margin-bottom: 8px; }
+    .chart-btn { font-size: 10px; padding: 5px 10px; }
+
+    .venc-grid { gap: 8px; }
+    .venc-card { padding: 10px; border-radius: 8px; }
+    .venc-title { font-size: 12px; }
+    .venc-desc { font-size: 10px; }
   }
 
   @media (max-width: 480px) {
     .onboarding-card { padding: 20px 14px; }
     .onboarding-logo { width: 40px; height: 40px; font-size: 16px; }
     .onboarding-title { font-size: 14px; }
+    .onboarding-sub { font-size: 12px; }
     .key-input { font-size: 11px; padding: 9px 36px 9px 11px; }
+    .key-label { font-size: 8px; }
+    .key-hint { font-size: 10px; margin-bottom: 12px; }
     .enter-btn { padding: 9px 16px; font-size: 12px; }
-    
+
     .app-header { padding: 6px 8px; }
     .header-title { font-size: 12px; }
     .header-nav { gap: 3px; }
     .nav-btn { font-size: 9px; padding: 5px 8px; }
-    
+
     .chat-messages { padding: 10px; }
-    .msg-avatar { width: 24px; height: 24px; }
+    .msg-avatar { width: 24px; height: 24px; font-size: 10px; }
     .msg-bubble { padding: 8px 10px; font-size: 11px; }
-    
-    .chat-input-area { padding: 6px 8px; }
+    .chat-input-area { padding: 6px 8px; gap: 4px; }
+    .input-row { gap: 3px; }
     .input-attach, .send-btn { width: 32px; height: 32px; font-size: 11px; }
     textarea.chat-input { font-size: 10px; min-height: 32px; padding: 6px 8px; }
-    
-    .chart-grid { gap: 8px !important; }
-    .chart-card { padding: 8px; }
-    .chart-wrap { min-height: 180px !important; }
-    
-    .analysis-card { padding: 8px; }
+
     .drop-zone { padding: 20px 8px; }
+    .file-item { padding: 8px; }
+    .section-title { font-size: 8px; }
+    .analysis-card { padding: 8px; }
+    .card-value { font-size: 16px; }
+    .chart-card { padding: 8px; }
+    .chart-wrap { min-height: 180px; }
   }
+
 
 </style>
 </head>
-
 <body>
 
 <!-- ONBOARDING -->
@@ -2108,14 +2429,16 @@ async function sendMessage() {
 
   if (text) {
     userContent.push({ type: 'text', text });
-  } else if (userContent.length > 0) {
-    const isPDF = attachedFileType === 'application/pdf';
+  }
+
+  if (attachedFile && attachedFileBase64) {
     const isImage = attachedFileType && attachedFileType.startsWith('image/');
+    const isPDF = attachedFileType === 'application/pdf';
     const instruccionDatos = ' Al FINAL de tu respuesta, después de todo el análisis en texto, agregá SIEMPRE un bloque con esta forma exacta (sin nada más adentro, valores numéricos sin signo $ ni puntos de miles, usá 0 si un campo no aplica o no lo encontrás, y "N/A" para campos de texto que no encuentres):\n\n```DATOS_FISCOIA\n{"tipo":"Factura A/B/C o Ticket/Recibo","numero":"...","fecha":"DD/MM/AAAA","cuitEmisor":"...","emisor":"...","neto":0,"iva":0,"total":0,"retIva":0,"retGan":0,"percIIBB":0}\n```';
     if (isPDF) {
-      userContent.push({ type: 'text', text: 'Analizá esta factura o documento contable. Extraé todos los datos relevantes: tipo de comprobante, fecha, CUIT emisor y receptor, importes, IVA, retenciones, CAE y cualquier información fiscal importante. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' + instruccionDatos });
+      userContent.push({ type: 'text', text: (text ? 'Además, analizá el archivo PDF adjunto. ' : 'Analizá esta factura o documento contable. ') + 'Extraé todos los datos relevantes: tipo de comprobante, fecha, CUIT emisor y receptor, importes, IVA, retenciones, CAE y cualquier información fiscal importante. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' + instruccionDatos });
     } else if (isImage) {
-      userContent.push({ type: 'text', text: 'Analizá esta imagen de factura o comprobante. Extraé todos los datos: tipo, fecha, CUIT, importes, IVA, retenciones y CAE. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' + instruccionDatos });
+      userContent.push({ type: 'text', text: (text ? 'Además, analizá la imagen adjunta. ' : 'Analizá esta imagen de factura o comprobante. ') + 'Extraé todos los datos: tipo, fecha, CUIT, importes, IVA, retenciones y CAE. Si hay importes en moneda extranjera (USD, BRL, UYU, CLP, EUR), convertílos a pesos argentinos usando las cotizaciones del día que tenés en contexto — mostrá el equivalente al tipo de cambio oficial y al blue. Indicá si hay inconsistencias.' + instruccionDatos });
     }
   }
 
@@ -2161,9 +2484,13 @@ async function sendMessage() {
       conversationHistory.push({ role: 'assistant', content: aiText });
       registrarActividad('Consulta Chat', `Pregunta: ${text || '[archivo adjunto]'} | Respuesta: ${aiText.substring(0, 150)}...`);
     } else if (data.error) {
-      appendMsg('ai', `⚠️ Error de la API de Anthropic: ${data.error.message || data.error.type || 'desconocido'}`);
+      const tipo = data.error.type || 'desconocido';
+      const mensaje = data.error.message || 'Sin detalle adicional';
+      appendMsg('ai', `⚠️ **Error de la API de Anthropic** (${tipo}):\n\n${mensaje}\n\n💡 Causas comunes: el PDF puede estar dañado, ser un escaneo sin texto (necesitaría OCR previo), ser muy pesado (>32MB), o tu API key puede no tener crédito. Verificá en console.anthropic.com.`);
+      console.error('Error API completo:', data.error);
     } else {
-      appendMsg('ai', `⚠️ No pude procesar la respuesta. Intentá de nuevo.\n\nDetalle técnico: ${JSON.stringify(data).substring(0, 300)}`);
+      appendMsg('ai', `⚠️ Respuesta inesperada de la API (sin contenido ni error). Esto puede pasar si el archivo no pudo procesarse.\n\nDetalle técnico: ${JSON.stringify(data).substring(0, 300)}`);
+      console.error('Respuesta completa sin content ni error:', data);
     }
   } catch (err) {
     removeTyping(typingId);
