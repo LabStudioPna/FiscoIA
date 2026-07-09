@@ -1119,6 +1119,335 @@ function leerExcelYActualizarGraficos(file) {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
+  /* ===== RESPONSIVE MOBILE FIXES ===== */
+
+@media (max-width: 768px) {
+  /* ONBOARDING */
+  .onboarding-card {
+    padding: 32px 24px;
+    max-width: 90vw;
+    border-radius: 16px;
+  }
+
+  .onboarding-title {
+    font-size: 18px;
+  }
+
+  .key-input {
+    font-size: 12px;
+    padding: 11px 40px 11px 12px;
+  }
+
+  /* MAIN LAYOUT */
+  body {
+    flex-direction: column;
+  }
+
+  /* HEADER/NAV */
+  .app-header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .header-top {
+    width: 100%;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  .header-nav {
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+  }
+
+  .nav-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+    flex-shrink: 0;
+  }
+
+  /* CHAT MESSAGES */
+  .chat-messages {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .msg {
+    max-width: 95%;
+  }
+
+  .msg-bubble {
+    max-width: 100%;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  /* CHAT INPUT AREA */
+  .chat-input-area {
+    padding: 12px 16px;
+  }
+
+  .input-row {
+    gap: 8px;
+  }
+
+  .input-attach,
+  .send-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  textarea.chat-input {
+    font-size: 13px;
+    min-height: 38px;
+    max-height: 100px;
+    padding: 9px 12px;
+  }
+
+  /* PANELS */
+  #panel-archivos {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .drop-zone {
+    padding: 32px 16px;
+  }
+
+  .drop-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+
+  .drop-title {
+    font-size: 16px;
+  }
+
+  .drop-sub {
+    font-size: 12px;
+  }
+
+  /* BUTTONS */
+  .analyze-btn,
+  .chart-btn {
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+
+  /* CHARTS */
+  #panel-graficos {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .chart-card {
+    padding: 16px;
+  }
+
+  .chart-card-title {
+    font-size: 12px;
+  }
+
+  .chart-wrap {
+    min-height: 240px;
+  }
+
+  .chart-wrap.tall {
+    min-height: 280px;
+  }
+
+  .chart-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* ANALYSIS CARDS */
+  .analysis-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .analysis-card {
+    padding: 14px;
+  }
+
+  .card-label {
+    font-size: 11px;
+  }
+
+  .card-value {
+    font-size: 18px;
+  }
+
+  .card-sub {
+    font-size: 11px;
+  }
+
+  /* VENCIMIENTOS */
+  .venc-grid,
+  .venc-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .venc-card {
+    padding: 14px;
+  }
+
+  /* FILE LIST */
+  .file-item {
+    padding: 12px 14px;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .file-item-icon {
+    font-size: 20px;
+  }
+
+  .file-item-info {
+    width: 100%;
+  }
+
+  /* SCROLLBAR HIDDEN */
+  .chat-messages::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  /* WHITEBOARD */
+  #whiteboard-container {
+    max-height: 300px;
+  }
+
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* SHEET PREVIEW */
+  .sheet-preview {
+    font-size: 11px;
+    max-height: 300px;
+    overflow-x: auto;
+  }
+
+  .sheet-preview table {
+    font-size: 11px;
+  }
+
+  .sheet-preview th,
+  .sheet-preview td {
+    padding: 6px 8px;
+  }
+
+  /* GENERAL FIXES */
+  .section-title {
+    font-size: 10px;
+  }
+
+  .key-label {
+    font-size: 10px;
+  }
+
+  .key-hint {
+    font-size: 11px;
+  }
+
+  /* FLEX FIX */
+  .chips {
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .onboarding-card {
+    padding: 24px 16px;
+  }
+
+  .onboarding-title {
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+
+  .onboarding-logo {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .header-title {
+    font-size: 14px;
+  }
+
+  .msg {
+    max-width: 100%;
+  }
+
+  .msg-bubble {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+
+  .chat-input-area {
+    padding: 10px 12px;
+  }
+
+  textarea.chat-input {
+    font-size: 12px;
+  }
+
+  .input-attach,
+  .send-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .chart-grid {
+    gap: 12px;
+  }
+
+  .chart-card {
+    padding: 12px;
+  }
+
+  .analysis-card {
+    padding: 12px;
+  }
+
+  .card-value {
+    font-size: 16px;
+  }
+
+  /* HIDE SOME DETAILS */
+  .section-title {
+    font-size: 9px;
+  }
+
+  .chart-controls {
+    gap: 6px;
+  }
+
+  .chart-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
 </style>
 </head>
 <body>
