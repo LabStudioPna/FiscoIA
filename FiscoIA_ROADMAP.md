@@ -1,30 +1,29 @@
 # FiscoIA — Roadmap
 
-*Última actualización: 10 de julio de 2026*
+*Última actualización: 13 de julio de 2026*
 
-## 🟢 Pendiente inmediato
+## 🔴 Bloqueado en LAB (necesita acción/decisión tuya)
 
 | Item | Detalle |
 |---|---|
-| Formspree del formulario de contacto | `index.html` tiene `action="https://formspree.io/f/YOUR_FORM_ID"` — hay que crear el form en formspree.io (gratis) y reemplazar el ID real. Sin esto el formulario de contacto no envía nada. |
-| Verificar OG image en producción | Pegar `https://labstudiopna.github.io/FiscoIA/` en el Facebook Sharing Debugger o mandarla por WhatsApp para confirmar que la tarjeta se ve bien con la imagen nueva. |
-| Dominio `fiscoia.com.ar` | Registro pendiente (estaba planeado para un sábado). |
-| Payment method en Anthropic Console | Para que la API key no se quede sin crédito cada pocos usos. |
+| Mercado Pago | Conseguir cuenta de developer + Access Token en developers.mercadopago.com |
+| Publicar OAuth fuera de "modo Prueba" | Google Cloud Console → Pantalla de consentimiento OAuth → Publicar. Sin esto, solo vos (y los emails agregados como prueba) pueden loguearse |
+| Cambiar plan de un usuario que paga | Manual: tabla `FiscoIA_Usuarios` en n8n → cambiar campo `plan` de "gratis" a "estudio" |
 
-## 🟡 Corto plazo (si hay tracción temprana de ventas)
+## 🟡 Corto plazo (si hay tracción de ventas)
 
-- **Integración Stripe** — pagos automáticos para planes pagos
-- **DDJJ precompletada ARCA** — alto valor percibido, diferenciador fuerte
-- **2FA** — seguridad esperable en cualquier SaaS con datos fiscales
-- **Vencimientos ARCA vinculados a cliente + semáforo combinado** — hoy los vencimientos son una lista general fija (hardcodeada, no dinámica), sin relación a clientes específicos. Requiere: (1) modelo de datos que asocie cada vencimiento a un cliente, (2) hacer la lista dinámica en vez de fechas fijas 2026 hardcodeadas, (3) semáforo verde/amarillo/rojo por cliente combinando vencimientos pendientes + anomalías detectadas en sus facturas. Es cambio de arquitectura, no ajuste rápido.
+- **Integración Stripe** — alternativa/complemento a Mercado Pago
+- **DDJJ precompletada ARCA** — alto valor percibido
+- **2FA** — esperable en un SaaS con datos fiscales
+- **Vencimientos ARCA vinculados a cliente + semáforo verde/amarillo/rojo** — hoy los vencimientos son una lista general fija (no por cliente, no recurrente mes a mes). Requiere: (1) modelo de datos que asocie vencimiento↔cliente, (2) hacerla dinámica/recurrente en vez de fechas fijas 2026 hardcodeadas, (3) semáforo combinando vencimientos + anomalías. Cambio de arquitectura, no ajuste rápido.
+- **Plantilla de Google Sheets "hacer una copia"** — para simplificar el modo avanzado de Apps Script (LAB tiene que crear la planilla plantilla una vez en su Drive y pasar el link con `/copy` al final)
 
 ## 🔵 Q3 2026 (según volumen de usuarios)
 
-- Carga automática a portal ARCA
-- Upgrade a modelo Sonnet (mejor calidad, más caro — evaluar cuándo se justifica)
-- Reportes mensuales PDF automáticos
-- Integración Mercado Pago
-- App mobile
+- Investigar si existe API oficial de ARCA para carga automática (si no existe, no se hace vía scraping/automatización de navegador — riesgo de manejar Clave Fiscal)
+- Reportes mensuales PDF ya están — evaluar si conviene modelo Sonnet para mejor calidad (más caro)
+- Mercado Pago activo
+- App mobile nativa (hoy es web responsive, no app)
 
 ## 🟣 Q4 2026 / 2027 (visión larga)
 
@@ -32,12 +31,18 @@
 - Analytics y predicción de impuestos
 - API para terceros
 - Expansión a Chile, Uruguay, Colombia
+- Notificaciones por WhatsApp (Monitor Normativo) — hay 2 nodos ya armados en n8n (WhatsApp Admin LABStudio + WhatsApp Clientes Plan) pero desactivados con placeholders sin completar. Requiere cuenta de WhatsApp Business API.
 
 ## 💡 Recomendación
 
-No avanzar con nada de "Corto plazo" en adelante hasta tener usuarios pagos reales dando señal de qué piden. Priorizar: validar que lo que ya existe funciona sin bugs, conseguir los primeros clientes, y recién ahí evaluar qué construir después.
+Con el modelo de prueba de 5 días ya andando, lo más urgente es: **publicar el OAuth** (para que cualquiera pueda entrar, no solo cuentas de prueba) y **conseguir el Access Token de Mercado Pago**. Todo lo demás puede esperar a tener usuarios reales dando señal de qué priorizar.
 
-## ⚠️ Cosas para revisar / posibles pendientes técnicos
+## ⚠️ Antes de la primera venta real
 
-- Confirmar que todos los archivos entregados en las últimas sesiones (agente-contador.html, index.html, guia-completa.html, favicon.svg/ico/pngs, og-image.png) están efectivamente subidos y en producción — hubo idas y vueltas donde algunos fixes no llegaban a pushearse.
-- Revisar bugs reportados como "resueltos" directamente en la app en celular real, no solo confiar en el código (varias veces un fix funcionaba en teoría pero no en la práctica por selectores CSS mal apuntados).
+- [ ] Confirmar que los 4 archivos HTML están efectivamente subidos y en producción (hubo varias rondas hoy, verificar que la última versión de `agente-contador.html` esté pusheada)
+- [ ] Probar el flujo completo en un dispositivo real: login → 5 días de prueba → bloqueo → contacto WhatsApp
+- [ ] Revisar `terminos.html` esté linkeado y accesible
+
+## ✅ Resuelto 13/07 (fin de sesión)
+
+- **Panel "IVA acumulado por mes" mezclaba clientes distintos.** Agregado botón "🔄 Nuevo Cliente / Limpiar" junto al panel — borra el acumulado persistente y los análisis de la sesión actual, con confirmación (acción destructiva). El contador ahora puede tocarlo antes de empezar con otro cliente para no mezclar datos.
