@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Términos y Privacidad — FiscoIA</title>
+<meta name="description" content="Términos de uso y política de privacidad de FiscoIA, asistente contable con inteligencia artificial.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--blue:#2563EB;--green:#10B981;--teal:#14B8A6;
+  --border:#E2E8F0;--text:#1E293B;--mid:#475569;--dim:#94A3B8;
+  --heading:#1B3A6B;
+  --bg-page:#fff;--surface:#fff;--surface-2:#F8FAFF;
+  --sans:'Inter',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+[data-theme="dark"]{
+  --border:rgba(255,255,255,.12);--text:#E5E7EB;--mid:#9CA3AF;--dim:#6B7280;
+  --heading:#F1F5F9;
+  --bg-page:#0B0D12;--surface:#161A23;--surface-2:#12151D;
+}
+body{font-family:var(--sans);color:var(--text);background:var(--bg-page);line-height:1.7;transition:background .2s,color .2s}
+
+header{position:sticky;top:0;z-index:100;background:var(--bg-page);border-bottom:1px solid var(--border);padding:0 24px}
+.nav{max-width:900px;margin:0 auto;height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Playfair Display',serif;font-weight:800;font-size:20px;color:var(--heading)}
+.logo em{font-style:normal;color:var(--green)}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{color:var(--mid);text-decoration:none;font-size:14px;font-weight:500}
+.nav-links a:hover{color:var(--heading)}
+#theme-toggle{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+
+.container{max-width:800px;margin:0 auto;padding:60px 24px 100px}
+h1{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--heading);margin-bottom:8px}
+.subtitulo{color:var(--dim);font-size:14px;margin-bottom:48px}
+.toc{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:48px}
+.toc h3{font-size:14px;color:var(--heading);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.toc ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.toc a{color:var(--mid);text-decoration:none;font-size:14px}
+.toc a:hover{color:var(--green)}
+
+section{margin-bottom:44px;scroll-margin-top:80px}
+h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--heading);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+h3{font-size:16px;font-weight:700;color:var(--heading);margin:20px 0 8px}
+p{color:var(--mid);margin-bottom:14px;font-size:15px}
+ul,ol{color:var(--mid);margin:0 0 14px 22px;font-size:15px}
+li{margin-bottom:6px}
+strong{color:var(--text);font-weight:600}
+
+.highlight{background:var(--surface-2);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0}
+.highlight p{margin:0;color:var(--text);font-size:14px}
+.warning{background:rgba(245,158,11,.08);border-left:3px solid var(--amber, #F59E0B);border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0}
+.warning p{margin:0;color:var(--text);font-size:14px}
+
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th{background:var(--surface-2);color:var(--heading);text-align:left;padding:10px 12px;border:1px solid var(--border)}
+td{padding:10px 12px;border:1px solid var(--border);color:var(--mid)}
+
+footer{border-top:1px solid var(--border);padding:32px 24px;text-align:center;color:var(--dim);font-size:13px}
+footer a{color:var(--green);text-decoration:none}
+
+@media(max-width:640px){
+  .container{padding:40px 16px 60px}
+  .nav-links a:not(.nav-cta){display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo">Fisco<em>IA</em></a>
+    <div class="nav-links">
+      <a href="index.html">← Volver a inicio</a>
+      <a href="agente-contador.html">Ir al Agente</a>
+      <button id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <h1>Términos de Uso y Política de Privacidad</h1>
+  <p class="subtitulo">Última actualización: 13 de julio de 2026</p>
+
+  <div class="toc">
+    <h3>Contenido</h3>
+    <ul>
+      <li><a href="#que-es">1. Qué es FiscoIA</a></li>
+      <li><a href="#como-funciona">2. Cómo funciona técnicamente (importante)</a></li>
+      <li><a href="#privacidad">3. Privacidad y tratamiento de datos</a></li>
+      <li><a href="#cuenta">4. Tu cuenta</a></li>
+      <li><a href="#api-key">5. Tu API Key de Anthropic</a></li>
+      <li><a href="#responsabilidad">6. Responsabilidad profesional</a></li>
+      <li><a href="#planes">7. Planes y pagos</a></li>
+      <li><a href="#uso-aceptable">8. Uso aceptable</a></li>
+      <li><a href="#cambios">9. Cambios a este documento</a></li>
+      <li><a href="#contacto">10. Contacto</a></li>
+    </ul>
+  </div>
+
+  <section id="que-es">
+    <h2>1. Qué es FiscoIA</h2>
+    <p>FiscoIA es una herramienta desarrollada por <strong>LABStudio.pna</strong> (Paraná, Entre Ríos, Argentina) que utiliza inteligencia artificial para asistir en tareas contables e impositivas: análisis de facturas y comprobantes, cálculo de IVA, seguimiento de vencimientos ARCA, generación de reportes y funciones relacionadas.</p>
+    <p>FiscoIA es una <strong>herramienta de asistencia</strong>, no un servicio de asesoría contable o impositiva profesional. Su uso no reemplaza la intervención de un contador matriculado.</p>
+  </section>
+
+  <section id="como-funciona">
+    <h2>2. Cómo funciona técnicamente</h2>
+    <p>Es importante que entiendas la arquitectura de FiscoIA antes de usarlo, porque determina qué datos tuyos (y de tus clientes) pasan por dónde:</p>
+
+    <h3>2.1 Análisis de documentos e IA</h3>
+    <p>Cuando subís una factura, imagen o consultás al chat, esa información se envía <strong>directamente desde tu navegador a la API de Anthropic</strong> (la empresa que provee el modelo de inteligencia artificial), usando tu propia API Key personal. <strong>LABStudio no aloja ni tiene acceso a esos datos en ningún momento</strong> — no existe un servidor de LABStudio en el medio de ese flujo.</p>
+
+    <h3>2.2 Almacenamiento de tus análisis</h3>
+    <p>Los resultados de tus análisis se guardan únicamente en la memoria de tu navegador durante la sesión, salvo que vos decidas conectar tu propia Google Sheets — en cuyo caso los datos van directo de tu navegador a tu propia cuenta de Google, tampoco a través de LABStudio.</p>
+
+    <h3>2.3 Cuenta de usuario</h3>
+    <p>Para identificarte usamos "Iniciar sesión con Google". Esto sí implica un registro mínimo en nuestra infraestructura (ver sección 4).</p>
+
+    <div class="highlight">
+      <p><strong>En resumen:</strong> tus facturas y datos fiscales nunca pasan por servidores de LABStudio. Solo guardamos tu email, nombre y plan de cuenta.</p>
+    </div>
+  </section>
+
+  <section id="privacidad">
+    <h2>3. Privacidad y tratamiento de datos</h2>
+
+    <h3>3.1 Qué datos recolecta LABStudio</h3>
+    <table>
+      <tr><th>Dato</th><th>Para qué</th><th>Dónde se guarda</th></tr>
+      <tr><td>Email y nombre (de tu cuenta Google)</td><td>Identificarte, asociar tu plan</td><td>Base de datos de LABStudio (n8n)</td></tr>
+      <tr><td>Fecha de alta y último ingreso</td><td>Estadísticas de uso</td><td>Base de datos de LABStudio (n8n)</td></tr>
+      <tr><td>Plan contratado</td><td>Saber qué soporte te corresponde</td><td>Base de datos de LABStudio (n8n)</td></tr>
+    </table>
+
+    <h3>3.2 Qué datos NO recolecta LABStudio</h3>
+    <ul>
+      <li>Contenido de tus facturas, comprobantes o documentos analizados</li>
+      <li>CUITs, montos, nombres de tus clientes o de terceros</li>
+      <li>Tu API Key de Anthropic (queda solo en tu navegador, se borra al cerrar la pestaña)</li>
+      <li>El contenido de tus conversaciones con el chat de IA</li>
+    </ul>
+
+    <h3>3.3 Terceros que sí procesan datos (fuera de LABStudio)</h3>
+    <ul>
+      <li><strong>Anthropic (Claude API):</strong> procesa el contenido que le enviás para el análisis. Se rige por su propia política de privacidad, disponible en anthropic.com/privacy.</li>
+      <li><strong>Google:</strong> si conectás Google Sheets, tus datos de facturación quedan en tu propia cuenta de Google, sujetos a la política de privacidad de Google.</li>
+    </ul>
+
+    <h3>3.4 Tus derechos</h3>
+    <p>Podés pedirnos en cualquier momento que eliminemos tu cuenta y los datos asociados (email, nombre, plan) escribiéndonos a los datos de contacto de la sección 10.</p>
+  </section>
+
+  <section id="cuenta">
+    <h2>4. Tu cuenta</h2>
+    <p>El acceso a FiscoIA se realiza mediante "Iniciar sesión con Google". Sos responsable de mantener la seguridad de tu cuenta de Google. LABStudio no tiene acceso a tu contraseña de Google en ningún momento — la autenticación la maneja Google directamente.</p>
+    <p>Podés cerrar sesión en cualquier momento desde el botón correspondiente dentro de la aplicación.</p>
+  </section>
+
+  <section id="api-key">
+    <h2>5. Tu API Key de Anthropic</h2>
+    <p>Para usar las funciones de inteligencia artificial de FiscoIA necesitás tu propia API Key de Anthropic (console.anthropic.com), con su propio método de pago cargado ahí.</p>
+    <ul>
+      <li>El costo del uso de la IA lo pagás <strong>directamente a Anthropic</strong>, no a LABStudio</li>
+      <li>Tu API Key se guarda únicamente en el <code>sessionStorage</code> de tu navegador — se borra automáticamente al cerrar la pestaña</li>
+      <li>Sos responsable de la seguridad y el uso de tu propia API Key</li>
+    </ul>
+  </section>
+
+  <section id="responsabilidad">
+    <h2>6. Responsabilidad profesional</h2>
+    <div class="warning">
+      <p><strong>Importante:</strong> los análisis, cálculos y reportes generados por FiscoIA son producidos por un modelo de inteligencia artificial y pueden contener errores. FiscoIA no reemplaza el criterio ni la responsabilidad de un contador matriculado. Todo reporte generado debe ser revisado por un profesional antes de presentarse ante organismos oficiales (ARCA u otros).</p>
+    </div>
+    <p>LABStudio no se responsabiliza por decisiones tomadas exclusivamente en base a los resultados generados por la herramienta, ni por errores, multas o sanciones derivadas de su uso sin la debida revisión profesional.</p>
+  </section>
+
+  <section id="planes">
+    <h2>7. Planes y pagos</h2>
+    <p>FiscoIA ofrece un plan Gratuito (con acceso completo a las funciones, pagando solo tu propio consumo de API a Anthropic) y un Plan Estudio pago, que incluye acompañamiento, soporte prioritario y onboarding personalizado por parte de LABStudio.</p>
+    <p>Los pagos de planes se gestionan de forma directa con LABStudio. Los términos específicos de facturación se comunican al momento de la contratación.</p>
+  </section>
+
+  <section id="uso-aceptable">
+    <h2>8. Uso aceptable</h2>
+    <p>Al usar FiscoIA, te comprometés a:</p>
+    <ul>
+      <li>No usar la herramienta para fines ilegales o fraudulentos</li>
+      <li>No intentar vulnerar la seguridad de la plataforma o de otros usuarios</li>
+      <li>Ser responsable de la veracidad de los documentos que subís para análisis</li>
+      <li>No revender ni redistribuir el acceso a tu cuenta sin autorización de LABStudio</li>
+    </ul>
+  </section>
+
+  <section id="cambios">
+    <h2>9. Cambios a este documento</h2>
+    <p>Podemos actualizar estos términos ocasionalmente. Los cambios importantes se comunicarán a los usuarios con cuenta activa. El uso continuado de FiscoIA después de un cambio implica la aceptación de los nuevos términos.</p>
+  </section>
+
+  <section id="contacto">
+    <h2>10. Contacto</h2>
+    <p>Para consultas sobre estos términos, privacidad, o para ejercer tus derechos sobre tus datos:</p>
+    <ul>
+      <li>Email: <a href="mailto:labstudio.pna@gmail.com" style="color:var(--green)">labstudio.pna@gmail.com</a></li>
+      <li>WhatsApp: <a href="https://wa.me/5493435344597" style="color:var(--green)">+54 9 3435 344597</a></li>
+    </ul>
+  </section>
+</div>
+
+<footer>
+  <p>FiscoIA — Desarrollado por <a href="https://labstudiopna.github.io" target="_blank">LABStudio.pna</a> · Paraná, Entre Ríos, Argentina</p>
+</footer>
+
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('fiscoia_theme') || 'light';
+    if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+  function applyTheme(theme) {
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('fiscoia_theme', next);
+    applyTheme(next);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    applyTheme(localStorage.getItem('fiscoia_theme') || 'light');
+  });
+</script>
+
+</body>
+</html>
