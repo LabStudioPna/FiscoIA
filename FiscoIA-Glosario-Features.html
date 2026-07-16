@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FiscoIA — Glosario Completo de Features</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0F1117 0%, #1C2030 100%);
+    color: #E8EAF0;
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 60px;
+    border-bottom: 2px solid #2E3450;
+    padding-bottom: 40px;
+  }
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .logo-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #00C896, #00e6ac);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 32px;
+    color: #0F1117;
+  }
+
+  h1 {
+    font-size: 48px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #00C896 0%, #4A9EFF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    color: #6B7394;
+    margin-bottom: 8px;
+  }
+
+  .tagline {
+    font-size: 14px;
+    color: #00C896;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .toc {
+    background: #1C2030;
+    border: 1px solid #2E3450;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 60px;
+  }
+
+  .toc-title {
+    font-size: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #00C896;
+    margin-bottom: 16px;
+  }
+
+  .toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+  }
+
+  .toc-item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #252A3A;
+    border: 1px solid #2E3450;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: #E8EAF0;
+  }
+
+  .toc-item:hover {
+    border-color: #00C896;
+    background: rgba(0, 200, 150, 0.08);
+    color: #00C896;
+  }
+
+  .section {
+    margin-bottom: 80px;
+    scroll-margin-top: 100px;
+  }
+
+  .section-title {
+    font-size: 32px;
+    margin-bottom: 12px;
+    color: #E8EAF0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-icon {
+    font-size: 36px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+    color: #6B7394;
+    margin-bottom: 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: #1C2030;
+    border: 1px solid #2E3450;
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s;
+  }
+
+  .feature-card:hover {
+    border-color: #00C896;
+    box-shadow: 0 0 20px rgba(0, 200, 150, 0.1);
+    transform: translateY(-4px);
+  }
+
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .feature-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #E8EAF0;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: #6B7394;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .feature-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    background: #252A3A;
+    border: 1px solid #2E3450;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: #6B7394;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .tag.plan-estudio { border-color: #4A9EFF; color: #4A9EFF; }
+  .tag.white-label { border-color: #C084FC; color: #C084FC; }
+  .tag.free { border-color: #00C896; color: #00C896; }
+
+  .feature-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .status-ready { background: rgba(0, 200, 150, 0.15); color: #00C896; }
+  .status-beta { background: rgba(245, 166, 35, 0.15); color: #F5A623; }
+  .status-coming { background: rgba(74, 158, 255, 0.15); color: #4A9EFF; }
+
+  .divider {
+    height: 1px;
+    background: #2E3450;
+    margin: 80px 0;
+  }
+
+  .pricing-section {
+    background: #1C2030;
+    border: 1px solid #2E3450;
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 60px;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .plan-card {
+    background: #252A3A;
+    border: 1px solid #2E3450;
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .plan-card:hover { border-color: #00C896; }
+  .plan-card.featured { border-color: #00C896; box-shadow: 0 0 30px rgba(0, 200, 150, 0.15); }
+
+  .plan-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #E8EAF0;
+  }
+
+  .plan-price {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #00C896;
+  }
+
+  .plan-period {
+    font-size: 12px;
+    color: #6B7394;
+    margin-bottom: 24px;
+  }
+
+  .plan-features {
+    text-align: left;
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  .plan-features li {
+    margin-bottom: 8px;
+    color: #6B7394;
+  }
+
+  .plan-features li::before {
+    content: '✓ ';
+    color: #00C896;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+
+  .cta-btn {
+    background: #00C896;
+    color: #0F1117;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .cta-btn:hover { background: #00e6ac; transform: translateY(-2px); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+
+  .stat-card {
+    background: #1C2030;
+    border: 1px solid #2E3450;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #00C896;
+    margin-bottom: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: #6B7394;
+  }
+
+  footer {
+    text-align: center;
+    padding-top: 40px;
+    border-top: 1px solid #2E3450;
+    color: #6B7394;
+    font-size: 12px;
+  }
+
+  .roadmap {
+    background: #1C2030;
+    border: 1px solid #2E3450;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 60px;
+  }
+
+  .roadmap-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #E8EAF0;
+  }
+
+  .roadmap-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #252A3A;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .roadmap-item:last-child { border-bottom: none; }
+  .roadmap-item .icon { font-size: 18px; flex-shrink: 0; }
+  .roadmap-item .text { font-size: 13px; color: #6B7394; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="logo-section">
+      <div class="logo-icon">F</div>
+      <div>
+        <h1>FiscoIA</h1>
+        <div class="subtitle">Tu Asistente Contable e Impositivo con IA</div>
+        <div class="tagline">Catálogo Completo de Features v1.0</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="toc">
+    <div class="toc-title">📍 Índice de Contenidos</div>
+    <div class="toc-list">
+      <a href="#analisis" class="toc-item">📄 Análisis de Documentos</a>
+      <a href="#impuestos" class="toc-item">🧮 Gestión Impositiva</a>
+      <a href="#reportes" class="toc-item">📊 Reportes Consolidados</a>
+      <a href="#cotizaciones" class="toc-item">💱 Cotizaciones</a>
+      <a href="#automatizacion" class="toc-item">⚙️ Automatización</a>
+      <a href="#datos" class="toc-item">📈 Gestión de Datos</a>
+      <a href="#precios" class="toc-item">💰 Planes y Precios</a>
+      <a href="#roadmap" class="toc-item">🛣️ Roadmap 2026</a>
+    </div>
+  </div>
+
+  <!-- ANÁLISIS DE DOCUMENTOS -->
+  <div class="section" id="analisis">
+    <h2 class="section-title">
+      <span class="section-icon">📄</span>
+      Análisis de Documentos
+    </h2>
+    <p class="section-subtitle">Lectura y procesamiento inteligente de facturas, liquidaciones y comprobantes</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🖼️</div>
+        <div class="feature-title">Análisis de Imágenes de Facturas</div>
+        <div class="feature-desc">Procesa fotos de facturas A, B, C con OCR integrado. Extrae automáticamente: número, fecha, CUIT, totales, IVA, retenciones, CAE, vencimiento.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Lectura de PDFs (Facturas Digitales)</div>
+        <div class="feature-desc">Procesa facturas PDF electrónicas. Valida estructura XML interna, extrae datos, detecta inconsistencias de numeración y fechas.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">✅</div>
+        <div class="feature-title">Validación Automática de Comprobantes</div>
+        <div class="feature-desc">Verifica: CUIT válido, CAE vigente, numeración correlativa, alícuota de IVA correcta, retenciones calculadas, moneda (ARS/USD).</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🧮</div>
+        <div class="feature-title">Cálculo de Impuestos Integrado</div>
+        <div class="feature-desc">Calcula automáticamente: IVA por alícuota (21%, 10.5%, 0%), retención de Ganancias, retención de IVA, percepción IIBB por provincia.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-beta">BETA</div>
+        <div class="feature-icon">🔍</div>
+        <div class="feature-title">Detección de Fraudes y Anomalías</div>
+        <div class="feature-desc">Alerta sobre: CUIT fantasma, numeración fuera de secuencia, importes improbables, duplicados, cambios de CUIT del cliente sin aviso.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- GESTIÓN IMPOSITIVA -->
+  <div class="section" id="impuestos">
+    <h2 class="section-title">
+      <span class="section-icon">🧮</span>
+      Gestión Impositiva ARCA (ex AFIP)
+    </h2>
+    <p class="section-subtitle">Toda la legislación tributaria argentina actualizada y consultas específicas por régimen</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">Calendario de Vencimientos ARCA</div>
+        <div class="feature-desc">Panel interactivo con todos los vencimientos: IVA, Ganancias, Bienes Personales, SUSS, Monotributo, Ingresos Brutos. Alertas por urgencia (rojo: vence en 7 días).</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🗂️</div>
+        <div class="feature-title">Libro IVA Digital (4 TXT ARCA)</div>
+        <div class="feature-desc">Genera automáticamente los 4 archivos TXT para Libro IVA Digital: Ventas Cabecera, Ventas Alícuotas, Compras Cabecera, Compras Alícuotas. Formato ANSI, longitud fija, listo para importar.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🏛️</div>
+        <div class="feature-title">Alícuotas de Ingresos Brutos por Provincia</div>
+        <div class="feature-desc">Base de datos actualizada de todas las 24 provincias: Buenos Aires (ARBA), CABA (AGIP), Córdoba, Santa Fe, Entre Ríos, Mendoza, etc. Filtrable por actividad económica (servicios, comercio, industria).</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Consultas sobre Retenciones y Percepciones</div>
+        <div class="feature-desc">Asesor IA sobre: retención de IVA (Res. 4291), retención de Ganancias (alícuotas por categoría), percepción de IIBB (por provincia), aplicación de percepciones en cascada.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Diferenciación: Factura A vs B vs C</div>
+        <div class="feature-desc">Asesor IA sobre cuándo usar cada tipo: A (monotributistas, IVA), B (IVA), C (consumidor final), M (mercado interno), E (exportación). Validación de idoneidad.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">Monitor de Actualizaciones Normativas</div>
+        <div class="feature-desc">n8n: Scraping automático de ATER (Entre Ríos), BlogDelContador, Boletín Oficial. Detecta cambios 1x día, analiza con IA, notifica por email. Histórico en Google Sheets.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-coming">PRÓXIMAMENTE</div>
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">Consultas Jurisprudenciales</div>
+        <div class="feature-desc">Base de datos de resoluciones ARCA, fallos de Tribunal Fiscal, criterios administrativos. Búsqueda por tema, impuesto, período.</div>
+        <div class="feature-tags">
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-coming">PRÓXIMAMENTE</div>
+        <div class="feature-icon">📞</div>
+        <div class="feature-title">Integración Clave Fiscal (Web Services ARCA)</div>
+        <div class="feature-desc">Conexión directa a ARCA para: validar CUIT, consultar comprobantes, obtener constancia de inscripción, consultar saldo de pagos.</div>
+        <div class="feature-tags">
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- REPORTES CONSOLIDADOS -->
+  <div class="section" id="reportes">
+    <h2 class="section-title">
+      <span class="section-icon">📊</span>
+      Reportes Consolidados (Sistema Nuevo)
+    </h2>
+    <p class="section-subtitle">Acumula análisis de múltiples facturas y genera reportes unificados, descargables en Excel y PDF</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📥</div>
+        <div class="feature-title">Acumulador de Análisis</div>
+        <div class="feature-desc">Caché local que acumula todos los análisis de facturas que hagas en la sesión. Sin descargar nada hasta que vos lo decidas. Base para reportes consolidados.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🔀</div>
+        <div class="feature-title">Agrupación Flexible por Múltiples Criterios</div>
+        <div class="feature-desc">Elegís cómo agrupar: por Cliente (razón social), por CUIT, por Tipo de Factura (A/B/C/E), por Tipo de Contribuyente, por Período (mes/trimestre), por Estado (✅ Válidas/⚠️ Obs/❌ Rechazadas).</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📈</div>
+        <div class="feature-title">Generador de PDF Profesional</div>
+        <div class="feature-desc">PDF con: Portada, Tabla de Contenidos, Resumen Ejecutivo (totales, alertas), Secciones agrupadas, Detalles de cada comprobante, Índice analítico, Footer con fecha.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Exportador a Excel Multi-Hoja</div>
+        <div class="feature-desc">Excel con múltiples hojas: Resumen Ejecutivo, Facturación por Cliente, Movimientos de IVA, Retenciones por Concepto, Análisis de Anomalías, Gráficos de tendencias.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Resumen Ejecutivo Automático</div>
+        <div class="feature-desc">Tabla resumen con: Total Facturas, Monto Neto, IVA Débito/Crédito, Saldo IVA, Total Retenciones (IVA/Ganancias/IIBB), Inconsistencias Detectadas, Recomendaciones.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Comparación Período vs Período</div>
+        <div class="feature-desc">Elegís dos períodos (ej. Junio vs Julio) y FiscoIA te muestra la variación de neto, IVA, retenciones e inconsistencias, con el porcentaje calculado automáticamente.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">⚠️</div>
+        <div class="feature-title">Reporte de Anomalías</div>
+        <div class="feature-desc">Documento PDF separado, solo con las facturas que presentan observaciones: CUIT inválido, CAE vencido, numeración fuera de secuencia, inconsistencias de IVA.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COTIZACIONES -->
+  <div class="section" id="cotizaciones">
+    <h2 class="section-title">
+      <span class="section-icon">💱</span>
+      Cotizaciones en Tiempo Real
+    </h2>
+    <p class="section-subtitle">Tipos de cambio actualizados automáticamente + conversión de monedas</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🇺🇸</div>
+        <div class="feature-title">Dólar Oficial + Blue + MEP + CCL</div>
+        <div class="feature-desc">Actualización automática cada 5 min desde DolarApi.com. Muestra: oficial (BCRA), blue (paralelo), MEP (bolsa), CCL (contado con liquidación), mayorista, cripto.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🌎</div>
+        <div class="feature-title">Monedas Regionales</div>
+        <div class="feature-desc">Real Brasileño (BRL), Peso Uruguayo (UYU), Peso Chileno (CLP), Euro (EUR). Cotización contra peso argentino. Actualización en tiempo real desde API.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">Convertidor de Moneda de Facturas</div>
+        <div class="feature-desc">Ingresás monto y moneda (USD/EUR/BRL/UYU/CLP) y elegís el tipo de cambio (oficial/blue/MEP/CCL/mayorista). Conversión instantánea a pesos argentinos.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Histórico de Cotizaciones</div>
+        <div class="feature-desc">Consultá el valor del dólar en cualquier fecha pasada (vía ArgentinaDatos API), o mirá el gráfico de los últimos 30 días con variación %. Ideal para reexpresar facturas antiguas.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- AUTOMATIZACIÓN -->
+  <div class="section" id="automatizacion">
+    <h2 class="section-title">
+      <span class="section-icon">⚙️</span>
+      Automatización con n8n
+    </h2>
+    <p class="section-subtitle">Workflows que corren en segundo plano sin intervención</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📡</div>
+        <div class="feature-title">Monitor Automático de Normativa</div>
+        <div class="feature-desc">Ejecuta 1x día: monitorea 6 fuentes (ATER Entre Ríos, Boletín Oficial, BlogDelContador, Santa Fe, Córdoba, Mendoza, Corrientes). Detecta cambios, analiza con Claude Haiku, envía email si hay novedades reales. Diseñado para que una fuente caída no afecte a las demás.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">Webhook de Actualizaciones</div>
+        <div class="feature-desc">Endpoint GET que devuelve las últimas actualizaciones normativas detectadas, con histórico real conectado a un log persistente. El agente web y el Digesto Semanal lo consumen para dar contexto actualizado.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-coming">PRÓXIMAMENTE</div>
+        <div class="feature-icon">📧</div>
+        <div class="feature-title">Notificaciones por WhatsApp</div>
+        <div class="feature-desc">Alertas automáticas por WhatsApp: Vencimiento en 7 días, Cambio normativo, Inconsistencia detectada en factura cargada. Configurable por contador.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📨</div>
+        <div class="feature-title">Digesto Semanal por Email</div>
+        <div class="feature-desc">Cada lunes a las 8 AM: resumen de cambios normativos de la semana + recordatorio de vencimientos próximos, directo al mail del estudio.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">Sincronización con Google Sheets (100% privada)</div>
+        <div class="feature-desc">Cada contador conecta <strong>su propia</strong> hoja de Google mediante un script de 5 minutos de instalación. Los datos van directo del navegador del contador a su hoja — nunca pasan por servidores de LABStudio. Sin hojas compartidas entre estudios.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📝</div>
+        <div class="feature-title">Registro Completo de Actividad</div>
+        <div class="feature-desc">Además de las facturas, queda registrado en tu propia hoja cada consulta al chat, cotización consultada, conversión de moneda, reporte generado y exportación ARCA — con fecha, hora y detalle. Trazabilidad total para tu estudio.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-coming">PRÓXIMAMENTE</div>
+        <div class="feature-icon">📲</div>
+        <div class="feature-title">API REST para Integraciones Terceros</div>
+        <div class="feature-desc">Endpoint que otros sistemas (contabilidad, ERPs) pueden llamar para: analizar factura, obtener cálculo de impuestos, validar comprobante, consultar vencimiento.</div>
+        <div class="feature-tags">
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- GESTIÓN DE DATOS -->
+  <div class="section" id="datos">
+    <h2 class="section-title">
+      <span class="section-icon">📈</span>
+      Gestión de Datos y Reportería
+    </h2>
+    <p class="section-subtitle">Almacenamiento, histórico y análisis de movimientos</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Gráficos Interactivos</div>
+        <div class="feature-desc">Panel con 4 gráficos: Ingresos vs Gastos (línea), Composición IVA (doughnut), Carga Impositiva (barras), Retenciones por Concepto (stacked). Filtrable por período (mensual/trimestral/anual).</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📥</div>
+        <div class="feature-title">Importador de Excel/CSV</div>
+        <div class="feature-desc">Sube plantilla con movimientos (Fecha, Concepto, Tipo, Neto, IVA, Retenciones). Parsea automáticamente, actualiza gráficos en tiempo real. Formato flexible.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">💾</div>
+        <div class="feature-title">Caché Local (Session Storage)</div>
+        <div class="feature-desc">Todos los análisis se guardan en el navegador (no hay backend). Al cerrar la pestaña se borran, salvo que el contador conecte su propia hoja de Google Sheets para tener registro permanente — sin depender de servidores de LABStudio.</div>
+        <div class="feature-tags">
+          <span class="tag free">Free</span>
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-coming">PRÓXIMAMENTE</div>
+        <div class="feature-icon">☁️</div>
+        <div class="feature-title">Almacenamiento Nube (Opt-in)</div>
+        <div class="feature-desc">Guardá análisis en la nube de forma segura. Accedé desde cualquier dispositivo. Histórico de todos tus análisis. Encriptado con tu clave.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-ready">LISTO</div>
+        <div class="feature-icon">📈</div>
+        <div class="feature-title">Análisis de Tendencias</div>
+        <div class="feature-desc">Gráfico de evolución de Neto, IVA y Retenciones entre períodos, con alertas automáticas cuando la variación entre los últimos dos períodos supera el 15%.</div>
+        <div class="feature-tags">
+          <span class="tag plan-estudio">Plan Estudio</span>
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-status status-coming">PRÓXIMAMENTE</div>
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Benchmarking por Industria</div>
+        <div class="feature-desc">Compara tu margen, carga impositiva, etc. vs promedio de industria. "Tu margen (35%) está arriba del promedio (28%)".</div>
+        <div class="feature-tags">
+          <span class="tag white-label">White Label</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PRECIOS -->
+  <div class="section" id="precios">
+    <h2 class="section-title">
+      <span class="section-icon">💰</span>
+      Planes y Precios
+    </h2>
+
+    <div class="pricing-section">
+      <h3 style="margin-bottom: 8px;">Elige el plan que se adapte a tus necesidades</h3>
+      <p style="color: #6B7394; margin-bottom: 32px;">Todos los planes incluyen actualizaciones automáticas y soporte vía WhatsApp/email.</p>
+
+      <div class="pricing-grid">
+        <div class="plan-card">
+          <div class="plan-name">Libre</div>
+          <div class="plan-price">$0</div>
+          <div class="plan-period">Acceso gratuito con limitaciones</div>
+          <ul class="plan-features">
+            <li>Chat IA ilimitado (vos pagas a Anthropic)</li>
+            <li>Análisis básico de facturas</li>
+            <li>Cotizaciones en tiempo real</li>
+            <li>Vencimientos ARCA</li>
+            <li>Gráficos interactivos</li>
+            <li>IIBB por provincia</li>
+            <li>7 días de prueba (luego requiere API key)</li>
+          </ul>
+          <button class="cta-btn">Comenzar ahora</button>
+        </div>
+
+        <div class="plan-card featured">
+          <div class="plan-name">Plan Estudio</div>
+          <div class="plan-price">USD 80</div>
+          <div class="plan-period">por mes (hasta 5 usuarios)</div>
+          <ul class="plan-features">
+            <li>Todo de Libre +</li>
+            <li>Monitor automático de normativa (6 organismos)</li>
+            <li>Digesto semanal por email</li>
+            <li>Reportes consolidados (Excel + PDF + Anomalías)</li>
+            <li>Comparación de períodos y análisis de tendencias</li>
+            <li>Sincronización con tu propia hoja de Google Sheets</li>
+            <li>Registro completo de actividad</li>
+            <li>Prioridad en soporte</li>
+          </ul>
+          <button class="cta-btn">Contratar</button>
+        </div>
+
+        <div class="plan-card">
+          <div class="plan-name">White Label</div>
+          <div class="plan-price">USD 400</div>
+          <div class="plan-period">setup + USD 120/mes</div>
+          <ul class="plan-features">
+            <li>Todo de Plan Estudio +</li>
+            <li>Tu marca (logo, colores, dominio propio)</li>
+            <li>Usuarios ilimitados</li>
+            <li>API REST para integraciones (próximamente)</li>
+            <li>Almacenamiento en nube seguro (próximamente)</li>
+            <li>Soporte técnico 24/7</li>
+            <li>Roadmap personalizado</li>
+          </ul>
+          <button class="cta-btn">Contactar ventas</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ROADMAP -->
+  <div class="section" id="roadmap">
+    <h2 class="section-title">
+      <span class="section-icon">🛣️</span>
+      Roadmap 2026
+    </h2>
+
+    <div class="roadmap">
+      <div class="roadmap-title">Julio - Agosto 2026 (EN CURSO)</div>
+      <div class="roadmap-item">
+        <div class="icon">📧</div>
+        <div class="text"><strong>Notificaciones WhatsApp</strong> — Alertas automáticas por vencimientos y cambios normativos. Pendiente de aprobación de WhatsApp Business API.</div>
+      </div>
+    </div>
+
+    <div class="roadmap">
+      <div class="roadmap-title">Septiembre - Octubre 2026</div>
+      <div class="roadmap-item">
+        <div class="icon">☁️</div>
+        <div class="text"><strong>Almacenamiento Nube</strong> — Guardá análisis de forma segura, accede desde cualquier dispositivo.</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="icon">🔗</div>
+        <div class="text"><strong>API REST</strong> — Integración con sistemas contables, ERPs, plataformas de facturación.</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="icon">🔐</div>
+        <div class="text"><strong>Web Services ARCA</strong> — Conexión directa a ARCA para validar CUIT, consultar comprobantes, constancias.</div>
+      </div>
+    </div>
+
+    <div class="roadmap">
+      <div class="roadmap-title">Noviembre - Diciembre 2026</div>
+      <div class="roadmap-item">
+        <div class="icon">🤖</div>
+        <div class="text"><strong>Análisis Predictivo</strong> — IA predice carga impositiva para próximo trimestre basándose en histórico.</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="icon">📞</div>
+        <div class="text"><strong>Consultas Jurisprudenciales</strong> — Base de datos de resoluciones ARCA y fallos de Tribunal Fiscal.</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="icon">🎓</div>
+        <div class="text"><strong>Academia FiscoIA</strong> — Cursos y webinars sobre normativa, use cases, best practices.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">30+</div>
+      <div class="stat-label">Features operacionales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">6</div>
+      <div class="stat-label">Organismos monitoreados por el Monitor Normativo</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">24</div>
+      <div class="stat-label">Provincias en base de datos IIBB</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">3</div>
+      <div class="stat-label">Planes disponibles (Libre, Estudio, White Label)</div>
+    </div>
+  </div>
+
+  <footer>
+    <p><strong>FiscoIA v1.0</strong> — Desarrollado por LABStudio.pna</p>
+    <p>Paraná, Entre Ríos, Argentina · hola@labstudio.pna · +54 343 534-4597</p>
+    <p style="margin-top: 12px; font-size: 11px;">
+      Última actualización: 6 de Julio 2026 | Este documento se actualiza continuamente a medida que se agregan features
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>
