@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Términos y Privacidad — FiscoIA · LABStudio.pna</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; color: #1e293b; background: #fff; margin: 0; padding: 0; }
+[data-theme="dark"] body { color: #e5e7eb; background: #0b0d12; }
+.container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+header { text-align: center; margin-bottom: 60px; }
+h1 { font-size: 36px; margin: 0 0 10px 0; color: #1b3a6b; }
+[data-theme="dark"] h1 { color: #f1f5f9; }
+.header-sub { font-size: 14px; color: #475569; margin: 0; }
+[data-theme="dark"] .header-sub { color: #9ca3af; }
+.toc { background: #f8faff; border-left: 4px solid #10b981; padding: 20px 24px; margin: 40px 0; border-radius: 8px; }
+[data-theme="dark"] .toc { background: #161a23; }
+.toc h2 { margin: 0 0 14px 0; font-size: 16px; }
+.toc ol { margin: 0; padding-left: 20px; }
+.toc a { color: #1b3a6b; text-decoration: none; }
+[data-theme="dark"] .toc a { color: #60a5fa; }
+.toc a:hover { text-decoration: underline; }
+h2 { font-size: 24px; margin: 50px 0 14px 0; color: #1b3a6b; }
+[data-theme="dark"] h2 { color: #f1f5f9; }
+h3 { font-size: 16px; margin: 24px 0 8px 0; color: #1e293b; font-weight: 600; }
+[data-theme="dark"] h3 { color: #e5e7eb; }
+p { margin: 12px 0; font-size: 15px; }
+code { background: #f1f5f9; color: #1b3a6b; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
+[data-theme="dark"] code { background: #1f2937; color: #60a5fa; }
+strong { color: #0f172a; font-weight: 600; }
+[data-theme="dark"] strong { color: #f0f9ff; }
+a { color: #10b981; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.section-nav { display: flex; justify-content: space-between; margin: 50px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 14px; }
+[data-theme="dark"] .section-nav { border-top-color: rgba(255,255,255,.12); }
+.section-nav a { color: #10b981; }
+footer { text-align: center; margin-top: 80px; padding: 40px 0; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; }
+[data-theme="dark"] footer { border-top-color: rgba(255,255,255,.12); color: #9ca3af; }
+footer a { color: #10b981; }
+#theme-toggle { position: fixed; bottom: 20px; right: 20px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 10; }
+[data-theme="dark"] #theme-toggle { background: #1f2937; border-color: rgba(255,255,255,.12); }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>Términos y Privacidad</h1>
+  <p class="header-sub">FiscoIA — Asistente Contable con IA</p>
+</header>
+
+<div class="toc">
+  <h2>Tabla de contenidos</h2>
+  <ol>
+    <li><a href="#qué-es">¿Qué es FiscoIA?</a></li>
+    <li><a href="#arquitectura">Arquitectura: tus datos siempre en tu control</a></li>
+    <li><a href="#privacidad">Privacidad de tus documentos</a></li>
+    <li><a href="#api-key">Tu API key de Anthropic</a></li>
+    <li><a href="#responsabilidad">Responsabilidad profesional</a></li>
+    <li><a href="#tarifas">Tarifas y planes</a></li>
+    <li><a href="#uso-aceptable">Uso aceptable</a></li>
+    <li><a href="#cambios">Cambios en estos términos</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ol>
+</div>
+
+<h2 id="qué-es">1. ¿Qué es FiscoIA?</h2>
+
+<p>FiscoIA es una herramienta de análisis contable con inteligencia artificial, pensada para estudios contables, profesionales independientes y pequeños negocios en Argentina. Te ayuda a:</p>
+
+<ul>
+  <li>Analizar facturas, recibos y documentos contables con IA (extrae CUIT, montos, impuestos automáticamente).</li>
+  <li>Calcular y seguir obligaciones impositivas: IVA, Ganancias, Ingresos Brutos (IIBB), Monotributo, Retenciones.</li>
+  <li>Verificar CAE/QR contra ARCA (Administración Federal de Ingresos Públicos).</li>
+  <li>Generar reportes consolidados por cliente, por período y análisis de tendencias.</li>
+  <li>Descargar datos en Excel, PDF y archivos compatibles con AFIP.</li>
+</ul>
+
+<p><strong>FiscoIA no reemplaza a un contador profesional.</strong> Es una herramienta de soporte. La firma, la responsabilidad y las decisiones técnicas siguen siendo del profesional.</p>
+
+<h2 id="arquitectura">2. Arquitectura: tus datos siempre en tu control</h2>
+
+<p>FiscoIA <strong>no tiene backend propio</strong>. No almacenamos tus documentos, tu API key, ni tus análisis en un servidor nuestro. Aquí te explicamos cómo funciona:</p>
+
+<h3>Flujo de datos</h3>
+<ul>
+  <li><strong>Tu navegador</strong> → tu documento (PDF, Excel, imagen) + tu API key de Anthropic → <strong>Anthropic</strong> (servidores de IA).</li>
+  <li>Anthropic devuelve el análisis (texto, números) a tu navegador.</li>
+  <li><strong>Vos decidís</strong> si lo guardás en tu computadora, en Google Drive, o en tu propio Google Sheets.</li>
+</ul>
+
+<p>FiscoIA <strong>nunca ve</strong> tus documentos originales ni tu API key. Todo ocurre entre tu navegador y Anthropic. Cuando cierras la pestaña, se borra todo.</p>
+
+<h3>localStorage y sessionStorage</h3>
+<ul>
+  <li><strong>sessionStorage</strong>: tu API key se guarda aquí <strong>solo mientras la pestaña está abierta</strong>. Al cerrar, se borra automáticamente.</li>
+  <li><strong>localStorage</strong>: solo guardamos tu preferencia de tema claro/oscuro y tu email de Google. No guardamos análisis ni documentos.</li>
+</ul>
+
+<h2 id="privacidad">3. Privacidad de tus documentos</h2>
+
+<h3>¿Dónde van tus facturas y documentos?</h3>
+<p>Cuando subes una factura a FiscoIA, enviamos el archivo a <strong>Anthropic</strong> para que su IA lo analice. Anthropic mantiene logs de tus consultas según sus <a href="https://www.anthropic.com/privacy" target="_blank">términos de privacidad</a>. Recomendamos revisar esa política.</p>
+
+<h3>Sensibilidad de los datos</h3>
+<p>Las facturas pueden contener información sensible: CUITs, números de transacciones, montos, datos de clientes. <strong>Es responsabilidad tuya</strong> determinar si esa información puede enviarse a Anthropic. Si tus clientes requieren que sus datos no se procesen fuera de Argentina, el flujo de FiscoIA no es apropiado para esos casos.</p>
+
+<h3>Sincronización con Google Sheets</h3>
+<p>Si habilitas la sincronización automática con Google Sheets, FiscoIA escribe en una hoja que VOS creás y controlás. Los datos viven en tu Google Drive, no en nuestros servidores. Vos podés ver quién tiene acceso.</p>
+
+<h2 id="api-key">4. Tu API key de Anthropic</h2>
+
+<h3>¿Por qué necesitamos tu API key?</h3>
+<p>FiscoIA no tiene una API propia: usamos la de Anthropic. Tu API key autoriza las consultas de IA y <strong>vos pagás directamente a Anthropic</strong> por el uso (típicamente centavos por consulta).</p>
+
+<h3>¿Dónde va tu API key?</h3>
+<ul>
+  <li>Se guarda en <strong>sessionStorage</strong> de tu navegador.</li>
+  <li>Se envía <strong>solo a Anthropic</strong> cuando haces una consulta (para autorizar esa consulta).</li>
+  <li>FiscoIA nunca ve tu API key: va directo de tu navegador a Anthropic.</li>
+  <li>Al cerrar la pestaña, se borra de sessionStorage.</li>
+</ul>
+
+<h3>Seguridad</h3>
+<ul>
+  <li>Usa siempre HTTPS. FiscoIA solo funciona en conexiones seguras.</li>
+  <li>No compartas tu API key con otros. Una persona con tu key puede hacer consultas y que se te facturen.</li>
+  <li>Si creés que tu key fue comprometida, generá una nueva en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> y descartá la antigua.</li>
+</ul>
+
+<h2 id="responsabilidad">5. Responsabilidad profesional</h2>
+
+<h3>FiscoIA es una herramienta de soporte, no asesoramiento fiscal</h3>
+<p>FiscoIA analiza facturas y tira números. <strong>Pero los números no son verdad legal</strong>. La IA puede errar, malinterpretar QR, o leer mal un PDF escaneado.</p>
+
+<h3>Responsabilidades tuyas</h3>
+<ul>
+  <li><strong>Verificar siempre los análisis</strong> antes de usarlos en reportes, declaraciones o decisiones.</li>
+  <li><strong>Mantener copias</strong> de tus documentos originales.</li>
+  <li><strong>Firmar y sellar</strong> los reportes como profesional, con tu matriculación vigente.</li>
+  <li><strong>Cumplir con AFIP, ARCA, provinciales</strong>: si FiscoIA dice una cosa y AFIP dice otra, AFIP tiene razón.</li>
+  <li><strong>Registrar auditoria</strong>: sabé qué análisis usaste, en qué fecha, y quién los aprobó.</li>
+</ul>
+
+<h3>Responsabilidades de FiscoIA</h3>
+<ul>
+  <li>Mantener la información técnica actualizada (normas, alícuotas, vencimientos).</li>
+  <li>No almacenar tus datos sin consentimiento.</li>
+  <li>No compartir tu API key ni tus análisis con terceros.</li>
+</ul>
+
+<h2 id="tarifas">6. Tarifas y planes</h2>
+
+<h3>Plan Gratis — 5 días</h3>
+<ul>
+  <li>Acceso completo a todas las funciones por 5 días.</li>
+  <li>Pagas solo el consumo de IA a Anthropic (~USD 0.002 por análisis).</li>
+  <li>Sin tarjeta de crédito.</li>
+</ul>
+
+<h3>Plan Estudio — USD 80/mes</h3>
+<ul>
+  <li>Sin límite de tiempo.</li>
+  <li>Onboarding 1 a 1.</li>
+  <li>Soporte por WhatsApp.</li>
+  <li>Alertas proactivas de cambios normativos.</li>
+  <li>Pagas el mismo consumo de IA a Anthropic.</li>
+</ul>
+
+<h3>Costo de la IA</h3>
+<p>Ambos planes usan los mismos modelos de Anthropic. El costo por análisis depende de cuántos tokens proceses. Típicamente:</p>
+<ul>
+  <li>Factura simple (1-2 páginas): USD 0.001-0.003</li>
+  <li>Análisis batch (50+ facturas): USD 0.05-0.20 total</li>
+</ul>
+
+<p>Vos cargás crédito a tu cuenta de Anthropic. FiscoIA no cobra nada más.</p>
+
+<h2 id="uso-aceptable">7. Uso aceptable</h2>
+
+<h3>Qué podés hacer</h3>
+<ul>
+  <li>Analizar tus propias facturas y documentos contables.</li>
+  <li>Usar FiscoIA para un estudio contable, empresa o negocio que controles.</li>
+  <li>Generar reportes para clientes auditados por vos.</li>
+  <li>Guardar, descargar y compartir los análisis que generaste.</li>
+</ul>
+
+<h3>Qué no podés hacer</h3>
+<ul>
+  <li>Compartir tu API key o credenciales de acceso.</li>
+  <li>Usar FiscoIA para procesar datos de terceros sin su consentimiento.</li>
+  <li>Intentar modificar, hackear o romper FiscoIA (ataques, fuerza bruta, etc.).</li>
+  <li>Usar FiscoIA para enviar spam, malware o contenido ilegal.</li>
+  <li>Revender acceso o usar FiscoIA como un servicio propio sin autorización.</li>
+</ul>
+
+<h2 id="cambios">8. Cambios en estos términos</h2>
+
+<p>Podemos actualizar estos términos en cualquier momento. Los cambios son vinculantes a partir de que se publiquen en esta página. Si usás FiscoIA después del cambio, aceptás los nuevos términos.</p>
+
+<p>Los cambios importantes (tarifas, privacidad, responsabilidad) serán comunicados también por email a tu cuenta.</p>
+
+<h2 id="contacto">9. Contacto</h2>
+
+<p>Si tenés preguntas sobre estos términos, si necesitás reportar un problema de seguridad, o si querés hablar sobre el Plan Estudio:</p>
+
+<p>
+  <strong>Email:</strong> <a href="mailto:labstudio.pna@gmail.com">labstudio.pna@gmail.com</a><br>
+  <strong>WhatsApp:</strong> <a href="https://wa.me/5493435344597" target="_blank">+54 9 3435-344597</a><br>
+  <strong>Web:</strong> <a href="https://labstudiopna.github.io" target="_blank">labstudiopna.github.io</a>
+</p>
+
+<hr style="margin: 60px 0; border: none; border-top: 1px solid #e2e8f0;">
+
+<p style="font-size: 13px; color: #64748b; text-align: center;">
+  Última actualización: 2026-07-16<br>
+  © 2026 LABStudio.pna — Todos los derechos reservados
+</p>
+</div>
+
+<button id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">🌙</button>
+
+<script>
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-toggle').textContent = '☀️';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('theme-toggle').textContent = '🌙';
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('fiscoia_theme', next);
+  applyTheme(next);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  applyTheme(localStorage.getItem('fiscoia_theme') || 'light');
+});
+</script>
+</body>
+</html>
