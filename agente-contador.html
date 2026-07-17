@@ -5340,7 +5340,91 @@ function mostrarAnalisisTendencias() {
 // Renderizar vencimientos cuando carga la página
 window.addEventListener('load', () => {
   setTimeout(renderVencimientos, 100);
+  // Inicializar chatbot pre-trial
+  initPreTrialChatbot();
 });
+
+// === CHATBOT PRE-TRIAL (sin API key) ===
+const preTrial FAQ = {
+  '¿Qué es una API key?': 'Es una clave personal para usar la IA de Anthropic. Creás cuenta gratis en console.anthropic.com, cargás crédito y generás tu key. Costo: ~USD 0.002 por consulta — USD 5 te dan unas 2.500 consultas.',
+  '¿Mis datos y facturas son privados?': 'Sí. FiscoIA no tiene backend propio. Tu API key y los archivos van directo de tu navegador a Anthropic. Al cerrar la pestaña, todo se borra.',
+  '¿La información impositiva está actualizada?': 'El agente tiene entrenamiento actualizado en legislación argentina. Con el Plan Estudio además te avisamos proactivamente cuando hay cambios normativos que te puedan afectar.',
+  '¿Reemplaza al contador?': 'No. Es una herramienta de apoyo para contadores. Acelera consultas técnicas y reduce tiempo de búsqueda. La firma y responsabilidad siempre es del profesional.',
+  '¿Funciona en el celular?': 'Sí, completamente responsive. Funciona perfecto en smartphone y tablet sin instalar ninguna app.',
+  '¿Cuál es la diferencia entre Prueba Gratis y Plan Estudio?': 'Prueba Gratis: acceso 5 días a todas las features. Plan Estudio (USD 80/mes): sin límite de tiempo, onboarding 1 a 1, soporte 24/7 WhatsApp, alertas de cambios normativos.',
+};
+
+function initPreTrialChatbot() {
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  if (!apiKeyInput) return;
+
+  // Mostrar chatbot solo si NO hay API key
+  function checkShowChatbot() {
+    const hasKey = apiKeyInput.value.trim().length > 0;
+    const chatbot = document.getElementById('preTrial Chatbot');
+    if (chatbot) chatbot.style.display = hasKey ? 'none' : 'flex';
+  }
+
+  // HTML del chatbot flotante
+  const chatbotHTML = `
+    <div id="preTrial Chatbot" style="position:fixed;bottom:20px;right:20px;width:320px;height:400px;background:#fff;border-radius:14px;border:1px solid #ddd;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.12);z-index:9999;font-family:Inter,sans-serif;">
+      <div style="background:#1B3A6B;color:#fff;padding:14px 16px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:600;font-size:14px;">¿Preguntas sobre FiscoIA?</span>
+        <button id="closeChatbot" style="border:none;background:none;color:#fff;cursor:pointer;font-size:18px;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+      <div id="preTrial ChatMessages" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:#f8f9fa;">
+        <div style="background:#1B3A6B;color:#fff;padding:10px 12px;border-radius:10px;font-size:12.5px;align-self:flex-start;max-width:80%;">Hola 👋 Soy el asistente de FiscoIA. ¿Qué querés saber?</div>
+      </div>
+      <div style="padding:12px 14px;border-top:1px solid #ddd;display:flex;flex-direction:column;gap:8px;">
+        <select id="preTrial Question" style="width:100%;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1B3A6B;font-family:Inter,sans-serif;">
+          <option value="">Elegí una pregunta...</option>
+          ${Object.keys(preTrial FAQ).map(q => `<option value="${q}">${q}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+  `;
+
+  // Agregar al DOM
+  document.body.insertAdjacentHTML('beforeend', chatbotHTML);
+
+  // Event listeners
+  const closeBtn = document.getElementById('closeChatbot');
+  const questionSelect = document.getElementById('preTrial Question');
+  const messagesDiv = document.getElementById('preTrial ChatMessages');
+
+  closeBtn.addEventListener('click', () => {
+    document.getElementById('preTrial Chatbot').style.display = 'none';
+  });
+
+  questionSelect.addEventListener('change', (e) => {
+    if (!e.target.value) return;
+
+    const q = e.target.value;
+    const a = preTrial FAQ[q];
+
+    // Agregar pregunta del usuario
+    const userMsg = document.createElement('div');
+    userMsg.style.cssText = 'background:#1B3A6B;color:#fff;padding:10px 12px;border-radius:10px;font-size:12.5px;align-self:flex-end;max-width:80%;';
+    userMsg.textContent = q;
+    messagesDiv.appendChild(userMsg);
+
+    // Agregar respuesta con delay
+    setTimeout(() => {
+      const aiMsg = document.createElement('div');
+      aiMsg.style.cssText = 'background:#e8f0ff;color:#1B3A6B;padding:10px 12px;border-radius:10px;font-size:12.5px;align-self:flex-start;max-width:80%;line-height:1.5;';
+      aiMsg.textContent = a;
+      messagesDiv.appendChild(aiMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }, 300);
+
+    e.target.value = '';
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
+
+  // Monitorear API key
+  apiKeyInput.addEventListener('input', checkShowChatbot);
+  checkShowChatbot();
+}
 </script>
 </body>
 </html>
