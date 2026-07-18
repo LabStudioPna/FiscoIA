@@ -147,17 +147,18 @@ function leerExcelYActualizarGraficos(file) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+ <style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
 
   :root {
     --bg: #FFFFFF;
     --surface: #F8F9FA;
     --surface2: #F0F1F3;
     --border: #E5E7EB;
-    --green: #10B981;
-    --green-dim: rgba(16,185,129,0.12);
-    --teal: #14B8A6;
-    --teal-dim: rgba(20,184,166,0.12);
+    --green: #0D9488;
+    --green-dim: rgba(13,148,136,0.12);
+    --teal: #0F766E;
+    --teal-dim: rgba(15,118,110,0.12);
     --red: #DC2626;
     --red-dim: rgba(220,38,38,0.12);
     --blue: #2563EB;
@@ -165,6 +166,8 @@ function leerExcelYActualizarGraficos(file) {
     --text-dim: #6B7280;
     --mono: 'IBM Plex Mono', monospace;
     --sans: 'Inter', sans-serif;
+    --serif: 'Playfair Display', Georgia, serif;
+    --navy: #1B3A6B;
   }
 
   [data-theme="dark"] {
@@ -172,8 +175,8 @@ function leerExcelYActualizarGraficos(file) {
     --surface: #12151B;
     --surface2: #1A1E27;
     --border: rgba(255,255,255,0.08);
-    --green: #10B981;
-    --green-dim: rgba(16,185,129,0.15);
+    --green: #0D9488;
+    --green-dim: rgba(13,148,136,0.15);
     --teal: #2DD4BF;
     --teal-dim: rgba(45,212,191,0.15);
     --red: #F87171;
@@ -242,7 +245,7 @@ function leerExcelYActualizarGraficos(file) {
   .onboarding-logo {
     width: 64px;
     height: 64px;
-    background: var(--green);
+    background: linear-gradient(135deg, var(--navy), #2563EB);
     border-radius: 16px;
     display: flex;
     align-items: center;
@@ -250,13 +253,13 @@ function leerExcelYActualizarGraficos(file) {
     font-family: var(--mono);
     font-weight: 600;
     font-size: 22px;
-    color: #1F2937;
+    color: #fff;
     margin: 0 auto 24px;
     letter-spacing: -1px;
   }
 
   .onboarding-title {
-    font-family: var(--mono);
+    font-family: var(--serif);
     font-size: 22px;
     font-weight: 600;
     color: var(--green);
@@ -352,7 +355,7 @@ function leerExcelYActualizarGraficos(file) {
     padding: 14px;
     font-size: 15px;
     font-weight: 600;
-    color: #1F2937;
+    color: #fff;
     cursor: pointer;
     font-family: var(--sans);
     transition: all 0.2s;
@@ -362,7 +365,7 @@ function leerExcelYActualizarGraficos(file) {
     gap: 8px;
   }
 
-  .enter-btn:hover { background: #0D9488; transform: translateY(-1px); }
+  .enter-btn:hover { background: #0F766E; transform: translateY(-1px); }
   .enter-btn:disabled { background: var(--border); color: var(--text-dim); transform: none; cursor: not-allowed; }
 
   .privacy-note {
@@ -435,7 +438,7 @@ function leerExcelYActualizarGraficos(file) {
   .logo-icon {
     width: 32px;
     height: 32px;
-    background: var(--green);
+    background: linear-gradient(135deg, var(--navy), #2563EB);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -443,12 +446,12 @@ function leerExcelYActualizarGraficos(file) {
     font-family: var(--mono);
     font-weight: 600;
     font-size: 14px;
-    color: #1F2937;
+    color: #fff;
     letter-spacing: -1px;
   }
 
   .logo-text {
-    font-family: var(--mono);
+    font-family: var(--serif);
     font-weight: 600;
     font-size: 16px;
     color: var(--green);
@@ -590,13 +593,13 @@ function leerExcelYActualizarGraficos(file) {
     font-weight: 600;
   }
 
-  .msg.ai .msg-avatar { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .msg.ai .msg-avatar { background: var(--green-dim); color: var(--green); border: 1px solid rgba(13,148,136,0.3); }
   .msg.user .msg-avatar { background: var(--blue); color: white; font-family: var(--sans); }
 
   .msg-bubble {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 14px 16px;
     font-size: 14px;
     line-height: 1.6;
@@ -623,7 +626,7 @@ function leerExcelYActualizarGraficos(file) {
   /* Highlight boxes */
   .highlight-box {
     background: var(--green-dim);
-    border: 1px solid rgba(16,185,129,0.3);
+    border: 1px solid rgba(13,148,136,0.3);
     border-radius: 8px;
     padding: 10px 14px;
     margin-top: 10px;
@@ -751,13 +754,13 @@ function leerExcelYActualizarGraficos(file) {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #1F2937;
+    color: #fff;
     font-size: 18px;
     transition: all 0.2s;
     flex-shrink: 0;
   }
 
-  .send-btn:hover { background: #0D9488; transform: scale(1.05); }
+  .send-btn:hover { background: #0F766E; transform: scale(1.05); }
   .send-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
 
   /* ========= ARCHIVOS ========= */
@@ -833,7 +836,7 @@ function leerExcelYActualizarGraficos(file) {
 
   .analyze-btn {
     background: var(--green);
-    color: #1F2937;
+    color: #fff;
     border: none;
     border-radius: 8px;
     padding: 8px 16px;
@@ -844,7 +847,7 @@ function leerExcelYActualizarGraficos(file) {
     font-family: var(--sans);
   }
 
-  .analyze-btn:hover { background: #0D9488; }
+  .analyze-btn:hover { background: #0F766E; }
 
   /* Quick analysis cards */
   .analysis-grid {
@@ -870,7 +873,7 @@ function leerExcelYActualizarGraficos(file) {
   }
 
   .analysis-card .card-value {
-    font-family: var(--mono);
+    font-family: var(--serif);
     font-size: 22px;
     font-weight: 600;
     color: var(--green);
@@ -975,7 +978,7 @@ function leerExcelYActualizarGraficos(file) {
   }
 
   .venc-stat .stat-num {
-    font-family: var(--mono);
+    font-family: var(--serif);
     font-size: 28px;
     font-weight: 600;
     display: block;
@@ -1115,7 +1118,7 @@ function leerExcelYActualizarGraficos(file) {
   }
 
   .cotiz-venta {
-    font-family: var(--mono);
+    font-family: var(--serif);
     font-size: 20px;
     font-weight: 600;
     color: var(--green);
@@ -1432,6 +1435,17 @@ function leerExcelYActualizarGraficos(file) {
     .cotiz-card { padding: 8px; }
     .cotiz-venta { font-size: 13px; }
   }
+
+
+  /* Pulido identidad 2.0 */
+  .analysis-card, .chart-card, .venc-item, .cotiz-card, .file-item, .onboarding-card { box-shadow: 0 2px 6px rgba(27,58,107,.05), 0 12px 28px rgba(27,58,107,.07); }
+  [data-theme="dark"] .analysis-card, [data-theme="dark"] .chart-card, [data-theme="dark"] .venc-item, [data-theme="dark"] .cotiz-card, [data-theme="dark"] .file-item, [data-theme="dark"] .onboarding-card { box-shadow: 0 2px 6px rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.35); }
+  .tab.active { font-weight: 600; }
+  .onboarding-title { color: var(--navy); }
+  [data-theme="dark"] .onboarding-title { color: #E5E7EB; }
+  .logo-text { color: var(--navy); }
+  [data-theme="dark"] .logo-text { color: #E5E7EB; }
+</style>
 
 </style>
 </head>
