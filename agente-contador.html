@@ -147,7 +147,6 @@ function leerExcelYActualizarGraficos(file) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
- <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
 
   :root {
@@ -1445,8 +1444,6 @@ function leerExcelYActualizarGraficos(file) {
   [data-theme="dark"] .onboarding-title { color: #E5E7EB; }
   .logo-text { color: var(--navy); }
   [data-theme="dark"] .logo-text { color: #E5E7EB; }
-</style>
-
 </style>
 </head>
 <body>
@@ -4295,7 +4292,7 @@ async function manejarLoginGoogle(response) {
       trialExpirado: data.trialExpirado, diasRestantes: data.diasRestantes
     }));
     mostrarUsuarioLogueado(data);
-    statusEl.textContent = data.esNuevo ? '✅ ¡Cuenta creada! Tenés 5 días de prueba gratis.' : '✅ ¡Bienvenido de nuevo!';
+    statusEl.textContent = data.esNuevo ? '✅ ¡Cuenta creada! Tenés 7 días de prueba gratis.' : '✅ ¡Bienvenido de nuevo!';
     statusEl.style.color = 'var(--green)';
   } catch (e) {
     statusEl.textContent = '⚠️ No se pudo verificar el login. Probá de nuevo.';
@@ -4319,7 +4316,7 @@ function mostrarUsuarioLogueado(data) {
   const bannerRestante = document.getElementById('trial-restante-banner');
 
   if (data.plan === 'gratis' && data.trialExpirado) {
-    // Prueba de 5 días vencida — se bloquea el acceso, no se muestra el campo de API key
+    // Prueba de 7 días vencida — se bloquea el acceso, no se muestra el campo de API key
     if (pantallaVencida) pantallaVencida.style.display = 'block';
     if (paso2) paso2.style.display = 'none';
   } else {
