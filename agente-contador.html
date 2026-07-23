@@ -1464,8 +1464,8 @@ function leerExcelYActualizarGraficos(file) {
     <div class="onboarding-features">
       <div class="feature-pill">📄 Análisis de facturas PDF</div>
       <div class="feature-pill">🧮 IVA · Ganancias · IIBB</div>
-      <div class="feature-pill">📊 Gráficos y reportes</div>
-      <div class="feature-pill">📅 Vencimientos ARCA</div>
+      <div class="feature-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Gráficos y reportes</div>
+      <div class="feature-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Vencimientos ARCA</div>
     </div>
 
     <div id="google-login-section">
@@ -1488,6 +1488,15 @@ function leerExcelYActualizarGraficos(file) {
       <a href="https://wa.me/5493435344597?text=Hola,%20quiero%20contratar%20el%20Plan%20Estudio%20de%20FiscoIA" target="_blank" style="display:inline-flex; align-items:center; gap:8px; background:var(--green); color:#1F2937; padding:12px 24px; border-radius:8px; font-weight:700; text-decoration:none; font-size:14px;">
         💬 Contratar Plan Estudio
       </a>
+
+      <div style="margin-top:20px; padding-top:18px; border-top:1px solid var(--border); text-align:left;">
+        <div style="font-size:12px; color:var(--text-dim); margin-bottom:8px; text-align:center;">¿Ya tenés tu código de acceso? Ingresalo acá</div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="access-code-input" placeholder="Código de acceso" autocomplete="off" style="flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text); font-size:13px; font-family:var(--sans);" onkeydown="if(event.key==='Enter') validarCodigoAcceso()">
+          <button onclick="validarCodigoAcceso()" id="access-code-btn" style="background:var(--teal); color:#0B1220; border:none; border-radius:8px; padding:10px 16px; font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap;">Desbloquear</button>
+        </div>
+        <div id="access-code-status" style="font-size:12px; margin-top:8px; text-align:center;"></div>
+      </div>
     </div>
 
     <div id="paso-2-container">
@@ -1527,28 +1536,28 @@ function leerExcelYActualizarGraficos(file) {
   <div class="header-right">
     <div class="status-dot"></div>
     <span class="status-text">Agente activo</span>
-    <button id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">🌙</button>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
     <div class="key-indicator" onclick="changeKey()" title="Cambiar API Key">
-      🔑 <span id="key-display">sk-ant-···</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg><span id="key-display">sk-ant-···</span>
     </div>
   </div>
 </header>  
 
 <div class="tabs">
   <button class="tab active" data-panel="chat" onclick="switchTab('chat')">
-    💬 Chat IA
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Chat IA
   </button>
   <button class="tab" data-panel="archivos" onclick="switchTab('archivos')">
-    📎 Archivos
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Archivos
   </button>
   <button class="tab" data-panel="graficos" onclick="switchTab('graficos')">
-    📊 Gráficos
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Gráficos
   </button>
   <button class="tab" data-panel="vencimientos" onclick="switchTab('vencimientos')">
-    📅 Vencimientos ARCA <span class="tab-badge" id="venc-badge">3</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Vencimientos ARCA <span class="tab-badge" id="venc-badge">3</span>
   </button>
   <button class="tab" data-panel="cotizaciones" onclick="switchTab('cotizaciones'); cargarCotizaciones()">
-    💱 Cotizaciones
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Cotizaciones
   </button>
 </div>
 
@@ -2707,7 +2716,7 @@ function applyTheme(theme) {
     document.documentElement.removeAttribute('data-theme');
   }
   const btn = document.getElementById('theme-toggle');
-  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  if (btn) btn.innerHTML = theme === 'dark' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
 
   if (typeof Chart !== 'undefined') {
     const textColor = theme === 'dark' ? '#9CA3AF' : '#6B7280';
@@ -4258,6 +4267,79 @@ function inicializarGoogleAuth() {
 
 // === LOGIN CON GOOGLE (identidad + plan — distinto del OAuth de arriba, que es para Sheets) ===
 const FISCOIA_AUTH_WEBHOOK = 'https://vps-6064485-x.dattaweb.com/webhook/fiscoia-auth';
+const LABSTUDIO_AUTH_PROXY = 'https://vps-6064485-x.dattaweb.com/webhook/labstudio-auth-proxy';
+const LABSTUDIO_PRODUCT_ID = 'fiscoia';
+
+async function validarCodigoAcceso() {
+  const input = document.getElementById('access-code-input');
+  const statusEl = document.getElementById('access-code-status');
+  const btn = document.getElementById('access-code-btn');
+  const code = input.value.trim();
+  if (!code) {
+    statusEl.textContent = 'Ingresá tu código de acceso.';
+    statusEl.style.color = 'var(--red)';
+    return;
+  }
+  btn.disabled = true;
+  statusEl.textContent = 'Verificando...';
+  statusEl.style.color = 'var(--text-dim)';
+  try {
+    const res = await fetch(LABSTUDIO_AUTH_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ access_token: code, product: LABSTUDIO_PRODUCT_ID })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      const motivos = {
+        token_invalido: 'Código inválido. Verificalo o contactanos por WhatsApp.',
+        cuenta_suspendida: 'Tu cuenta está suspendida. Contactanos por WhatsApp.',
+        limite_alcanzado: 'Alcanzaste el límite mensual. Contactanos por WhatsApp.'
+      };
+      statusEl.textContent = motivos[data.motivo] || 'Código inválido o vencido.';
+      statusEl.style.color = 'var(--red)';
+      btn.disabled = false;
+      return;
+    }
+    localStorage.setItem('labstudio_access_code', code);
+    statusEl.textContent = '✅ Acceso desbloqueado. ¡Bienvenido!';
+    statusEl.style.color = 'var(--green)';
+    setTimeout(() => {
+      const pantallaVencida = document.getElementById('trial-expirado-screen');
+      const paso2 = document.getElementById('paso-2-container');
+      if (pantallaVencida) pantallaVencida.style.display = 'none';
+      if (paso2) paso2.style.display = 'block';
+    }, 700);
+  } catch (e) {
+    statusEl.textContent = '⚠️ No se pudo verificar. Probá de nuevo.';
+    statusEl.style.color = 'var(--red)';
+    btn.disabled = false;
+    console.error('Error validando código de acceso:', e);
+  }
+}
+
+async function verificarCodigoGuardado() {
+  const code = localStorage.getItem('labstudio_access_code');
+  if (!code) return;
+  try {
+    const res = await fetch(LABSTUDIO_AUTH_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ access_token: code, product: LABSTUDIO_PRODUCT_ID })
+    });
+    const data = await res.json();
+    if (res.ok && !data.error) {
+      const pantallaVencida = document.getElementById('trial-expirado-screen');
+      const paso2 = document.getElementById('paso-2-container');
+      if (pantallaVencida) pantallaVencida.style.display = 'none';
+      if (paso2) paso2.style.display = 'block';
+    } else {
+      localStorage.removeItem('labstudio_access_code');
+    }
+  } catch (e) {
+    // sin conexión: no bloqueamos ni desbloqueamos, se revalida en el próximo intento
+  }
+}
 
 function inicializarGoogleLogin() {
   if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
@@ -4319,6 +4401,7 @@ function mostrarUsuarioLogueado(data) {
     // Prueba de 5 días vencida — se bloquea el acceso, no se muestra el campo de API key
     if (pantallaVencida) pantallaVencida.style.display = 'block';
     if (paso2) paso2.style.display = 'none';
+    verificarCodigoGuardado();
   } else {
     if (pantallaVencida) pantallaVencida.style.display = 'none';
     if (paso2) paso2.style.display = 'block';
@@ -5357,7 +5440,7 @@ window.addEventListener('load', () => {
 });
 
 // === CHATBOT PRE-TRIAL (sin API key) ===
-const preTrial FAQ = {
+const preTrialFAQ = {
   '¿Qué es una API key?': 'Es una clave personal para usar la IA de Anthropic. Creás cuenta gratis en console.anthropic.com, cargás crédito y generás tu key. Costo: ~USD 0.002 por consulta — USD 5 te dan unas 2.500 consultas.',
   '¿Mis datos y facturas son privados?': 'Sí. FiscoIA no tiene backend propio. Tu API key y los archivos van directo de tu navegador a Anthropic. Al cerrar la pestaña, todo se borra.',
   '¿La información impositiva está actualizada?': 'El agente tiene entrenamiento actualizado en legislación argentina. Con el Plan Estudio además te avisamos proactivamente cuando hay cambios normativos que te puedan afectar.',
@@ -5373,24 +5456,24 @@ function initPreTrialChatbot() {
   // Mostrar chatbot solo si NO hay API key
   function checkShowChatbot() {
     const hasKey = apiKeyInput.value.trim().length > 0;
-    const chatbot = document.getElementById('preTrial Chatbot');
+    const chatbot = document.getElementById('preTrialChatbot');
     if (chatbot) chatbot.style.display = hasKey ? 'none' : 'flex';
   }
 
   // HTML del chatbot flotante
   const chatbotHTML = `
-    <div id="preTrial Chatbot" style="position:fixed;bottom:20px;right:20px;width:320px;height:400px;background:#fff;border-radius:14px;border:1px solid #ddd;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.12);z-index:9999;font-family:Inter,sans-serif;">
+    <div id="preTrialChatbot" style="position:fixed;bottom:20px;right:20px;width:320px;height:400px;background:#fff;border-radius:14px;border:1px solid #ddd;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.12);z-index:9999;font-family:Inter,sans-serif;">
       <div style="background:#1B3A6B;color:#fff;padding:14px 16px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;">
         <span style="font-weight:600;font-size:14px;">¿Preguntas sobre FiscoIA?</span>
         <button id="closeChatbot" style="border:none;background:none;color:#fff;cursor:pointer;font-size:18px;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">✕</button>
       </div>
-      <div id="preTrial ChatMessages" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:#f8f9fa;">
+      <div id="preTrialChatMessages" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:#f8f9fa;">
         <div style="background:#1B3A6B;color:#fff;padding:10px 12px;border-radius:10px;font-size:12.5px;align-self:flex-start;max-width:80%;">Hola 👋 Soy el asistente de FiscoIA. ¿Qué querés saber?</div>
       </div>
       <div style="padding:12px 14px;border-top:1px solid #ddd;display:flex;flex-direction:column;gap:8px;">
-        <select id="preTrial Question" style="width:100%;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1B3A6B;font-family:Inter,sans-serif;">
+        <select id="preTrialQuestion" style="width:100%;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1B3A6B;font-family:Inter,sans-serif;">
           <option value="">Elegí una pregunta...</option>
-          ${Object.keys(preTrial FAQ).map(q => `<option value="${q}">${q}</option>`).join('')}
+          ${Object.keys(preTrialFAQ).map(q => `<option value="${q}">${q}</option>`).join('')}
         </select>
       </div>
     </div>
@@ -5401,18 +5484,18 @@ function initPreTrialChatbot() {
 
   // Event listeners
   const closeBtn = document.getElementById('closeChatbot');
-  const questionSelect = document.getElementById('preTrial Question');
-  const messagesDiv = document.getElementById('preTrial ChatMessages');
+  const questionSelect = document.getElementById('preTrialQuestion');
+  const messagesDiv = document.getElementById('preTrialChatMessages');
 
   closeBtn.addEventListener('click', () => {
-    document.getElementById('preTrial Chatbot').style.display = 'none';
+    document.getElementById('preTrialChatbot').style.display = 'none';
   });
 
   questionSelect.addEventListener('change', (e) => {
     if (!e.target.value) return;
 
     const q = e.target.value;
-    const a = preTrial FAQ[q];
+    const a = preTrialFAQ[q];
 
     // Agregar pregunta del usuario
     const userMsg = document.createElement('div');
