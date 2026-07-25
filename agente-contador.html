@@ -1444,6 +1444,200 @@ function leerExcelYActualizarGraficos(file) {
   [data-theme="dark"] .onboarding-title { color: #E5E7EB; }
   .logo-text { color: var(--navy); }
   [data-theme="dark"] .logo-text { color: #E5E7EB; }
+
+/* === PANEL OPCIONES ARCA (NUEVO) === */
+#panel-opciones-arca {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  animation: fadeIn 0.3s ease;
+  box-shadow: 0 4px 20px rgba(27,58,107,0.08);
+}
+
+.arca-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.arca-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  font-family: var(--sans);
+  border: none;
+  outline: none;
+}
+
+.arca-card:hover {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+
+.arca-card:active {
+  transform: scale(0.98);
+}
+
+.arca-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 3px;
+}
+
+.arca-card-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.arca-btn-principal {
+  background: var(--green);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s;
+  font-family: var(--sans);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(13,148,136,0.3);
+}
+
+.arca-btn-principal:hover {
+  background: #0F766E;
+  transform: translateY(-1px);
+}
+
+.arca-btn-principal:active {
+  transform: translateY(0);
+}
+
+.arca-btn-descargar-todos {
+  width: 100%;
+  background: var(--navy);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.arca-btn-descargar-todos:hover {
+  background: #2563EB;
+}
+
+.arca-historial-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.arca-historial-icon {
+  font-size: 20px;
+}
+
+.arca-historial-info {
+  flex: 1;
+}
+
+.arca-historial-nombre {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.arca-historial-fecha {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+.arca-historial-estado {
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 600;
+  background: var(--green-dim);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.arca-cerrar-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.arca-cerrar-btn:hover {
+  color: var(--red);
+}
+
+/* === RESPONSIVE ARCA === */
+@media (max-width: 640px) {
+  .arca-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #panel-opciones-arca {
+    padding: 12px !important;
+    margin: 12px 0 !important;
+  }
+
+  .arca-card {
+    padding: 10px 12px !important;
+  }
+
+  .arca-btn-principal {
+    padding: 10px 14px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .arca-card-title {
+    font-size: 11px;
+  }
+  .arca-card-sub {
+    font-size: 10px;
+  }
+
+  .arca-historial-nombre {
+    font-size: 12px;
+  }
+
+  .arca-historial-fecha {
+    font-size: 10px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1616,7 +1810,14 @@ function leerExcelYActualizarGraficos(file) {
       <a href="FiscoIA-Plantilla-Movimientos.xlsx" download style="background:var(--green); color:#1F2937; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">📥 Descargar plantilla Excel</a>
       <button onclick="exportarMovimientosExcel()" style="background:#10B981; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📊 Exportar a Excel (3 hojas)</button>
       <button onclick="exportarParaTXT()" style="background:#1B3A6B; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📄 Exportar TXT pipe-delimited</button>
-      <button onclick="exportarParaARCA()" style="background:var(--blue); border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📤 Exportar para ARCA</button>
+      <button onclick="exportarParaARCA()" class="arca-btn-principal">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+  ARCA TXT
+</button>
       <button onclick="generarHojasDiarias()" style="background:#7C3AED; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📋 Hoja Diaria por Cliente</button>
       <div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center;">Completá la plantilla y subila acá — los gráficos se actualizan solos</div>
     </div>
@@ -2628,18 +2829,151 @@ function exportarParaARCA() {
     return;
   }
 
+  // Toggle del panel de opciones ARCA
+  let panel = document.getElementById('panel-opciones-arca');
+  if (panel) {
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    return;
+  }
+
+  // Si no existe el panel, lo creamos
+  crearPanelOpcionesARCA();
+}
+
+function crearPanelOpcionesARCA() {
+  const panelArchivos = document.getElementById('panel-archivos');
+
+  // Verificar si ya existe
+  if (document.getElementById('panel-opciones-arca')) return;
+
+  const panel = document.createElement('div');
+  panel.id = 'panel-opciones-arca';
+  panel.style.cssText = 'display:none;';
+
+  panel.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+      <div style="font-size:13px; font-weight:600; color:var(--text);">📋 Libro IVA Digital — ARCA</div>
+      <button onclick="document.getElementById('panel-opciones-arca').style.display='none'" class="arca-cerrar-btn">✕</button>
+    </div>
+
+    <div class="arca-grid">
+      <button onclick="descargarArchivoARCA('ventas')" class="arca-card">
+        <div class="arca-card-title">Ventas CBTE</div>
+        <div class="arca-card-sub">Comprobantes de venta</div>
+      </button>
+      <button onclick="descargarArchivoARCA('ventas-alic')" class="arca-card">
+        <div class="arca-card-title">Ventas Alic.</div>
+        <div class="arca-card-sub">Alícuotas de venta</div>
+      </button>
+      <button onclick="descargarArchivoARCA('compras')" class="arca-card">
+        <div class="arca-card-title">Compras CBTE</div>
+        <div class="arca-card-sub">Comprobantes de compra</div>
+      </button>
+      <button onclick="descargarArchivoARCA('compras-alic')" class="arca-card">
+        <div class="arca-card-title">Compras Alic.</div>
+        <div class="arca-card-sub">Alícuotas de compra</div>
+      </button>
+    </div>
+
+    <button onclick="descargarArchivoARCA('todos')" class="arca-btn-descargar-todos">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Descargar los 4 archivos
+    </button>
+  `;
+
+  // Insertar después de los botones de exportación
+  const botonesContainer = panelArchivos.querySelector('div[style*="flex-wrap"]');
+  if (botonesContainer) {
+    botonesContainer.after(panel);
+  } else {
+    panelArchivos.appendChild(panel);
+  }
+
+  panel.style.display = 'block';
+}
+
+function descargarArchivoARCA(tipo) {
   const cuit = prompt('Ingresá el CUIT de tu empresa (solo números, sin guiones):') || '00000000000';
+
   const { ventas, alicuotasVentas } = generarTXTVentas(datosReales.movimientos, cuit);
   const { compras, alicuotasCompras } = generarTXTCompras(datosReales.movimientos, cuit);
 
-  if (ventas) descargarTXT(ventas, 'LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt');
-  if (alicuotasVentas) descargarTXT(alicuotasVentas, 'LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt');
-  if (compras) descargarTXT(compras, 'LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt');
-  if (alicuotasCompras) descargarTXT(alicuotasCompras, 'LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt');
+  const archivos = {
+    'ventas': { contenido: ventas, nombre: 'LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt' },
+    'ventas-alic': { contenido: alicuotasVentas, nombre: 'LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt' },
+    'compras': { contenido: compras, nombre: 'LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt' },
+    'compras-alic': { contenido: alicuotasCompras, nombre: 'LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt' }
+  };
 
-  switchTab('chat');
-  appendMsg('ai', `✅ **4 archivos TXT generados para ARCA — Libro IVA Digital**\n\n📄 LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt\n\n**Para importar en ARCA:**\n1. Entrás a arca.gob.ar → Servicios → Libro IVA Digital\n2. Seleccionás el período\n3. Importás cada archivo en el módulo correspondiente\n4. Los importes están en pesos, formato ANSI, longitud fija\n\n⚠️ **Importante:** Verificá los CUIT de tus clientes/proveedores antes de presentar. Los dejé en 00000000000 donde no estaban en la planilla — hay que completarlos manualmente.`);
+  if (tipo === 'todos') {
+    Object.values(archivos).forEach(a => {
+      if (a.contenido) descargarTXT(a.contenido, a.nombre);
+    });
+
+    agregarAHistorialARCA([
+      'LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt',
+      'LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt',
+      'LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt',
+      'LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt'
+    ]);
+
+    appendMsg('ai', `✅ **4 archivos TXT descargados para ARCA — Libro IVA Digital**\n\n📄 LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt\n\n**Para importar en ARCA:**\n1. Entrá a arca.gob.ar → Servicios → Libro IVA Digital\n2. Seleccioná el período\n3. Importá cada archivo en el módulo correspondiente\n4. Los importes están en pesos, formato ANSI, longitud fija\n\n⚠️ **Importante:** Verificá los CUIT de tus clientes/proveedores antes de presentar. Los dejé en 00000000000 donde no estaban en la planilla — hay que completarlos manualmente.`);
+  } else {
+    const archivo = archivos[tipo];
+    if (archivo && archivo.contenido) {
+      descargarTXT(archivo.contenido, archivo.nombre);
+      agregarAHistorialARCA([archivo.nombre]);
+    }
+  }
+
   registrarActividad('Exportación ARCA', `Libro IVA Digital generado — CUIT empresa: ${cuit} — ${datosReales.movimientos.length} movimientos procesados`);
+
+  // Cerrar panel
+  const panel = document.getElementById('panel-opciones-arca');
+  if (panel) panel.style.display = 'none';
+}
+
+function agregarAHistorialARCA(nombres) {
+  let historial = document.getElementById('historial-descargas-arca');
+  let lista = document.getElementById('lista-descargas-arca');
+
+  if (!historial) {
+    historial = document.createElement('div');
+    historial.id = 'historial-descargas-arca';
+    historial.style.cssText = 'margin-top:20px;';
+
+    const titulo = document.createElement('div');
+    titulo.className = 'section-title';
+    titulo.textContent = 'DESCARGAS RECIENTES';
+    titulo.style.marginBottom = '10px';
+
+    lista = document.createElement('div');
+    lista.id = 'lista-descargas-arca';
+
+    historial.appendChild(titulo);
+    historial.appendChild(lista);
+
+    const panelArchivos = document.getElementById('panel-archivos');
+    panelArchivos.appendChild(historial);
+  }
+
+  nombres.forEach(nombre => {
+    const item = document.createElement('div');
+    item.className = 'arca-historial-item';
+    item.innerHTML = `
+      <div class="arca-historial-icon">📄</div>
+      <div class="arca-historial-info">
+        <div class="arca-historial-nombre">${nombre}</div>
+        <div class="arca-historial-fecha">${new Date().toLocaleString('es-AR')}</div>
+      </div>
+      <span class="arca-historial-estado">✓ Listo</span>
+    `;
+    lista.insertBefore(item, lista.firstChild);
+  });
 }
 
 let contextoNormativo = '';
