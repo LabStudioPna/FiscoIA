@@ -199,7 +199,10 @@ function leerExcelYActualizarGraficos(file) {
     transition: all 0.2s;
   }
 
-  #theme-toggle:hover { border-color: var(--green); }
+  #theme-toggle { color: var(--text-dim); }
+  #theme-toggle:hover { border-color: var(--green); color: var(--green); }
+  [data-theme="dark"] #theme-toggle { color: #FBBF24; }
+  [data-theme="dark"] #theme-toggle:hover { color: #FDE68A; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1195,14 +1198,12 @@ function leerExcelYActualizarGraficos(file) {
     .key-indicator { font-size: 10px; padding: 3px 8px; }
 
     .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       padding: 8px 10px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      gap: 6px;
     }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab { padding: 8px 14px; font-size: 12px; flex-shrink: 0; white-space: nowrap; }
+    .tab { padding: 8px 6px; font-size: 11px; justify-content: center; white-space: nowrap; }
     .tab-badge { font-size: 9px; padding: 1px 5px; }
 
     .chat-messages { padding: 14px; gap: 10px; }
@@ -1310,14 +1311,12 @@ function leerExcelYActualizarGraficos(file) {
     .key-indicator span { display: none; }
 
     .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       padding: 6px 8px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      gap: 5px;
     }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab { padding: 7px 12px; font-size: 11px; gap: 4px; flex-shrink: 0; white-space: nowrap; }
+    .tab { padding: 7px 4px; font-size: 9px; gap: 3px; justify-content: center; text-align: center; white-space: normal; line-height: 1.2; }
 
     .chat-messages { padding: 12px; gap: 8px; }
     .msg { max-width: 100%; }
@@ -1430,14 +1429,12 @@ function leerExcelYActualizarGraficos(file) {
     .logo-text { font-size: 12px; }
 
     .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       padding: 5px 6px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      gap: 4px;
     }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab { padding: 6px 10px; font-size: 9px; gap: 3px; flex-shrink: 0; white-space: nowrap; }
+    .tab { padding: 6px 3px; font-size: 8px; gap: 2px; justify-content: center; text-align: center; white-space: normal; line-height: 1.15; }
 
     .chat-messages { padding: 10px; }
     .msg-avatar { width: 24px; height: 24px; font-size: 10px; }
