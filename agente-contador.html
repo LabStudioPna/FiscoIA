@@ -1279,6 +1279,12 @@ function leerExcelYActualizarGraficos(file) {
       padding: 8px 12px !important;
       min-width: 0 !important;
     }
+
+    #panel-clientes { padding: 14px !important; gap: 12px !important; }
+    #panel-clientes > div[style*="justify-content:space-between"] { flex-direction: column !important; align-items: stretch !important; }
+    #clientes-lista-container { grid-template-columns: 1fr !important; }
+    #clientes-detalles div[style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr 1fr !important; row-gap: 8px !important; }
+    #clientes-detalles div[style*="display:flex; gap:8px; flex-wrap:wrap"] button { flex: 1 1 auto !important; font-size: 11px !important; }
   }
 
   /* ---------- MOBILE (640px) ---------- */
@@ -1391,6 +1397,12 @@ function leerExcelYActualizarGraficos(file) {
       width: 100% !important;
       min-width: 0 !important;
     }
+
+    #panel-clientes { padding: 10px !important; gap: 10px !important; }
+    #clientes-detalles { padding: 14px !important; }
+    #clientes-detalles div[style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr !important; gap: 6px !important; }
+    #clientes-detalles div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+    #clientes-detalles div[style*="display:flex; gap:8px; flex-wrap:wrap"] button { width: 100% !important; }
   }
 
   /* ---------- MOBILE CHICO (480px) ---------- */
@@ -1444,200 +1456,6 @@ function leerExcelYActualizarGraficos(file) {
   [data-theme="dark"] .onboarding-title { color: #E5E7EB; }
   .logo-text { color: var(--navy); }
   [data-theme="dark"] .logo-text { color: #E5E7EB; }
-
-/* === PANEL OPCIONES ARCA (NUEVO) === */
-#panel-opciones-arca {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 16px 0;
-  animation: fadeIn 0.3s ease;
-  box-shadow: 0 4px 20px rgba(27,58,107,0.08);
-}
-
-.arca-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.arca-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-  font-family: var(--sans);
-  border: none;
-  outline: none;
-}
-
-.arca-card:hover {
-  border-color: var(--green);
-  background: var(--green-dim);
-}
-
-.arca-card:active {
-  transform: scale(0.98);
-}
-
-.arca-card-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--green);
-  margin-bottom: 3px;
-}
-
-.arca-card-sub {
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-.arca-btn-principal {
-  background: var(--green);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  color: #fff;
-  transition: all 0.2s;
-  font-family: var(--sans);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(13,148,136,0.3);
-}
-
-.arca-btn-principal:hover {
-  background: #0F766E;
-  transform: translateY(-1px);
-}
-
-.arca-btn-principal:active {
-  transform: translateY(0);
-}
-
-.arca-btn-descargar-todos {
-  width: 100%;
-  background: var(--navy);
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--sans);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.arca-btn-descargar-todos:hover {
-  background: #2563EB;
-}
-
-.arca-historial-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-  animation: fadeIn 0.3s ease;
-}
-
-.arca-historial-icon {
-  font-size: 20px;
-}
-
-.arca-historial-info {
-  flex: 1;
-}
-
-.arca-historial-nombre {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.arca-historial-fecha {
-  font-size: 11px;
-  color: var(--text-dim);
-  font-family: var(--mono);
-}
-
-.arca-historial-estado {
-  font-size: 11px;
-  color: var(--green);
-  font-weight: 600;
-  background: var(--green-dim);
-  padding: 3px 10px;
-  border-radius: 20px;
-}
-
-.arca-cerrar-btn {
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  padding: 4px;
-  transition: color 0.2s;
-}
-
-.arca-cerrar-btn:hover {
-  color: var(--red);
-}
-
-/* === RESPONSIVE ARCA === */
-@media (max-width: 640px) {
-  .arca-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  #panel-opciones-arca {
-    padding: 12px !important;
-    margin: 12px 0 !important;
-  }
-
-  .arca-card {
-    padding: 10px 12px !important;
-  }
-
-  .arca-btn-principal {
-    padding: 10px 14px !important;
-    font-size: 12px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .arca-card-title {
-    font-size: 11px;
-  }
-  .arca-card-sub {
-    font-size: 10px;
-  }
-
-  .arca-historial-nombre {
-    font-size: 12px;
-  }
-
-  .arca-historial-fecha {
-    font-size: 10px;
-  }
-}
-
 </style>
 </head>
 <body>
@@ -1753,6 +1571,9 @@ function leerExcelYActualizarGraficos(file) {
   <button class="tab" data-panel="cotizaciones" onclick="switchTab('cotizaciones'); cargarCotizaciones()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Cotizaciones
   </button>
+  <button class="tab" data-panel="clientes" onclick="switchTab('clientes'); mostrarPanelClientes()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="vertical-align:-3px;margin-right:4px;flex-shrink:0"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes
+  </button>
 </div>
 
 <div class="main">
@@ -1810,14 +1631,7 @@ function leerExcelYActualizarGraficos(file) {
       <a href="FiscoIA-Plantilla-Movimientos.xlsx" download style="background:var(--green); color:#1F2937; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">📥 Descargar plantilla Excel</a>
       <button onclick="exportarMovimientosExcel()" style="background:#10B981; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📊 Exportar a Excel (3 hojas)</button>
       <button onclick="exportarParaTXT()" style="background:#1B3A6B; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📄 Exportar TXT pipe-delimited</button>
-      <button onclick="exportarParaARCA()" class="arca-btn-principal">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/>
-    <line x1="12" y1="15" x2="12" y2="3"/>
-  </svg>
-  ARCA TXT
-</button>
+      <button onclick="exportarParaARCA()" style="background:var(--blue); border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📤 Exportar para ARCA</button>
       <button onclick="generarHojasDiarias()" style="background:#7C3AED; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px;">📋 Hoja Diaria por Cliente</button>
       <div style="font-size:12px; color:var(--text-dim); display:flex; align-items:center;">Completá la plantilla y subila acá — los gráficos se actualizan solos</div>
     </div>
@@ -2080,6 +1894,92 @@ function leerExcelYActualizarGraficos(file) {
         </select>
       </div>
       <div id="iibb-tabla" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px;"></div>
+    </div>
+
+  </div>
+
+  <!-- CLIENTES - CRM -->
+  <div class="panel" id="panel-clientes" style="padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:16px;">
+
+    <!-- HEADER -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div class="section-title">👥 Mis Clientes</div>
+        <div style="font-size:12px; color:var(--text-dim); margin-top:4px;" id="clientes-contador">0 clientes registrados</div>
+      </div>
+      <button onclick="mostrarFormularioNuevoCliente()" style="background:var(--green); border:none; border-radius:8px; padding:10px 16px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">+ Nuevo Cliente</button>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div style="position:relative;">
+      <input type="text" id="clientes-buscar" placeholder="Buscar cliente por nombre, email o CUIT..."
+        style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 16px; font-size:14px; color:var(--text); font-family:var(--sans);"
+        oninput="filtrarClientes(this.value)">
+      <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:14px;">🔍</span>
+    </div>
+
+    <!-- VISTA PRINCIPAL: LISTA O DETALLES -->
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; min-height:300px;">
+
+      <!-- LISTA DE CLIENTES -->
+      <div id="clientes-lista-container" style="flex:1; display:grid; gap:12px;">
+        <div style="padding:32px; text-align:center; color:var(--text-dim); font-size:14px;">
+          📭 No hay clientes registrados.<br><button onclick="mostrarFormularioNuevoCliente()" style="background:none; border:none; color:var(--green); cursor:pointer; text-decoration:underline; font-family:var(--sans); margin-top:8px;">Crear el primero</button>
+        </div>
+      </div>
+
+      <!-- DETALLES DEL CLIENTE (oculto inicialmente) -->
+      <div id="clientes-detalles" style="display:none; flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <div class="section-title" id="detalle-nombre" style="font-size:18px;">Cliente</div>
+            <div style="font-size:12px; color:var(--text-dim); margin-top:4px;" id="detalle-cuit">CUIT: ---</div>
+          </div>
+          <button onclick="cerrarDetallesCliente()" style="background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:20px; padding:0;">✕</button>
+        </div>
+
+        <!-- INFO DEL CLIENTE -->
+        <div style="background:var(--surface2); border-radius:8px; padding:12px; margin-bottom:16px; font-size:13px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div><span style="color:var(--text-dim);">Email:</span><br><strong id="detalle-email" style="color:var(--text);">---</strong></div>
+            <div><span style="color:var(--text-dim);">Teléfono:</span><br><strong id="detalle-telefono" style="color:var(--text);">---</strong></div>
+            <div style="grid-column:1/-1;"><span style="color:var(--text-dim);">Domicilio:</span><br><strong id="detalle-domicilio" style="color:var(--text);">---</strong></div>
+          </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:16px;">
+          <div style="background:rgba(16,185,129,0.1); border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-size:12px; color:var(--text-dim);">Total Análisis</div>
+            <div style="font-size:20px; font-weight:bold; color:var(--green);" id="detalle-total-analisis">0</div>
+          </div>
+          <div style="background:rgba(37,99,235,0.1); border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-size:12px; color:var(--text-dim);">Monto Total</div>
+            <div style="font-size:20px; font-weight:bold; color:var(--blue);" id="detalle-monto">$0</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.1); border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-size:12px; color:var(--text-dim);">Último Análisis</div>
+            <div style="font-size:20px; font-weight:bold; color:#F59E0B;" id="detalle-hace">Nunca</div>
+          </div>
+        </div>
+
+        <!-- ÚLTIMOS ANÁLISIS -->
+        <div style="border-top:1px solid var(--border); padding-top:12px;">
+          <div style="font-size:12px; font-weight:600; color:var(--text); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Últimos análisis</div>
+          <div id="detalle-analisis" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="padding:8px; background:var(--surface2); border-radius:6px; color:var(--text-dim); font-size:12px;">Sin análisis registrados</div>
+          </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+          <button onclick="exportarClienteExcel()" style="background:var(--blue); border:none; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">📥 Exportar Excel</button>
+          <button onclick="exportarClientePDF()" style="background:#F59E0B; border:none; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">📄 Exportar PDF</button>
+          <button onclick="editarClienteModal()" style="background:var(--text-dim); border:none; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">✏️ Editar</button>
+          <button onclick="eliminarClienteConConfirm()" style="background:var(--red); border:none; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">🗑️ Eliminar</button>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -2829,151 +2729,18 @@ function exportarParaARCA() {
     return;
   }
 
-  // Toggle del panel de opciones ARCA
-  let panel = document.getElementById('panel-opciones-arca');
-  if (panel) {
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    return;
-  }
-
-  // Si no existe el panel, lo creamos
-  crearPanelOpcionesARCA();
-}
-
-function crearPanelOpcionesARCA() {
-  const panelArchivos = document.getElementById('panel-archivos');
-
-  // Verificar si ya existe
-  if (document.getElementById('panel-opciones-arca')) return;
-
-  const panel = document.createElement('div');
-  panel.id = 'panel-opciones-arca';
-  panel.style.cssText = 'display:none;';
-
-  panel.innerHTML = `
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-      <div style="font-size:13px; font-weight:600; color:var(--text);">📋 Libro IVA Digital — ARCA</div>
-      <button onclick="document.getElementById('panel-opciones-arca').style.display='none'" class="arca-cerrar-btn">✕</button>
-    </div>
-
-    <div class="arca-grid">
-      <button onclick="descargarArchivoARCA('ventas')" class="arca-card">
-        <div class="arca-card-title">Ventas CBTE</div>
-        <div class="arca-card-sub">Comprobantes de venta</div>
-      </button>
-      <button onclick="descargarArchivoARCA('ventas-alic')" class="arca-card">
-        <div class="arca-card-title">Ventas Alic.</div>
-        <div class="arca-card-sub">Alícuotas de venta</div>
-      </button>
-      <button onclick="descargarArchivoARCA('compras')" class="arca-card">
-        <div class="arca-card-title">Compras CBTE</div>
-        <div class="arca-card-sub">Comprobantes de compra</div>
-      </button>
-      <button onclick="descargarArchivoARCA('compras-alic')" class="arca-card">
-        <div class="arca-card-title">Compras Alic.</div>
-        <div class="arca-card-sub">Alícuotas de compra</div>
-      </button>
-    </div>
-
-    <button onclick="descargarArchivoARCA('todos')" class="arca-btn-descargar-todos">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="7 10 12 15 17 10"/>
-        <line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-      Descargar los 4 archivos
-    </button>
-  `;
-
-  // Insertar después de los botones de exportación
-  const botonesContainer = panelArchivos.querySelector('div[style*="flex-wrap"]');
-  if (botonesContainer) {
-    botonesContainer.after(panel);
-  } else {
-    panelArchivos.appendChild(panel);
-  }
-
-  panel.style.display = 'block';
-}
-
-function descargarArchivoARCA(tipo) {
   const cuit = prompt('Ingresá el CUIT de tu empresa (solo números, sin guiones):') || '00000000000';
-
   const { ventas, alicuotasVentas } = generarTXTVentas(datosReales.movimientos, cuit);
   const { compras, alicuotasCompras } = generarTXTCompras(datosReales.movimientos, cuit);
 
-  const archivos = {
-    'ventas': { contenido: ventas, nombre: 'LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt' },
-    'ventas-alic': { contenido: alicuotasVentas, nombre: 'LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt' },
-    'compras': { contenido: compras, nombre: 'LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt' },
-    'compras-alic': { contenido: alicuotasCompras, nombre: 'LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt' }
-  };
+  if (ventas) descargarTXT(ventas, 'LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt');
+  if (alicuotasVentas) descargarTXT(alicuotasVentas, 'LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt');
+  if (compras) descargarTXT(compras, 'LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt');
+  if (alicuotasCompras) descargarTXT(alicuotasCompras, 'LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt');
 
-  if (tipo === 'todos') {
-    Object.values(archivos).forEach(a => {
-      if (a.contenido) descargarTXT(a.contenido, a.nombre);
-    });
-
-    agregarAHistorialARCA([
-      'LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt',
-      'LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt',
-      'LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt',
-      'LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt'
-    ]);
-
-    appendMsg('ai', `✅ **4 archivos TXT descargados para ARCA — Libro IVA Digital**\n\n📄 LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt\n\n**Para importar en ARCA:**\n1. Entrá a arca.gob.ar → Servicios → Libro IVA Digital\n2. Seleccioná el período\n3. Importá cada archivo en el módulo correspondiente\n4. Los importes están en pesos, formato ANSI, longitud fija\n\n⚠️ **Importante:** Verificá los CUIT de tus clientes/proveedores antes de presentar. Los dejé en 00000000000 donde no estaban en la planilla — hay que completarlos manualmente.`);
-  } else {
-    const archivo = archivos[tipo];
-    if (archivo && archivo.contenido) {
-      descargarTXT(archivo.contenido, archivo.nombre);
-      agregarAHistorialARCA([archivo.nombre]);
-    }
-  }
-
+  switchTab('chat');
+  appendMsg('ai', `✅ **4 archivos TXT generados para ARCA — Libro IVA Digital**\n\n📄 LIBRO_IVA_DIGITAL_VENTAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_VENTAS_ALICUOTAS.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_CBTE.txt\n📄 LIBRO_IVA_DIGITAL_COMPRAS_ALICUOTAS.txt\n\n**Para importar en ARCA:**\n1. Entrás a arca.gob.ar → Servicios → Libro IVA Digital\n2. Seleccionás el período\n3. Importás cada archivo en el módulo correspondiente\n4. Los importes están en pesos, formato ANSI, longitud fija\n\n⚠️ **Importante:** Verificá los CUIT de tus clientes/proveedores antes de presentar. Los dejé en 00000000000 donde no estaban en la planilla — hay que completarlos manualmente.`);
   registrarActividad('Exportación ARCA', `Libro IVA Digital generado — CUIT empresa: ${cuit} — ${datosReales.movimientos.length} movimientos procesados`);
-
-  // Cerrar panel
-  const panel = document.getElementById('panel-opciones-arca');
-  if (panel) panel.style.display = 'none';
-}
-
-function agregarAHistorialARCA(nombres) {
-  let historial = document.getElementById('historial-descargas-arca');
-  let lista = document.getElementById('lista-descargas-arca');
-
-  if (!historial) {
-    historial = document.createElement('div');
-    historial.id = 'historial-descargas-arca';
-    historial.style.cssText = 'margin-top:20px;';
-
-    const titulo = document.createElement('div');
-    titulo.className = 'section-title';
-    titulo.textContent = 'DESCARGAS RECIENTES';
-    titulo.style.marginBottom = '10px';
-
-    lista = document.createElement('div');
-    lista.id = 'lista-descargas-arca';
-
-    historial.appendChild(titulo);
-    historial.appendChild(lista);
-
-    const panelArchivos = document.getElementById('panel-archivos');
-    panelArchivos.appendChild(historial);
-  }
-
-  nombres.forEach(nombre => {
-    const item = document.createElement('div');
-    item.className = 'arca-historial-item';
-    item.innerHTML = `
-      <div class="arca-historial-icon">📄</div>
-      <div class="arca-historial-info">
-        <div class="arca-historial-nombre">${nombre}</div>
-        <div class="arca-historial-fecha">${new Date().toLocaleString('es-AR')}</div>
-      </div>
-      <span class="arca-historial-estado">✓ Listo</span>
-    `;
-    lista.insertBefore(item, lista.firstChild);
-  });
 }
 
 let contextoNormativo = '';
@@ -3510,6 +3277,9 @@ function appendMsg(role, text, fileName) {
       </button>
       <button onclick="abrirModalReportes()" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; color:var(--text); cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='var(--surface); this.style.borderColor='var(--green)'" onmouseout="this.style.background='var(--surface2)'; this.style.borderColor='var(--border)'">
         📊 Generar Reporte Consolidado (${analisisAcumulados.length})
+      </button>
+      <button onclick="vincularUltimoAnalisisACliente()" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; color:var(--text); cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        👥 Vincular a cliente (CRM)
       </button>
     `;
     bubble.appendChild(buttonContainer);
@@ -5853,6 +5623,456 @@ function initPreTrialChatbot() {
   // Monitorear API key
   apiKeyInput.addEventListener('input', checkShowChatbot);
   checkShowChatbot();
+}
+
+// ========================================
+// === CRM DE CLIENTES ===
+// (registro persistente de clientes, vinculación de análisis,
+//  reporte individual por cliente. No reemplaza la sincronización
+//  a Google Sheets / digesto que ya existe — convive con ella)
+// ========================================
+
+let clienteSeleccionado = null;
+let clienteSeleccionadoEnChat = null;
+let clientesFiltrados = [];
+
+// --- DATA LAYER ---
+
+function inicializarDataLayerClientes() {
+  if (!localStorage.getItem('fiscoIA_clientes')) {
+    localStorage.setItem('fiscoIA_clientes', JSON.stringify({}));
+  }
+  if (!localStorage.getItem('fiscoIA_analisisHistory')) {
+    localStorage.setItem('fiscoIA_analisisHistory', JSON.stringify([]));
+  }
+}
+
+function obtenerTodosLosClientes() {
+  return JSON.parse(localStorage.getItem('fiscoIA_clientes') || '{}');
+}
+
+function obtenerCliente(clienteId) {
+  const clientes = obtenerTodosLosClientes();
+  return clientes[clienteId] || null;
+}
+
+function guardarCliente(clienteId, datosCliente) {
+  const clientes = obtenerTodosLosClientes();
+  clientes[clienteId] = {
+    id: clienteId,
+    nombre: datosCliente.nombre || 'Sin nombre',
+    email: datosCliente.email || '',
+    cuit: datosCliente.cuit || '',
+    telefono: datosCliente.telefono || '',
+    domicilio: datosCliente.domicilio || '',
+    notas: datosCliente.notas || '',
+    createdAt: clientes[clienteId]?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    totalAnalisis: clientes[clienteId]?.totalAnalisis || 0,
+    montoTotalProcesado: clientes[clienteId]?.montoTotalProcesado || 0,
+    ultimoAnalisis: datosCliente.ultimoAnalisis || clientes[clienteId]?.ultimoAnalisis || null
+  };
+  localStorage.setItem('fiscoIA_clientes', JSON.stringify(clientes));
+  return clientes[clienteId];
+}
+
+function obtenerAnalisisDelCliente(clienteId) {
+  const historial = JSON.parse(localStorage.getItem('fiscoIA_analisisHistory') || '[]');
+  return historial.filter(a => a.clienteId === clienteId);
+}
+
+// Función principal: guarda un análisis vinculado a un cliente del CRM.
+// Se llama manualmente desde el selector del chat (no interfiere con
+// el guardado normal de análisis ni con la sincronización a Sheets existente).
+function guardarAnalisisConCliente(clienteId, datosAnalisis) {
+  if (!clienteId || !datosAnalisis) return null;
+
+  const analisis = {
+    id: `analisis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    clienteId: clienteId,
+    timestamp: new Date().toISOString(),
+    tipo: datosAnalisis.tipo || 'pdf',
+    archivo: datosAnalisis.archivo || '',
+    datos: {
+      neto: datosAnalisis.neto || 0,
+      iva: datosAnalisis.iva || 0,
+      total: datosAnalisis.total || 0,
+      retenciones: datosAnalisis.retenciones || {},
+      concepto: datosAnalisis.concepto || ''
+    },
+    notas: datosAnalisis.notas || ''
+  };
+
+  const historial = JSON.parse(localStorage.getItem('fiscoIA_analisisHistory') || '[]');
+  historial.push(analisis);
+  localStorage.setItem('fiscoIA_analisisHistory', JSON.stringify(historial));
+
+  const cliente = obtenerCliente(clienteId) || { nombre: clienteId };
+  guardarCliente(clienteId, {
+    ...cliente,
+    totalAnalisis: (cliente.totalAnalisis || 0) + 1,
+    montoTotalProcesado: (cliente.montoTotalProcesado || 0) + (analisis.datos.total || 0),
+    ultimoAnalisis: analisis.timestamp
+  });
+
+  return analisis;
+}
+
+function eliminarCliente(clienteId) {
+  const clientes = obtenerTodosLosClientes();
+  delete clientes[clienteId];
+  localStorage.setItem('fiscoIA_clientes', JSON.stringify(clientes));
+
+  let historial = JSON.parse(localStorage.getItem('fiscoIA_analisisHistory') || '[]');
+  historial = historial.filter(a => a.clienteId !== clienteId);
+  localStorage.setItem('fiscoIA_analisisHistory', JSON.stringify(historial));
+}
+
+inicializarDataLayerClientes();
+
+// --- PANEL DE CLIENTES (UI) ---
+
+function mostrarPanelClientes() {
+  const clientes = obtenerTodosLosClientes();
+  clientesFiltrados = Object.values(clientes);
+  actualizarListaClientes(clientesFiltrados);
+  cerrarDetallesCliente();
+  const buscar = document.getElementById('clientes-buscar');
+  if (buscar) buscar.value = '';
+}
+
+function actualizarListaClientes(clientes) {
+  const container = document.getElementById('clientes-lista-container');
+  if (!container) return;
+
+  if (clientes.length === 0) {
+    container.innerHTML = `
+      <div style="padding:32px; text-align:center; color:var(--text-dim); font-size:14px;">
+        📭 No hay clientes registrados.<br>
+        <button onclick="mostrarFormularioNuevoCliente()" style="background:none; border:none; color:var(--green); cursor:pointer; text-decoration:underline; font-family:var(--sans); margin-top:8px;">Crear el primero</button>
+      </div>
+    `;
+    document.getElementById('clientes-contador').textContent = '0 clientes registrados';
+    return;
+  }
+
+  document.getElementById('clientes-contador').textContent = `${clientes.length} cliente${clientes.length !== 1 ? 's' : ''} registrado${clientes.length !== 1 ? 's' : ''}`;
+
+  container.innerHTML = clientes.map(cliente => {
+    const analisisCliente = obtenerAnalisisDelCliente(cliente.id);
+    const ultimoAnalisis = analisisCliente.length > 0
+      ? new Date(analisisCliente[analisisCliente.length - 1].timestamp).toLocaleDateString('es-AR')
+      : 'Sin análisis';
+
+    return `
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s;" onclick="seleccionarCliente('${cliente.id}')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
+          <div>
+            <div style="font-weight:600; color:var(--text); font-size:15px;">${cliente.nombre}</div>
+            <div style="font-size:12px; color:var(--text-dim); margin-top:2px;">${cliente.email || 'Sin email'}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:12px; font-weight:600; color:var(--green);">${cliente.totalAnalisis || 0} análisis</div>
+            <div style="font-size:11px; color:var(--text-dim);">$${(cliente.montoTotalProcesado || 0).toLocaleString('es-AR')}</div>
+          </div>
+        </div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:8px; padding-top:8px; border-top:1px solid var(--border);">
+          🕐 Último: ${ultimoAnalisis}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function seleccionarCliente(clienteId) {
+  clienteSeleccionado = clienteId;
+  const cliente = obtenerCliente(clienteId);
+  if (!cliente) return;
+  const analisis = obtenerAnalisisDelCliente(clienteId);
+
+  document.getElementById('detalle-nombre').textContent = cliente.nombre;
+  document.getElementById('detalle-cuit').textContent = `CUIT: ${cliente.cuit || '---'}`;
+  document.getElementById('detalle-email').textContent = cliente.email || '---';
+  document.getElementById('detalle-telefono').textContent = cliente.telefono || '---';
+  document.getElementById('detalle-domicilio').textContent = cliente.domicilio || '---';
+  document.getElementById('detalle-total-analisis').textContent = cliente.totalAnalisis || 0;
+  document.getElementById('detalle-monto').textContent = `$${(cliente.montoTotalProcesado || 0).toLocaleString('es-AR')}`;
+
+  if (cliente.ultimoAnalisis) {
+    const hace = Math.floor((Date.now() - new Date(cliente.ultimoAnalisis).getTime()) / (1000 * 60 * 60 * 24));
+    document.getElementById('detalle-hace').textContent = hace === 0 ? 'Hoy' : `Hace ${hace}d`;
+  } else {
+    document.getElementById('detalle-hace').textContent = 'Nunca';
+  }
+
+  const contDetalle = document.getElementById('detalle-analisis');
+  if (analisis.length === 0) {
+    contDetalle.innerHTML = `<div style="padding:8px; background:var(--surface2); border-radius:6px; color:var(--text-dim); font-size:12px;">Sin análisis registrados</div>`;
+  } else {
+    contDetalle.innerHTML = analisis.slice(-3).reverse().map(a => `
+      <div style="padding:10px; background:var(--surface2); border-radius:6px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text);">${a.datos.concepto || a.archivo || 'Análisis'}</span>
+          <strong style="color:var(--green);">$${(a.datos.total || 0).toLocaleString('es-AR')}</strong>
+        </div>
+        <div style="color:var(--text-dim); margin-top:2px;">${new Date(a.timestamp).toLocaleDateString('es-AR')}</div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('clientes-lista-container').style.display = 'none';
+  document.getElementById('clientes-detalles').style.display = 'block';
+}
+
+function cerrarDetallesCliente() {
+  clienteSeleccionado = null;
+  const lista = document.getElementById('clientes-lista-container');
+  const detalles = document.getElementById('clientes-detalles');
+  if (lista) lista.style.display = 'grid';
+  if (detalles) detalles.style.display = 'none';
+}
+
+function filtrarClientes(query) {
+  const todos = Object.values(obtenerTodosLosClientes());
+  const q = (query || '').toLowerCase().trim();
+  clientesFiltrados = q === '' ? todos : todos.filter(c =>
+    (c.nombre || '').toLowerCase().includes(q) ||
+    (c.email || '').toLowerCase().includes(q) ||
+    (c.cuit || '').toLowerCase().includes(q)
+  );
+  actualizarListaClientes(clientesFiltrados);
+}
+
+function mostrarFormularioNuevoCliente() {
+  const nombre = prompt('Nombre del cliente:');
+  if (!nombre || !nombre.trim()) return;
+  const email = prompt('Email (opcional):') || '';
+  const cuit = prompt('CUIT (opcional):') || '';
+  const telefono = prompt('Teléfono (opcional):') || '';
+  const domicilio = prompt('Domicilio (opcional):') || '';
+
+  const clienteId = nombre.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') + '_' + Date.now().toString(36).slice(-4);
+  guardarCliente(clienteId, { nombre: nombre.trim(), email, cuit, telefono, domicilio });
+  mostrarPanelClientes();
+}
+
+function editarClienteModal() {
+  if (!clienteSeleccionado) return;
+  const cliente = obtenerCliente(clienteSeleccionado);
+  if (!cliente) return;
+
+  const nombre = prompt('Nombre del cliente:', cliente.nombre) ?? cliente.nombre;
+  const email = prompt('Email:', cliente.email) ?? cliente.email;
+  const cuit = prompt('CUIT:', cliente.cuit) ?? cliente.cuit;
+  const telefono = prompt('Teléfono:', cliente.telefono) ?? cliente.telefono;
+  const domicilio = prompt('Domicilio:', cliente.domicilio) ?? cliente.domicilio;
+
+  guardarCliente(clienteSeleccionado, { ...cliente, nombre, email, cuit, telefono, domicilio });
+  seleccionarCliente(clienteSeleccionado);
+  mostrarPanelClientes();
+  seleccionarCliente(clienteSeleccionado);
+}
+
+function eliminarClienteConConfirm() {
+  if (!clienteSeleccionado) return;
+  const cliente = obtenerCliente(clienteSeleccionado);
+  if (!cliente) return;
+  const confirmacion = confirm(`¿Estás seguro de que querés eliminar a "${cliente.nombre}" y TODOS sus análisis? Esta acción no se puede deshacer.`);
+  if (confirmacion) {
+    eliminarCliente(clienteSeleccionado);
+    cerrarDetallesCliente();
+    mostrarPanelClientes();
+    if (typeof registrarActividad === 'function') {
+      registrarActividad('Cliente eliminado', `Cliente "${cliente.nombre}" eliminado del CRM`);
+    }
+  }
+}
+
+// --- SELECTOR RÁPIDO DE CLIENTE DESDE EL CHAT (opcional) ---
+// Permite, después de un análisis, vincularlo a un cliente del CRM con 2 clics.
+
+function vincularUltimoAnalisisACliente() {
+  if (typeof analisisAcumulados === 'undefined' || analisisAcumulados.length === 0) {
+    alert('No hay ningún análisis para vincular todavía.');
+    return;
+  }
+  const ultimo = analisisAcumulados[analisisAcumulados.length - 1];
+  const d = ultimo.datos || {};
+  mostrarSelectorClienteRapido({
+    tipo: 'pdf',
+    archivo: ultimo.archivo || '',
+    concepto: d.emisor && d.emisor !== 'N/A' ? d.emisor : (d.tipo || 'Análisis'),
+    neto: d.neto || 0,
+    iva: d.iva || 0,
+    total: d.total || 0,
+    retenciones: { iva: d.retIva || 0, ganancias: d.retGan || 0 }
+  });
+}
+
+function mostrarSelectorClienteRapido(datosAnalisis) {
+  const clientes = Object.values(obtenerTodosLosClientes());
+  let opciones = clientes.map(c => `${c.nombre} (${c.id})`).join('\n');
+  const listado = clientes.length
+    ? `Clientes existentes:\n${clientes.map((c, i) => `${i + 1}. ${c.nombre}`).join('\n')}\n\n`
+    : '';
+  const respuesta = prompt(`${listado}Escribí el nombre del cliente para vincular este análisis (o dejá vacío para omitir):`);
+  if (!respuesta || !respuesta.trim()) return;
+
+  const nombreBuscado = respuesta.trim().toLowerCase();
+  let clienteExistente = clientes.find(c => c.nombre.toLowerCase() === nombreBuscado);
+
+  let clienteId;
+  if (clienteExistente) {
+    clienteId = clienteExistente.id;
+  } else {
+    clienteId = respuesta.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') + '_' + Date.now().toString(36).slice(-4);
+    guardarCliente(clienteId, { nombre: respuesta.trim() });
+  }
+
+  guardarAnalisisConCliente(clienteId, datosAnalisis);
+  if (typeof appendMsg === 'function') {
+    appendMsg('ai', `✅ Análisis vinculado al cliente "${respuesta.trim()}" en el CRM. Podés verlo en la pestaña 👥 Clientes.`);
+  }
+}
+
+// --- REPORTES INDIVIDUALES POR CLIENTE (Excel / PDF) ---
+
+function generarResumenEjecutivoCliente(cliente, analisis) {
+  const total = analisis.reduce((s, a) => s + (a.datos.total || 0), 0);
+  const neto = analisis.reduce((s, a) => s + (a.datos.neto || 0), 0);
+  const iva = analisis.reduce((s, a) => s + (a.datos.iva || 0), 0);
+  const fechas = analisis.map(a => new Date(a.timestamp)).sort((a, b) => a - b);
+  return {
+    cantidad: analisis.length,
+    total, neto, iva,
+    promedio: analisis.length ? total / analisis.length : 0,
+    desde: fechas[0] ? fechas[0].toLocaleDateString('es-AR') : '---',
+    hasta: fechas[fechas.length - 1] ? fechas[fechas.length - 1].toLocaleDateString('es-AR') : '---'
+  };
+}
+
+function exportarClienteExcel() {
+  if (!clienteSeleccionado || typeof XLSX === 'undefined') {
+    alert('No se pudo exportar: seleccioná un cliente primero.');
+    return;
+  }
+  const cliente = obtenerCliente(clienteSeleccionado);
+  const analisis = obtenerAnalisisDelCliente(clienteSeleccionado);
+  const resumen = generarResumenEjecutivoCliente(cliente, analisis);
+
+  const wb = XLSX.utils.book_new();
+
+  const wsResumenData = [
+    ['Reporte de Cliente — FiscoIA'],
+    [],
+    ['Cliente', cliente.nombre],
+    ['CUIT', cliente.cuit || '---'],
+    ['Email', cliente.email || '---'],
+    ['Período', `${resumen.desde} — ${resumen.hasta}`],
+    [],
+    ['Total de análisis', resumen.cantidad],
+    ['Neto', resumen.neto],
+    ['IVA', resumen.iva],
+    ['Total', resumen.total],
+    ['Promedio por análisis', resumen.promedio]
+  ];
+  const wsResumen = XLSX.utils.aoa_to_sheet(wsResumenData);
+  XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+
+  const wsDetalleData = [
+    ['Fecha', 'Concepto', 'Archivo', 'Neto', 'IVA', 'Total']
+  ];
+  analisis.forEach(a => {
+    wsDetalleData.push([
+      new Date(a.timestamp).toLocaleDateString('es-AR'),
+      a.datos.concepto || '',
+      a.archivo || '',
+      a.datos.neto || 0,
+      a.datos.iva || 0,
+      a.datos.total || 0
+    ]);
+  });
+  const wsDetalle = XLSX.utils.aoa_to_sheet(wsDetalleData);
+  XLSX.utils.book_append_sheet(wb, wsDetalle, 'Detalle');
+
+  const nombreArchivo = `${cliente.nombre.replace(/[^a-zA-Z0-9]+/g, '_')}_reporte_${new Date().toLocaleDateString('es-AR').replace(/\//g, '-')}.xlsx`;
+  XLSX.writeFile(wb, nombreArchivo);
+
+  if (typeof registrarActividad === 'function') {
+    registrarActividad('Reporte de cliente (Excel)', `Reporte exportado para "${cliente.nombre}" — ${resumen.cantidad} análisis`);
+  }
+}
+
+function exportarClientePDF() {
+  if (!clienteSeleccionado || typeof window.jspdf === 'undefined') {
+    alert('No se pudo exportar: seleccioná un cliente primero.');
+    return;
+  }
+  const cliente = obtenerCliente(clienteSeleccionado);
+  const analisis = obtenerAnalisisDelCliente(clienteSeleccionado);
+  const resumen = generarResumenEjecutivoCliente(cliente, analisis);
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageWidth = 210;
+  const marginX = 15;
+  let y = 20;
+
+  doc.setFillColor(27, 58, 107);
+  doc.rect(marginX, y - 6, pageWidth - marginX * 2, 10, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('FiscoIA — Reporte de Cliente', marginX + 4, y + 1);
+  y += 16;
+
+  doc.setTextColor(27, 58, 107);
+  doc.setFontSize(14);
+  doc.text(cliente.nombre, marginX, y);
+  y += 7;
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 100, 100);
+  doc.text(`CUIT: ${cliente.cuit || '---'}   Email: ${cliente.email || '---'}`, marginX, y);
+  y += 6;
+  doc.text(`Período: ${resumen.desde} — ${resumen.hasta}`, marginX, y);
+  y += 10;
+
+  doc.autoTable({
+    startY: y,
+    margin: { left: marginX, right: marginX },
+    body: [
+      ['Total de análisis', String(resumen.cantidad)],
+      ['Neto', `$${resumen.neto.toLocaleString('es-AR')}`],
+      ['IVA', `$${resumen.iva.toLocaleString('es-AR')}`],
+      ['Total', `$${resumen.total.toLocaleString('es-AR')}`]
+    ],
+    theme: 'plain',
+    styles: { fontSize: 10, cellPadding: 3 },
+    columnStyles: { 0: { fontStyle: 'bold', textColor: [27, 58, 107] }, 1: { fontStyle: 'bold', textColor: [16, 150, 100], halign: 'right' } },
+    alternateRowStyles: { fillColor: [240, 249, 255] }
+  });
+
+  y = doc.lastAutoTable.finalY + 12;
+  doc.autoTable({
+    startY: y,
+    margin: { left: marginX, right: marginX },
+    head: [['Fecha', 'Concepto', 'Total']],
+    body: analisis.map(a => [
+      new Date(a.timestamp).toLocaleDateString('es-AR'),
+      a.datos.concepto || a.archivo || '',
+      `$${(a.datos.total || 0).toLocaleString('es-AR')}`
+    ]),
+    theme: 'striped',
+    headStyles: { fillColor: [13, 148, 136] },
+    styles: { fontSize: 9, cellPadding: 3 }
+  });
+
+  doc.save(`${cliente.nombre.replace(/[^a-zA-Z0-9]+/g, '_')}_reporte_${new Date().toLocaleDateString('es-AR').replace(/\//g, '-')}.pdf`);
+
+  if (typeof registrarActividad === 'function') {
+    registrarActividad('Reporte de cliente (PDF)', `Reporte exportado para "${cliente.nombre}" — ${resumen.cantidad} análisis`);
+  }
 }
 </script>
 </body>

@@ -416,6 +416,7 @@
       .section { page-break-inside: avoid; }
     }
   </style>
+  <script src="tracker.js" defer></script>
 </head>
 <body>
 <script>
@@ -667,6 +668,17 @@
         <li>Se usan automáticamente en análisis para convertir monedas</li>
       </ul>
 
+      <h3>👥 Clientes (CRM)</h3>
+      <p>Una ficha por cada cliente, para no tener que buscar factura por factura cuando te preguntan "¿cuánto le facturé este mes a Fulano?".</p>
+      <ul style="margin: 12px 0 0 20px;">
+        <li><strong>Alta rápida:</strong> botón "+ Nuevo Cliente" — nombre, email, CUIT, teléfono y domicilio (todos opcionales salvo el nombre).</li>
+        <li><strong>Vincular un análisis:</strong> después de analizar una factura en el Chat, aparece el botón "👥 Vincular a cliente (CRM)" — elegís el cliente (o creás uno nuevo al vuelo) y ese análisis queda guardado en su ficha.</li>
+        <li><strong>Ficha del cliente:</strong> total de análisis, monto total procesado, fecha del último análisis, y los últimos movimientos.</li>
+        <li><strong>Reporte individual:</strong> desde la ficha, "📥 Exportar Excel" o "📄 Exportar PDF" te arma un reporte solo con los datos de ese cliente — ideal para mandarle un resumen o adjuntarlo a la liquidación.</li>
+        <li><strong>Buscador:</strong> filtrá por nombre, email o CUIT en la barra de arriba del panel.</li>
+      </ul>
+      <p style="margin-top:10px; font-size:14px; color:var(--text-dim);">💡 Esto es independiente de la sincronización a Google Sheets — el CRM vive en tu navegador (localStorage), no se sube a ningún servidor.</p>
+
       <h3>🔄 Sincronización y Reportes Automáticos</h3>
       <p>FiscoIA puede mandar tus datos a herramientas que ya usás — <strong>siempre desde tu navegador, nunca por servidores de LABStudio</strong>. Se configuran desde el botón "Generar Reporte" (ícono 📊 en el panel Archivos) → "⚙️ Configurar".</p>
       <div class="cards-grid" style="margin-top: 16px;">
@@ -681,6 +693,10 @@
         <div class="card">
           <h4>📄 Reporte Mensual en PDF</h4>
           <p>El día 1 de cada mes recibís un PDF con el resumen completo del mes anterior y el desglose factura por cliente. Mismo email que el digesto semanal — <strong>también requiere el modo avanzado</strong>.</p>
+        </div>
+        <div class="card">
+          <h4>🔗 Sincronización vía n8n (avanzado, opcional)</h4>
+          <p>Si preferís centralizar todo en tu propio n8n (por ejemplo para combinarlo con otros flujos), hay un workflow listo para importar que recibe los análisis por webhook y los escribe en Google Sheets. No hace falta si ya usás la sincronización directa de arriba — son dos caminos alternativos al mismo resultado.</p>
         </div>
       </div>
       <p style="margin-top:14px; font-size:14px; color:var(--text-dim);">💡 <strong>Todo es opcional.</strong> Si no configurás nada, FiscoIA funciona igual — son atajos para no tener que revisar todo manualmente.</p>

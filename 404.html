@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página no encontrada — FiscoIA</title>
+<meta name="description" content="La página que buscás no existe o fue movida. Volvé al inicio de FiscoIA.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://labstudiopna.github.io/FiscoIA/404.html">
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="shortcut icon" href="favicon.ico">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--blue:#2563EB;--green:#10B981;--teal:#14B8A6;
+  --purple:#8B5CF6;--amber:#F59E0B;
+  --border:#E2E8F0;--text:#1E293B;--mid:#475569;--dim:#94A3B8;
+  --heading:#1B3A6B;
+  --bg-page:#fff;--surface:#fff;--surface-2:#F8FAFF;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Inter',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+[data-theme="dark"]{
+  --border:rgba(255,255,255,.12);--text:#E5E7EB;--mid:#9CA3AF;--dim:#6B7280;
+  --heading:#F1F5F9;
+  --bg-page:#0B0D12;--surface:#161A23;--surface-2:#12151D;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--text);background:var(--bg-page);transition:background .2s,color .2s}
+
+#theme-toggle{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .2s;flex-shrink:0}
+#theme-toggle:hover{border-color:var(--green)}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:3px solid var(--green);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+[data-theme="dark"] nav{background:rgba(11,13,18,.92)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.logo-icon img{width:100%;height:100%;object-fit:contain}
+.logo-name{font-family:var(--serif);font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--navy),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-cta{background:linear-gradient(135deg,var(--green),var(--teal));color:#fff!important;padding:10px 22px;border-radius:8px;font-weight:600;box-shadow:0 4px 16px rgba(16,185,129,.35);transition:all .2s!important;text-decoration:none;font-size:14px}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.45)!important}
+.nav-actions{display:flex;align-items:center;gap:12px}
+
+.e404{background:linear-gradient(160deg,#EFF6FF 0%,#E0F8F5 40%,#FFF5F0 100%);padding:110px 32px 100px;text-align:center;position:relative;overflow:hidden;min-height:74vh;display:flex;align-items:center;justify-content:center}
+[data-theme="dark"] .e404{background:linear-gradient(160deg,#0F1B2E 0%,#0D2420 40%,#241A14 100%)}
+.e404::before{content:'';position:absolute;top:-100px;right:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(37,99,235,.15) 0%,transparent 70%);pointer-events:none}
+.e404::after{content:'';position:absolute;bottom:-60px;left:-60px;width:420px;height:420px;background:radial-gradient(circle,rgba(16,185,129,.15) 0%,transparent 70%);pointer-events:none}
+.e404-inner{position:relative;z-index:1;max-width:600px;margin:0 auto}
+.e404-badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:20px;padding:8px 18px;font-size:13px;font-weight:600;color:var(--green);margin-bottom:28px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+[data-theme="dark"] .e404-badge{background:var(--surface)}
+.e404-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.e404-num{font-family:var(--serif);font-weight:800;font-size:clamp(4.5rem,14vw,8rem);line-height:1;margin-bottom:10px;background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.e404-title{font-family:var(--serif);font-size:clamp(24px,3.6vw,34px);font-weight:800;color:var(--heading);margin-bottom:20px}
+.e404-text{font-size:17px;color:var(--mid);max-width:480px;margin:0 auto 36px;line-height:1.7}
+.e404-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-g{background:linear-gradient(135deg,var(--green),var(--teal));color:#fff;padding:15px 30px;border-radius:10px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 4px 20px rgba(16,185,129,.4);transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-g:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,.5)}
+.btn-w{background:#fff;color:var(--navy);padding:15px 30px;border-radius:10px;font-size:16px;font-weight:600;text-decoration:none;border:2px solid var(--green);transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+[data-theme="dark"] .btn-w{background:var(--surface);color:var(--heading)}
+.btn-w:hover{background:var(--green);color:#fff}
+
+footer{background:var(--navy);color:#fff;padding:40px 32px 24px}
+.foot-bottom{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:rgba(255,255,255,.5)}
+.foot-bottom a{color:#00C896;text-decoration:none}
+.foot-bottom a:hover{color:#4A9EFF}
+
+@media(max-width:640px){
+  .e404-actions{flex-direction:column;align-items:stretch}
+  .foot-bottom{flex-direction:column;align-items:center;text-align:center}
+  nav{padding:0 18px}
+}
+</style>
+  <script src="tracker.js" defer></script>
+</head>
+<body>
+
+<script>
+  (function(){
+    const savedTheme = localStorage.getItem('fiscoia_theme') || 'light';
+    if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+</script>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"><img src="favicon.svg" alt="FiscoIA"></div>
+    <div class="logo-name">FiscoIA</div>
+  </a>
+  <div class="nav-actions">
+    <button id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">🌙</button>
+    <a href="agente-contador.html" class="nav-cta">Ir al Agente →</a>
+  </div>
+</nav>
+
+<section class="e404">
+  <div class="e404-inner">
+    <div class="e404-badge"><span class="e404-dot"></span> Página no encontrada</div>
+    <p class="e404-num">404</p>
+    <h1 class="e404-title">Este comprobante no cierra.</h1>
+    <p class="e404-text">La página que buscás no está disponible — puede que el enlace esté roto o que se haya movido. Volvé al inicio o entrá directo al agente contable.</p>
+    <div class="e404-actions">
+      <a href="index.html" class="btn-g">← Volver al inicio</a>
+      <a href="agente-contador.html" class="btn-w">Ir al Agente</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-bottom">
+    <span>© 2026 FiscoIA · Todos los derechos reservados</span>
+    <span>Desarrollado por <a href="https://labstudiopna.github.io" target="_blank">LABStudio.pna</a> · Paraná, Entre Ríos, Argentina</span>
+  </div>
+</footer>
+
+<script>
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('fiscoia_theme', next);
+  applyTheme(next);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme(localStorage.getItem('fiscoia_theme') || 'light');
+});
+</script>
+</body>
+</html>
