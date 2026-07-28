@@ -1921,8 +1921,12 @@ function leerExcelYActualizarGraficos(file) {
         <div class="section-title">👥 Mis Clientes</div>
         <div style="font-size:12px; color:var(--text-dim); margin-top:4px;" id="clientes-contador">0 clientes registrados</div>
       </div>
-      <button onclick="mostrarFormularioNuevoCliente()" style="background:var(--green); border:none; border-radius:8px; padding:10px 16px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">+ Nuevo Cliente</button>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button onclick="configurarWebhookCRM()" id="btn-config-sync-crm" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:12px; font-weight:600; color:var(--text); cursor:pointer; font-family:var(--sans);">⚙️ Sync Sheets</button>
+        <button onclick="mostrarFormularioNuevoCliente()" style="background:var(--green); border:none; border-radius:8px; padding:10px 16px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">+ Nuevo Cliente</button>
+      </div>
     </div>
+    <div id="crm-sync-estado" style="font-size:12px; color:var(--text-dim); display:none;"></div>
 
     <!-- BUSCADOR -->
     <div style="position:relative;">
@@ -5729,6 +5733,9 @@ function guardarAnalisisConCliente(clienteId, datosAnalisis) {
     ultimoAnalisis: analisis.timestamp
   });
 
+  // Sync automático a Google Sheets (vía n8n) — no bloquea el guardado local si falla
+  enviarAnalisisClienteASheets(clienteId, analisis).catch(() => {});
+
   return analisis;
 }
 
@@ -5744,6 +5751,62 @@ function eliminarCliente(clienteId) {
 
 inicializarDataLayerClientes();
 
+// --- SYNC A GOOGLE SHEETS (vía n8n) ---
+
+function obtenerWebhookCRM() {
+  return localStorage.getItem('fiscoIA_crmWebhookUrl') || '';
+}
+
+function configurarWebhookCRM() {
+  const actual = obtenerWebhookCRM();
+  const url = prompt(
+    'Pegá la URL del webhook de n8n (nodo "Recibir Analisis FiscoIA" → URL de producción, algo como https://tu-vps.com/webhook/fiscoia):',
+    actual
+  );
+  if (url === null) return;
+  if (url.trim() === '') {
+    localStorage.removeItem('fiscoIA_crmWebhookUrl');
+    alert('Sync a Sheets desactivada. Los clientes y análisis siguen guardándose en este navegador.');
+    return;
+  }
+  localStorage.setItem('fiscoIA_crmWebhookUrl', url.trim());
+  alert('✅ Configurado. A partir de ahora, cada análisis que vincules a un cliente se manda automáticamente a tu Google Sheet.');
+}
+
+async function enviarAnalisisClienteASheets(clienteId, analisis) {
+  const webhookUrl = obtenerWebhookCRM();
+  if (!webhookUrl) return; // no configurado todavía, no hace nada
+
+  const cliente = obtenerCliente(clienteId) || {};
+  const payload = {
+    clienteId: clienteId,
+    clienteNombre: cliente.nombre || '',
+    clienteEmail: cliente.email || '',
+    clienteCUIT: cliente.cuit || '',
+    analisisId: analisis.id,
+    timestamp: analisis.timestamp,
+    fecha: new Date(analisis.timestamp).toLocaleDateString('es-AR'),
+    concepto: analisis.datos.concepto || '',
+    neto: analisis.datos.neto || 0,
+    iva: analisis.datos.iva || 0,
+    total: analisis.datos.total || 0,
+    retenciónIVA: (analisis.datos.retenciones && analisis.datos.retenciones.iva) || 0,
+    retenciónGanancias: (analisis.datos.retenciones && analisis.datos.retenciones.ganancias) || 0,
+    archivo: analisis.archivo || '',
+    tipo: analisis.tipo || ''
+  };
+
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    console.warn('No se pudo sincronizar con Sheets (el análisis igual quedó guardado local):', e);
+  }
+}
+
 // --- PANEL DE CLIENTES (UI) ---
 
 function mostrarPanelClientes() {
@@ -5753,6 +5816,15 @@ function mostrarPanelClientes() {
   cerrarDetallesCliente();
   const buscar = document.getElementById('clientes-buscar');
   if (buscar) buscar.value = '';
+
+  const estado = document.getElementById('crm-sync-estado');
+  if (estado) {
+    const url = obtenerWebhookCRM();
+    estado.style.display = 'block';
+    estado.innerHTML = url
+      ? `🟢 Sync a Google Sheets activa`
+      : `⚪ Sync a Google Sheets desactivada — <a href="#" onclick="configurarWebhookCRM(); return false;" style="color:var(--green);">configurar</a>`;
+  }
 }
 
 function actualizarListaClientes(clientes) {
