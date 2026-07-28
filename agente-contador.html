@@ -154,10 +154,10 @@ function leerExcelYActualizarGraficos(file) {
     --surface: #F8F9FA;
     --surface2: #F0F1F3;
     --border: #E5E7EB;
-    --green: #0D9488;
-    --green-dim: rgba(13,148,136,0.12);
-    --teal: #0F766E;
-    --teal-dim: rgba(15,118,110,0.12);
+    --green: #10B981;
+    --green-dim: rgba(16,185,129,0.12);
+    --teal: #059669;
+    --teal-dim: rgba(5,150,105,0.12);
     --red: #DC2626;
     --red-dim: rgba(220,38,38,0.12);
     --blue: #2563EB;
@@ -170,19 +170,19 @@ function leerExcelYActualizarGraficos(file) {
   }
 
   [data-theme="dark"] {
-    --bg: #0B0D12;
-    --surface: #12151B;
-    --surface2: #1A1E27;
-    --border: rgba(255,255,255,0.08);
-    --green: #0D9488;
-    --green-dim: rgba(13,148,136,0.15);
-    --teal: #2DD4BF;
-    --teal-dim: rgba(45,212,191,0.15);
+    --bg: #0A101C;
+    --surface: #111A2A;
+    --surface2: #182338;
+    --border: #1F2C40;
+    --green: #10B981;
+    --green-dim: rgba(16,185,129,0.15);
+    --teal: #34D399;
+    --teal-dim: rgba(52,211,153,0.15);
     --red: #F87171;
     --red-dim: rgba(248,113,113,0.15);
     --blue: #60A5FA;
-    --text: #E5E7EB;
-    --text-dim: #9CA3AF;
+    --text: #EAF0F8;
+    --text-dim: #93A2B8;
   }
 
   #theme-toggle {
@@ -1196,10 +1196,13 @@ function leerExcelYActualizarGraficos(file) {
 
     .tabs {
       padding: 8px 10px;
-      flex-wrap: wrap;
-      row-gap: 6px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-    .tab { padding: 8px 12px; font-size: 12px; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 8px 14px; font-size: 12px; flex-shrink: 0; white-space: nowrap; }
     .tab-badge { font-size: 9px; padding: 1px 5px; }
 
     .chat-messages { padding: 14px; gap: 10px; }
@@ -1306,8 +1309,15 @@ function leerExcelYActualizarGraficos(file) {
     #theme-toggle { width: 28px; height: 28px; font-size: 12px; }
     .key-indicator span { display: none; }
 
-    .tabs { padding: 6px 8px; flex-wrap: wrap; row-gap: 5px; }
-    .tab { padding: 7px 10px; font-size: 10px; gap: 4px; }
+    .tabs {
+      padding: 6px 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 7px 12px; font-size: 11px; gap: 4px; flex-shrink: 0; white-space: nowrap; }
 
     .chat-messages { padding: 12px; gap: 8px; }
     .msg { max-width: 100%; }
@@ -1419,8 +1429,15 @@ function leerExcelYActualizarGraficos(file) {
     header { padding: 0 8px; }
     .logo-text { font-size: 12px; }
 
-    .tabs { padding: 5px 6px; flex-wrap: wrap; row-gap: 4px; }
-    .tab { padding: 6px 8px; font-size: 9px; gap: 3px; }
+    .tabs {
+      padding: 5px 6px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 6px 10px; font-size: 9px; gap: 3px; flex-shrink: 0; white-space: nowrap; }
 
     .chat-messages { padding: 10px; }
     .msg-avatar { width: 24px; height: 24px; font-size: 10px; }
