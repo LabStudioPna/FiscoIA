@@ -7034,10 +7034,16 @@ function proximosVencimientos(cantidad = 5) {
 const DRIVE_CLIENTE_WEBHOOK = 'https://vps-6064485-x.dattaweb.com/webhook/fiscoia-cliente-archivo';
 const DRIVE_CLIENTE_KEY = 'fiscoIA_driveClienteWebhook';
 
+// Viene APAGADO a proposito. La copia de la plantilla en Drive todavia no funciona:
+// la credencial de Google Sheets no tiene permiso para escribir en los archivos que
+// crea la credencial de Google Drive (error 403). Hasta resolver eso, no tiene sentido
+// mandar datos a un workflow que va a fallar.
+// Para prenderlo una vez resuelto: activarPlanillaPorCliente()
 function obtenerWebhookDriveCliente() {
   const guardada = localStorage.getItem(DRIVE_CLIENTE_KEY);
-  if (guardada === 'DESACTIVADO') return '';
-  return guardada || DRIVE_CLIENTE_WEBHOOK;
+  if (guardada === 'ACTIVADO') return DRIVE_CLIENTE_WEBHOOK;
+  if (guardada && /^https?:\/\//.test(guardada)) return guardada;
+  return '';
 }
 
 function desactivarPlanillaPorCliente() {
@@ -7047,8 +7053,9 @@ function desactivarPlanillaPorCliente() {
 }
 
 function activarPlanillaPorCliente() {
-  localStorage.removeItem(DRIVE_CLIENTE_KEY);
+  localStorage.setItem(DRIVE_CLIENTE_KEY, 'ACTIVADO');
   console.log('Listo. Cada cliente vuelve a tener su planilla propia en Drive.');
+  console.log('Recorda: antes tiene que estar resuelto el permiso de Google Sheets sobre los archivos que crea Drive.');
   return { status: 'activado' };
 }
 
