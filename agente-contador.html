@@ -1922,7 +1922,7 @@ function leerExcelYActualizarGraficos(file) {
         <div style="font-size:12px; color:var(--text-dim); margin-top:4px;" id="clientes-contador">0 clientes registrados</div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button onclick="configurarWebhookCRM()" id="btn-config-sync-crm" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:12px; font-weight:600; color:var(--text); cursor:pointer; font-family:var(--sans);">⚙️ Sync Sheets</button>
+        <button onclick="configurarWebhookCRM()" id="btn-config-sync-crm" style="display:none; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:12px; font-weight:600; color:var(--text); cursor:pointer; font-family:var(--sans);">⚙️ Sync Sheets</button>
         <button onclick="mostrarFormularioNuevoCliente()" style="background:var(--green); border:none; border-radius:8px; padding:10px 16px; font-size:12px; font-weight:600; color:#fff; cursor:pointer; font-family:var(--sans);">+ Nuevo Cliente</button>
       </div>
     </div>
@@ -5823,7 +5823,7 @@ function mostrarPanelClientes() {
     estado.style.display = 'block';
     estado.innerHTML = url
       ? `🟢 Sync a Google Sheets activa`
-      : `⚪ Sync a Google Sheets desactivada — <a href="#" onclick="configurarWebhookCRM(); return false;" style="color:var(--green);">configurar</a>`;
+      : `🔒 Tus clientes se guardan solo en este navegador`;
   }
 }
 
@@ -6501,7 +6501,8 @@ function herramientasMantenimiento() {
 // 9. PUENTE CON N8N (lo que faltaba para que el workflow reciba datos)
 // ---------------------------------------------------------------------------
 const N8N_WEBHOOK_KEY = 'fiscoIA_carteraWebhookUrl';
-const N8N_WEBHOOK_DEFAULT = 'https://vps-6064485-x.dattaweb.com/webhook/fiscoia-crm';
+// Sin valor por defecto a proposito: nadie sincroniza a un servidor ajeno sin pedirlo.
+const N8N_WEBHOOK_DEFAULT = '';
 
 function configurarN8n(url) {
   if (!url || !/^https?:\/\//.test(url)) {
@@ -6513,10 +6514,15 @@ function configurarN8n(url) {
   return { status: 'ok', url: url.trim() };
 }
 
+// La cartera NO se sincroniza a ningun servidor salvo que el propio usuario
+// configure una URL suya. Los datos de sus clientes (nombre, CUIT, email, montos)
+// se quedan en su navegador. Es lo que permite prometer que nada sale de su compu.
+// Para prenderlo con un n8n propio: configurarN8n("https://tu-servidor/webhook/...")
 function obtenerWebhookN8n() {
   const guardada = localStorage.getItem(N8N_WEBHOOK_KEY);
-  if (guardada === 'DESACTIVADO') return '';
-  return guardada || N8N_WEBHOOK_DEFAULT;
+  if (!guardada || guardada === 'DESACTIVADO') return '';
+  if (!/^https?:\/\//.test(guardada)) return '';
+  return guardada;
 }
 
 function desconectarN8n() {
@@ -6589,7 +6595,8 @@ async function sincronizarCarteraCompletaConN8n() {
 async function probarConexionN8n() {
   const webhook = obtenerWebhookN8n();
   if (!webhook) {
-    console.log('n8n esta desactivado. Reactivalo con: configurarN8n("' + N8N_WEBHOOK_DEFAULT + '")');
+    console.log('No hay ningun servidor configurado. Tus clientes se guardan solo en este navegador.');
+    console.log('Si tenes tu propio n8n: configurarN8n("https://tu-servidor/webhook/loquesea")');
     return { status: 'desactivado' };
   }
   console.log('Probando conexion con', webhook, '...');
@@ -7031,7 +7038,7 @@ function proximosVencimientos(cantidad = 5) {
 // ---------------------------------------------------------------------------
 // 17. PLANILLA PROPIA POR CLIENTE EN DRIVE
 // ---------------------------------------------------------------------------
-const DRIVE_CLIENTE_WEBHOOK = 'https://vps-6064485-x.dattaweb.com/webhook/fiscoia-cliente-archivo';
+// Sin valor por defecto a proposito. Requiere que el usuario ponga su propia URL.
 const DRIVE_CLIENTE_KEY = 'fiscoIA_driveClienteWebhook';
 
 // Viene APAGADO a proposito. La copia de la plantilla en Drive todavia no funciona:
@@ -7041,7 +7048,6 @@ const DRIVE_CLIENTE_KEY = 'fiscoIA_driveClienteWebhook';
 // Para prenderlo una vez resuelto: activarPlanillaPorCliente()
 function obtenerWebhookDriveCliente() {
   const guardada = localStorage.getItem(DRIVE_CLIENTE_KEY);
-  if (guardada === 'ACTIVADO') return DRIVE_CLIENTE_WEBHOOK;
   if (guardada && /^https?:\/\//.test(guardada)) return guardada;
   return '';
 }
@@ -7052,11 +7058,15 @@ function desactivarPlanillaPorCliente() {
   return { status: 'desactivado' };
 }
 
-function activarPlanillaPorCliente() {
-  localStorage.setItem(DRIVE_CLIENTE_KEY, 'ACTIVADO');
-  console.log('Listo. Cada cliente vuelve a tener su planilla propia en Drive.');
-  console.log('Recorda: antes tiene que estar resuelto el permiso de Google Sheets sobre los archivos que crea Drive.');
-  return { status: 'activado' };
+function activarPlanillaPorCliente(url) {
+  if (!url || !/^https?:\/\//.test(url)) {
+    console.error('Hace falta la URL de TU propio webhook.');
+    console.error('Ejemplo: activarPlanillaPorCliente("https://tu-servidor/webhook/cliente-archivo")');
+    return { status: 'error' };
+  }
+  localStorage.setItem(DRIVE_CLIENTE_KEY, url.trim());
+  console.log('Listo. Cada cliente va a tener su planilla propia en tu Drive.');
+  return { status: 'activado', url: url.trim() };
 }
 
 async function enviarAnalisisAPlanillaDelCliente(clienteId, analisis) {
@@ -7139,7 +7149,47 @@ herramientasMantenimiento = function () {
   console.log('  desactivarPlanillaPorCliente()       Deja de crear planillas en Drive');
   console.log('  activarPlanillaPorCliente()          Vuelve a crearlas');
   console.log('  desconectarN8n()                     Modo 100% local');
+  console.log('');
+  console.log('PRIVACIDAD');
+  console.log('  dondeVanMisDatos()                   Muestra que sale y que no');
+  console.log('  modoAvanzado()                       Herramientas para tecnicos');
 };
+
+
+// ---------------------------------------------------------------------------
+// 20. MODO AVANZADO — herramientas que un cliente comun no deberia tocar
+// ---------------------------------------------------------------------------
+function modoAvanzado() {
+  const btn = document.getElementById('btn-config-sync-crm');
+  if (btn) btn.style.display = 'inline-flex';
+  console.log('%c Modo avanzado activado ', 'background:#F59E0B;color:#1F2937;font-weight:bold;padding:2px 6px');
+  console.log('Aparecio el boton de Sync Sheets en la pestana Clientes.');
+  console.log('');
+  console.log('Ojo: la URL que pegues ahi define a que planilla van los analisis.');
+  console.log('Si pegas una que no es tuya, tus datos terminan en la planilla de otro.');
+  return { status: 'activado' };
+}
+
+function dondeVanMisDatos() {
+  const cartera = obtenerWebhookN8n();
+  const analisis = localStorage.getItem('fiscoIA_crmWebhookUrl') || '';
+  const sheets = localStorage.getItem('fiscoia_sheets_url') || '';
+
+  console.log('%c Donde van tus datos ', 'background:#1B3A6B;color:#fff;font-weight:bold;padding:2px 6px');
+  console.log('');
+  console.log('Clientes y analisis  : este navegador (siempre)');
+  console.log('Respaldos            : este navegador (siempre)');
+  console.log('Tu API key           : este navegador, nunca se envia');
+  console.log('');
+  console.log('Cartera a un servidor: ' + (cartera || 'no (queda solo aca)'));
+  console.log('Analisis a una hoja  : ' + (analisis || 'no'));
+  console.log('Google Sheets propio : ' + (sheets || 'no conectado'));
+  console.log('');
+  console.log('Lo unico que siempre sale de tu compu es tu email, para verificar');
+  console.log('que tu suscripcion siga activa. Nada mas.');
+
+  return { cartera: cartera || null, analisis: analisis || null, sheets: sheets || null };
+}
 
 // ---------------------------------------------------------------------------
 // 19. ARRANQUE
