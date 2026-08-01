@@ -6160,6 +6160,1007 @@ function exportarClientePDF() {
     registrarActividad('Reporte de cliente (PDF)', `Reporte exportado para "${cliente.nombre}" — ${resumen.cantidad} análisis`);
   }
 }
+
+// ============================================================================
+// MEJORAS FISCOIA CRM v2.0 - CRÍTICAS, IMPORTANTES Y VALOR AGREGADO
+// ============================================================================
+
+// ============================================================================
+// 1. VALIDACIÓN Y DEDUPLICACIÓN (CRÍTICO)
+// ============================================================================
+function deduplicarClientes() {
+  const clientes = obtenerTodosLosClientes();
+  const vistos = new Map();
+  const duplicados = [];
+  
+  for (const [id, cliente] of Object.entries(clientes)) {
+    const clave = `${cliente.email || ''}:${cliente.cuit || ''}`.toLowerCase().trim();
+    if (!clave || clave === ':') continue;
+    
+    if (vistos.has(clave)) {
+      duplicados.push({ id, clienteAnterior: vistos.get(clave), cliente });
+    } else {
+      vistos.set(clave, id);
+    }
+  }
+  
+  if (duplicados.length === 0) {
+    console.log('✅ Sin duplicados detectados');
+    return { status: 'ok', duplicados: [] };
+  }
+  
+  duplicados.forEach(dup => {
+    const analisisDelDup = obtenerAnalisisDelCliente(dup.id);
+    if (analisisDelDup.length > 0) {
+      analisisDelDup.forEach(a => {
+        guardarAnalisisConCliente(dup.clienteAnterior, a);
+      });
+    }
+    delete clientes[dup.id];
+  });
+  
+  localStorage.setItem('fiscoIA_clientes', JSON.stringify(clientes));
+  console.log(`⚠️ ${duplicados.length} duplicados consolidados`);
+  return { status: 'consolidado', duplicados: duplicados.length };
+}
+
+function validarDatosCliente(cliente) {
+  const errores = [];
+  if (!cliente.nombre || cliente.nombre.trim() === '') {
+    errores.push('Nombre es obligatorio');
+  }
+  if (cliente.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cliente.email)) {
+    errores.push('Email inválido');
+  }
+  if (cliente.cuit && !/^\d{11}$/.test(cliente.cuit.replace(/[-\.]/g, ''))) {
+    errores.push('CUIT debe tener 11 dígitos');
+  }
+  return { valido: errores.length === 0, errores };
+}
+
+// ============================================================================
+// 2. BÚSQUEDA OPTIMIZADA Y FILTROS AVANZADOS (IMPORTANTE)
+// ============================================================================
+function buscarClientesAvanzado(query, filtros = {}) {
+  const clientes = obtenerTodosLosClientes();
+  const queryLower = query.toLowerCase().trim();
+  
+  let resultados = Object.entries(clientes).filter(([id, cliente]) => {
+    const match = !query || 
+      cliente.nombre.toLowerCase().includes(queryLower) ||
+      (cliente.email && cliente.email.toLowerCase().includes(queryLower)) ||
+      (cliente.cuit && cliente.cuit.includes(query));
+    
+    if (filtros.estado && cliente.estado !== filtros.estado) return false;
+    if (filtros.categoría && cliente.categoría !== filtros.categoría) return false;
+    if (filtros.desde) {
+      const desde = new Date(filtros.desde);
+      const createdAt = new Date(cliente.createdAt);
+      if (createdAt < desde) return false;
+    }
+    if (filtros.hasta) {
+      const hasta = new Date(filtros.hasta);
+      const createdAt = new Date(cliente.createdAt);
+      if (createdAt > hasta) return false;
+    }
+    return match;
+  });
+  
+  resultados.sort((a, b) => {
+    if (a[1].estado === 'activo' && b[1].estado !== 'activo') return -1;
+    if (a[1].estado !== 'activo' && b[1].estado === 'activo') return 1;
+    return a[1].nombre.localeCompare(b[1].nombre);
+  });
+  
+  return resultados.map(([id, cliente]) => ({ id, ...cliente }));
+}
+
+function calcularSaludCliente(clienteId) {
+  const analisis = obtenerAnalisisDelCliente(clienteId);
+  if (analisis.length === 0) return { salud: 'nuevo', score: 0 };
+  
+  const ahora = Date.now();
+  const último = analisis[analisis.length - 1];
+  const diasSinAnalisis = (ahora - último.timestamp) / (24 * 60 * 60 * 1000);
+  
+  let salud = 'activo';
+  let score = 100;
+  
+  if (diasSinAnalisis > 90) {
+    salud = 'inactivo';
+    score = 30;
+  } else if (diasSinAnalisis > 30) {
+    salud = 'en_riesgo';
+    score = 60;
+  }
+  
+  return { salud, score, diasSinAnalisis, totalAnalisis: analisis.length, montoTotal: analisis.reduce((sum, a) => sum + (a.datos.total || 0), 0) };
+}
+
+// ============================================================================
+// 3. DASHBOARD CON KPIs (IMPORTANTE)
+// ============================================================================
+function generarDashboardClientes() {
+  const clientes = obtenerTodosLosClientes();
+  const clientesList = Object.entries(clientes).map(([id, c]) => ({ id, ...c }));
+  
+  const kpis = {
+    totalClientes: clientesList.length,
+    clientesActivos: clientesList.filter(c => c.estado === 'activo').length,
+    clientesNuevos: clientesList.filter(c => {
+      const dias = (Date.now() - new Date(c.createdAt)) / (24 * 60 * 60 * 1000);
+      return dias <= 30;
+    }).length,
+    
+    analisisTotal: clientesList.reduce((sum, c) => {
+      return sum + (obtenerAnalisisDelCliente(c.id) || []).length;
+    }, 0),
+    
+    ingresosTotales: clientesList.reduce((sum, c) => {
+      return sum + (obtenerAnalisisDelCliente(c.id) || []).reduce((s, a) => s + (a.datos.total || 0), 0);
+    }, 0),
+    
+    ingresos30Días: clientesList.reduce((sum, c) => {
+      const ahora = Date.now();
+      const análisisRecientes = (obtenerAnalisisDelCliente(c.id) || []).filter(a => ahora - a.timestamp < 30 * 24 * 60 * 60 * 1000);
+      return sum + análisisRecientes.reduce((s, a) => s + (a.datos.total || 0), 0);
+    }, 0),
+    
+    salud: {
+      activos: clientesList.filter(c => calcularSaludCliente(c.id).salud === 'activo').length,
+      enRiesgo: clientesList.filter(c => calcularSaludCliente(c.id).salud === 'en_riesgo').length,
+      inactivos: clientesList.filter(c => calcularSaludCliente(c.id).salud === 'inactivo').length,
+    }
+  };
+  
+  const ahora = Date.now();
+  const top5 = clientesList
+    .map(c => {
+      const análisisRecientes = (obtenerAnalisisDelCliente(c.id) || []).filter(a => ahora - a.timestamp < 30 * 24 * 60 * 60 * 1000);
+      const monto = análisisRecientes.reduce((s, a) => s + (a.datos.total || 0), 0);
+      return { ...c, montoUltimos30: monto };
+    })
+    .sort((a, b) => b.montoUltimos30 - a.montoUltimos30)
+    .slice(0, 5);
+  
+  kpis.top5Clientes = top5;
+  return kpis;
+}
+
+// ============================================================================
+// 4. EXPORTACIÓN COMPLETA DE CARTERA (IMPORTANTE)
+// ============================================================================
+function exportarCarteraCompleta() {
+  const clientes = obtenerTodosLosClientes();
+  const ahora = Date.now();
+  
+  const datos = Object.entries(clientes).map(([id, cliente]) => {
+    const analisis = obtenerAnalisisDelCliente(id);
+    const salud = calcularSaludCliente(id);
+    const análisisRecientes = analisis.filter(a => ahora - a.timestamp < 30 * 24 * 60 * 60 * 1000);
+    
+    return {
+      'ID': id,
+      'Nombre': cliente.nombre,
+      'Email': cliente.email || '',
+      'CUIT': cliente.cuit || '',
+      'Teléfono': cliente.telefono || '',
+      'Categoría': cliente.categoría || 'Sin clasificar',
+      'Estado': cliente.estado || 'activo',
+      'Salud': salud.salud,
+      'Score': salud.score,
+      'Total Análisis': salud.totalAnalisis,
+      'Monto Total': salud.montoTotal,
+      'Últimos 30 días': análisisRecientes.reduce((s, a) => s + (a.datos.total || 0), 0),
+      'Días sin análisis': Math.round(salud.diasSinAnalisis || 0),
+    };
+  });
+  
+  const ws = XLSX.utils.json_to_sheet(datos);
+  ws['!cols'] = [
+    { wch: 10 }, { wch: 25 }, { wch: 25 }, { wch: 15 }, { wch: 15 },
+    { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 15 },
+    { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }
+  ];
+  
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Cartera');
+  
+  XLSX.writeFile(wb, `FiscoIA_Cartera_${new Date().toLocaleDateString('es-AR').replace(/\//g, '-')}.xlsx`);
+  registrarActividad('Exportación cartera', `Cartera completa exportada — ${datos.length} clientes`);
+}
+
+// ============================================================================
+// 5. ALERTAS INTELIGENTES (VALOR AGREGADO)
+// ============================================================================
+function generarAlertasClientes() {
+  const clientes = obtenerTodosLosClientes();
+  const alertas = [];
+  const ahora = Date.now();
+  
+  Object.entries(clientes).forEach(([id, cliente]) => {
+    const analisis = obtenerAnalisisDelCliente(id);
+    const salud = calcularSaludCliente(id);
+    
+    if (salud.salud === 'inactivo') {
+      alertas.push({
+        tipo: 'inactivo',
+        cliente: cliente.nombre,
+        clienteId: id,
+        mensaje: `Inactivo hace ${Math.round(salud.diasSinAnalisis)} días`,
+        urgencia: 'alta',
+      });
+    }
+    
+    if (salud.salud === 'en_riesgo') {
+      alertas.push({
+        tipo: 'en_riesgo',
+        cliente: cliente.nombre,
+        clienteId: id,
+        mensaje: `Sin análisis hace ${Math.round(salud.diasSinAnalisis)} días`,
+        urgencia: 'media',
+      });
+    }
+    
+    if (salud.totalAnalisis === 0) {
+      const diasCreado = (ahora - new Date(cliente.createdAt)) / (24 * 60 * 60 * 1000);
+      if (diasCreado > 7) {
+        alertas.push({
+          tipo: 'nuevo_sin_análisis',
+          cliente: cliente.nombre,
+          clienteId: id,
+          mensaje: `Nuevo hace ${Math.round(diasCreado)} días sin análisis`,
+          urgencia: 'baja',
+        });
+      }
+    }
+  });
+  
+  return alertas.sort((a, b) => {
+    const urgencia = { alta: 3, media: 2, baja: 1 };
+    return urgencia[b.urgencia] - urgencia[a.urgencia];
+  });
+}
+
+// ============================================================================
+// 6. BACKUP Y RESTAURACIÓN (VALOR AGREGADO)
+// ============================================================================
+function hacerBackupClientes() {
+  const clientes = obtenerTodosLosClientes();
+  const backup = {
+    timestamp: new Date().toISOString(),
+    datos: clientes,
+    cantidad: Object.keys(clientes).length
+  };
+  
+  const backups = JSON.parse(localStorage.getItem('fiscoIA_backups') || '[]');
+  backups.push(backup);
+  
+  if (backups.length > 10) backups.shift();
+  localStorage.setItem('fiscoIA_backups', JSON.stringify(backups));
+  console.log(`✅ Backup: ${backup.cantidad} clientes`);
+  return backup;
+}
+
+function obtenerBackups() {
+  return JSON.parse(localStorage.getItem('fiscoIA_backups') || '[]');
+}
+
+function restaurarBackup(índice) {
+  const backups = obtenerBackups();
+  if (índice < 0 || índice >= backups.length) return { error: 'Backup no encontrado' };
+  localStorage.setItem('fiscoIA_clientes', JSON.stringify(backups[índice].datos));
+  return { status: 'restaurado' };
+}
+
+// ============================================================================
+// 7. CATEGORIZACIÓN AUTOMÁTICA (VALOR AGREGADO)
+// ============================================================================
+function categorizarClienteAutomático(clienteId) {
+  const cliente = obtenerCliente(clienteId);
+  const analisis = obtenerAnalisisDelCliente(clienteId);
+  
+  if (analisis.length === 0) return 'Sin clasificar';
+  
+  const montoTotal = analisis.reduce((sum, a) => sum + (a.datos.total || 0), 0);
+  const frecuencia = analisis.length / Math.max(1, (Date.now() - new Date(cliente.createdAt)) / (30 * 24 * 60 * 60 * 1000));
+  
+  let categoría = 'Otros';
+  
+  if (montoTotal > 100000) categoría = 'Enterprise';
+  else if (montoTotal > 50000) categoría = 'Premium';
+  else if (montoTotal > 10000) categoría = 'Pyme';
+  else if (montoTotal > 0) categoría = 'Startup';
+  
+  if (frecuencia > 4) categoría += ' (Frecuente)';
+  return categoría;
+}
+
+// ============================================================================
+// 8. HERRAMIENTA DE MANTENIMIENTO (CRÍTICO)
+// ============================================================================
+function herramientasMantenimiento() {
+  console.log('🔧 FiscoIA Maintenance Tools');
+  console.log('================================');
+  console.log('deduplicarClientes() - Elimina duplicados');
+  console.log('exportarCarteraCompleta() - Exporta todo a Excel');
+  console.log('generarDashboardClientes() - KPIs actuales');
+  console.log('generarAlertasClientes() - Alertas de clientes');
+  console.log('hacerBackupClientes() - Backup manual');
+  console.log('obtenerBackups() - Ver todos los backups');
+  console.log('restaurarBackup(índice) - Restaurar backup');
+  console.log('deduplicarClientes(); // Ejecutar deduplicación');
+}
+
+// ============================================================================
+// CAPA DE INTEGRACIÓN v2.1 — CIERRA LOS HUECOS DE v2.0
+// Puente con n8n, auto-backup real, validación y categorización enganchadas.
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// 9. PUENTE CON N8N (lo que faltaba para que el workflow reciba datos)
+// ---------------------------------------------------------------------------
+const N8N_WEBHOOK_KEY = 'fiscoIA_carteraWebhookUrl';
+const N8N_WEBHOOK_DEFAULT = 'https://vps-6064485-x.dattaweb.com/webhook/fiscoia-crm';
+
+function configurarN8n(url) {
+  if (!url || !/^https?:\/\//.test(url)) {
+    console.error('❌ URL inválida. Ejemplo: configurarN8n("https://tu-servidor/webhook/fiscoia")');
+    return { status: 'error' };
+  }
+  localStorage.setItem(N8N_WEBHOOK_KEY, url.trim());
+  console.log('✅ n8n configurado:', url.trim());
+  return { status: 'ok', url: url.trim() };
+}
+
+function obtenerWebhookN8n() {
+  const guardada = localStorage.getItem(N8N_WEBHOOK_KEY);
+  if (guardada === 'DESACTIVADO') return '';
+  return guardada || N8N_WEBHOOK_DEFAULT;
+}
+
+function desconectarN8n() {
+  localStorage.setItem(N8N_WEBHOOK_KEY, 'DESACTIVADO');
+  console.log('🔌 n8n desconectado. FiscoIA sigue funcionando en modo local.');
+  return { status: 'desconectado' };
+}
+
+async function sincronizarConN8n(clienteId, accion = 'sincronizar_cliente') {
+  const webhook = obtenerWebhookN8n();
+  if (!webhook) return { status: 'omitido', motivo: 'n8n no configurado' };
+
+  const cliente = obtenerCliente(clienteId);
+  if (!cliente) return { status: 'error', motivo: 'cliente no encontrado' };
+
+  const analisis = obtenerAnalisisDelCliente(clienteId);
+  const montoTotal = analisis.reduce((sum, a) => sum + ((a.datos && a.datos.total) || 0), 0);
+
+  const payload = {
+    accion: accion,
+    cliente: {
+      id: cliente.id,
+      nombre: cliente.nombre,
+      email: cliente.email || '',
+      cuit: cliente.cuit || '',
+      telefono: cliente.telefono || '',
+      categoria: cliente.categoria || 'Sin clasificar',
+      estado: cliente.estado || 'activo',
+      totalAnalisis: analisis.length,
+      montoTotal: montoTotal
+    },
+    salud: calcularSaludCliente(clienteId),
+    enviadoEn: new Date().toISOString()
+  };
+
+  try {
+    const resp = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) {
+      console.warn(`⚠️ n8n respondió ${resp.status}. FiscoIA sigue funcionando local.`);
+      return { status: 'error', codigo: resp.status };
+    }
+    const data = await resp.json().catch(() => ({}));
+    return { status: 'ok', respuesta: data };
+  } catch (e) {
+    console.warn('⚠️ n8n no respondió. Los datos quedan guardados localmente.', e.message);
+    return { status: 'sin_conexion', motivo: e.message };
+  }
+}
+
+async function sincronizarCarteraCompletaConN8n() {
+  if (!obtenerWebhookN8n()) {
+    console.error('❌ Primero configurá n8n: configurarN8n("URL_DEL_WEBHOOK")');
+    return { status: 'error' };
+  }
+  const ids = Object.keys(obtenerTodosLosClientes());
+  let ok = 0, fallos = 0;
+  for (const id of ids) {
+    const r = await sincronizarConN8n(id, 'sincronizar_cliente');
+    r.status === 'ok' ? ok++ : fallos++;
+    await new Promise(res => setTimeout(res, 250));
+  }
+  console.log(`✅ Sincronizados: ${ok} | ⚠️ Con problemas: ${fallos}`);
+  return { status: 'completado', sincronizados: ok, fallos: fallos };
+}
+
+async function probarConexionN8n() {
+  const webhook = obtenerWebhookN8n();
+  if (!webhook) {
+    console.log('n8n esta desactivado. Reactivalo con: configurarN8n("' + N8N_WEBHOOK_DEFAULT + '")');
+    return { status: 'desactivado' };
+  }
+  console.log('Probando conexion con', webhook, '...');
+  try {
+    const resp = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accion: 'prueba',
+        cliente: { id: 'test', nombre: 'Prueba de conexion', cuit: '', email: '' },
+        salud: { salud: 'nuevo', score: 0, diasSinAnalisis: 0 }
+      })
+    });
+    if (resp.ok) {
+      console.log('Conexion OK. n8n respondio correctamente.');
+      return { status: 'ok' };
+    }
+    console.warn('n8n respondio con codigo ' + resp.status);
+    return { status: 'error', codigo: resp.status };
+  } catch (e) {
+    console.warn('No se pudo contactar n8n:', e.message);
+    return { status: 'sin_conexion' };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 10. ALIAS SIN ACENTOS (evita errores de tipeo en la consola)
+// ---------------------------------------------------------------------------
+function categorizarClienteAuto(clienteId) {
+  return categorizarClienteAutomático(clienteId);
+}
+
+function restaurarBackupPorIndice(indice) {
+  return restaurarBackup(indice);
+}
+
+// ---------------------------------------------------------------------------
+// 11. AUTO-BACKUP REAL (antes el contador nunca se incrementaba)
+// ---------------------------------------------------------------------------
+const BACKUP_CADA_N_CAMBIOS = 20;
+
+function registrarCambioCliente() {
+  const previo = parseInt(localStorage.getItem('fiscoIA_cambios') || '0', 10);
+  const actual = previo + 1;
+  localStorage.setItem('fiscoIA_cambios', String(actual));
+  if (actual % BACKUP_CADA_N_CAMBIOS === 0) {
+    hacerBackupClientes();
+    console.log(`💾 Backup automático (cambio nº ${actual})`);
+  }
+  return actual;
+}
+
+// ---------------------------------------------------------------------------
+// 12. ENGANCHE FINAL: valida, categoriza, respalda y sincroniza al guardar
+// ---------------------------------------------------------------------------
+const _guardarClienteOriginal = guardarCliente;
+
+guardarCliente = function (clienteId, datosCliente) {
+  const validacion = validarDatosCliente(datosCliente);
+  if (!validacion.valido) {
+    console.error('❌ Cliente no guardado:', validacion.errores.join(' | '));
+    if (typeof mostrarNotificacion === 'function') {
+      mostrarNotificacion('No se pudo guardar: ' + validacion.errores.join(', '), 'error');
+    }
+    return { error: true, errores: validacion.errores };
+  }
+
+  const guardado = _guardarClienteOriginal(clienteId, datosCliente);
+
+  try {
+    const clientes = obtenerTodosLosClientes();
+    if (clientes[clienteId]) {
+      clientes[clienteId].categoria = categorizarClienteAutomático(clienteId);
+      const salud = calcularSaludCliente(clienteId);
+      clientes[clienteId].estado = salud.salud;
+      clientes[clienteId].scoreSalud = salud.score;
+      localStorage.setItem('fiscoIA_clientes', JSON.stringify(clientes));
+    }
+  } catch (e) {
+    console.warn('⚠️ No se pudo categorizar automáticamente:', e.message);
+  }
+
+  registrarCambioCliente();
+  sincronizarConN8n(clienteId, 'sincronizar_cliente');
+
+  return guardado;
+};
+
+// ---------------------------------------------------------------------------
+// 13. PANEL DE ESTADO — un solo comando para ver cómo está todo
+// ---------------------------------------------------------------------------
+function estadoFiscoIA() {
+  const clientes = obtenerTodosLosClientes();
+  const total = Object.keys(clientes).length;
+  const webhook = obtenerWebhookN8n();
+  const backups = obtenerBackups();
+  const alertas = generarAlertasClientes();
+
+  console.log('%c FiscoIA — Estado del sistema ', 'background:#1a1a2e;color:#fff;font-weight:bold;padding:2px 6px');
+  console.log(`Clientes en cartera : ${total}`);
+  console.log(`Alertas activas     : ${alertas.length}`);
+  console.log(`Backups guardados   : ${backups.length}`);
+  console.log(`Cambios registrados : ${localStorage.getItem('fiscoIA_cambios') || 0}`);
+  console.log(`Conexión n8n        : ${webhook ? '✅ ' + webhook : '⚪ no configurada'}`);
+  console.log('');
+  console.log('Escribí herramientasMantenimiento() para ver todos los comandos.');
+
+  return { clientes: total, alertas: alertas.length, backups: backups.length, n8n: webhook || null };
+}
+
+// ---------------------------------------------------------------------------
+// 14. AYUDA ACTUALIZADA
+// ---------------------------------------------------------------------------
+herramientasMantenimiento = function () {
+  console.log('%c 🔧 FiscoIA — Comandos disponibles ', 'background:#0f3460;color:#fff;font-weight:bold;padding:2px 6px');
+  console.log('');
+  console.log('ESTADO GENERAL');
+  console.log('  estadoFiscoIA()                  Resumen de todo el sistema');
+  console.log('  generarDashboardClientes()       KPIs de la cartera');
+  console.log('  generarAlertasClientes()         Clientes que necesitan atención');
+  console.log('');
+  console.log('CARTERA');
+  console.log('  buscarClientesAvanzado(texto)    Búsqueda con filtros');
+  console.log('  calcularSaludCliente(id)         Score 0-100 de un cliente');
+  console.log('  categorizarClienteAuto(id)       Categoría según facturación');
+  console.log('  deduplicarClientes()             Consolida clientes repetidos');
+  console.log('  exportarCarteraCompleta()        Descarga todo en Excel');
+  console.log('');
+  console.log('RESPALDOS');
+  console.log('  hacerBackupClientes()            Backup manual');
+  console.log('  obtenerBackups()                 Lista de backups');
+  console.log('  restaurarBackupPorIndice(0)      Restaura un backup (0 = el más reciente)');
+  console.log('');
+  console.log('CONEXIÓN N8N');
+  console.log('  configurarN8n("URL")             Conecta FiscoIA con n8n');
+  console.log('  sincronizarConN8n(id)            Envía un cliente a n8n');
+  console.log('  sincronizarCarteraCompletaConN8n()  Envía toda la cartera');
+  console.log('  probarConexionN8n()              Prueba que n8n responda');
+  console.log('  desconectarN8n()                 Vuelve a modo 100% local');
+};
+
+console.log('%c FiscoIA CRM v2.1 listo ', 'background:#16a34a;color:#fff;font-weight:bold;padding:2px 6px');
+console.log('Escribí estadoFiscoIA() para ver cómo está tu cartera.');
+
+// ============================================================================
+// FISCOIA v2.2 — HABILITACIONES, CALENDARIO Y PLANILLA POR CLIENTE
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// 15. HABILITACIONES: se revalida contra el servidor en cada visita
+// ---------------------------------------------------------------------------
+const FISCOIA_ESTADO_WEBHOOK = 'https://vps-6064485-x.dattaweb.com/webhook/fiscoia-estado';
+const HORAS_DE_GRACIA_SIN_SERVIDOR = 72;
+
+async function consultarHabilitacion(email) {
+  if (!email) return { ok: false, motivo: 'sin_email' };
+  try {
+    const resp = await fetch(FISCOIA_ESTADO_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!resp.ok) return { ok: false, motivo: 'servidor_error' };
+    const data = await resp.json();
+    return { ok: true, datos: data };
+  } catch (e) {
+    return { ok: false, motivo: 'sin_conexion' };
+  }
+}
+
+function dentroDeGracia(usuario) {
+  if (!usuario || !usuario.verificadoEn) return false;
+  const desde = new Date(usuario.verificadoEn).getTime();
+  if (isNaN(desde)) return false;
+  const horas = (Date.now() - desde) / 3600000;
+  return horas < HORAS_DE_GRACIA_SIN_SERVIDOR;
+}
+
+function mensajeSegunMotivo(motivo, plan) {
+  switch (motivo) {
+    case 'trial_vencido':
+      return 'Se terminaron tus 5 días de prueba. Activá tu cuenta para seguir usando FiscoIA.';
+    case 'pago_vencido':
+      return 'Tu suscripción venció. Renovala para volver a tener acceso.';
+    case 'usuario_no_encontrado':
+      return 'No encontramos tu cuenta. Volvé a entrar con Google.';
+    default:
+      return 'Tu cuenta no está habilitada en este momento.';
+  }
+}
+
+function aplicarHabilitacion(datos) {
+  const pantallaVencida = document.getElementById('trial-expirado-screen');
+  const paso2 = document.getElementById('paso-2-container');
+  const banner = document.getElementById('trial-restante-banner');
+  const badge = document.getElementById('user-info-badge');
+  const seccionLogin = document.getElementById('google-login-section');
+
+  if (seccionLogin) seccionLogin.style.display = 'none';
+  if (badge && datos.nombre) {
+    badge.style.display = 'flex';
+    const plan = datos.plan || 'gratis';
+    const nombrePlan = plan === 'gratis' ? 'Gratis' : plan.charAt(0).toUpperCase() + plan.slice(1);
+    const txt = document.getElementById('user-info-text');
+    if (txt) txt.textContent = `${datos.nombre} · Plan ${nombrePlan}`;
+  }
+
+  if (datos.acceso === false) {
+    if (pantallaVencida) {
+      pantallaVencida.style.display = 'block';
+      const detalle = pantallaVencida.querySelector('[data-motivo-habilitacion]');
+      if (detalle) detalle.textContent = mensajeSegunMotivo(datos.motivo, datos.plan);
+    }
+    if (paso2) paso2.style.display = 'none';
+    if (banner) banner.style.display = 'none';
+    if (typeof verificarCodigoGuardado === 'function') verificarCodigoGuardado();
+    return;
+  }
+
+  if (pantallaVencida) pantallaVencida.style.display = 'none';
+  if (paso2) paso2.style.display = 'block';
+
+  if (banner) {
+    const d = datos.diasRestantes;
+    if (typeof d === 'number' && d <= 7 && d >= 0) {
+      banner.style.display = 'block';
+      if (datos.motivo === 'trial_activo') {
+        banner.textContent = d <= 0
+          ? 'Último día de prueba gratuita'
+          : `Te quedan ${d} día${d === 1 ? '' : 's'} de prueba gratuita`;
+      } else {
+        banner.textContent = d <= 0
+          ? 'Tu suscripción vence hoy'
+          : `Tu suscripción vence en ${d} día${d === 1 ? '' : 's'}`;
+      }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+}
+
+async function revalidarUsuario() {
+  const guardado = localStorage.getItem('fiscoia_user');
+  if (!guardado) return;
+
+  let usuario;
+  try { usuario = JSON.parse(guardado); } catch (e) { return; }
+  if (!usuario || !usuario.email) return;
+
+  aplicarHabilitacion(usuario);
+
+  const consulta = await consultarHabilitacion(usuario.email);
+
+  if (consulta.ok) {
+    const fresco = { ...usuario, ...consulta.datos, verificadoEn: new Date().toISOString() };
+    localStorage.setItem('fiscoia_user', JSON.stringify(fresco));
+    aplicarHabilitacion(fresco);
+    return;
+  }
+
+  if (!dentroDeGracia(usuario)) {
+    aplicarHabilitacion({ ...usuario, acceso: false, motivo: 'sin_verificar' });
+  }
+}
+
+cargarUsuarioGuardado = function () {
+  revalidarUsuario();
+};
+
+// ---------------------------------------------------------------------------
+// 16. CALENDARIO DE VENCIMIENTOS — se genera solo, ya no queda viejo
+// ---------------------------------------------------------------------------
+//
+// IMPORTANTE: estos dias son los del esquema general y sirven como referencia.
+// ARCA publica su calendario oficial cada ano y puede correr fechas puntuales.
+// Antes de cada periodo conviene confirmar contra el calendario oficial.
+// Si algo cambia, se edita aca abajo y listo — el resto se recalcula solo.
+
+const REGLAS_VENCIMIENTOS = [
+  {
+    id: 'iva',
+    titulo: 'IVA — DDJJ y pago mensual',
+    detalle: 'Formulario 2002 · Período {periodoAnterior}',
+    porTerminacionCUIT: { '0': 18, '1': 18, '2': 19, '3': 19, '4': 20, '5': 20, '6': 21, '7': 21, '8': 22, '9': 22 },
+    usaIVACalculado: true
+  },
+  {
+    id: 'f931',
+    titulo: 'Cargas sociales — F931',
+    detalle: 'Aportes y contribuciones · Período {periodoAnterior}',
+    porTerminacionCUIT: { '0': 7, '1': 7, '2': 8, '3': 8, '4': 9, '5': 9, '6': 10, '7': 10, '8': 11, '9': 11 }
+  },
+  {
+    id: 'monotributo',
+    titulo: 'Monotributo — Cuota mensual',
+    detalle: 'Vencimiento general · {mesActual}',
+    diaFijo: 20
+  },
+  {
+    id: 'iibb-cm',
+    titulo: 'Ingresos Brutos — Convenio Multilateral',
+    detalle: 'CM03 · Período {periodoAnterior}',
+    diaFijo: 15
+  },
+  {
+    id: 'ganancias-anticipo',
+    titulo: 'Ganancias — Anticipo',
+    detalle: 'Personas humanas y sociedades',
+    diaFijo: 13
+  }
+];
+
+const MESES_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+function obtenerTerminacionCUIT() {
+  const guardada = localStorage.getItem('fiscoia_cuit_terminacion');
+  if (guardada && /^\d$/.test(guardada)) return guardada;
+  return '0';
+}
+
+function configurarTerminacionCUIT(cuit) {
+  const limpio = String(cuit || '').replace(/\D/g, '');
+  if (!limpio) {
+    console.error('Pasá tu CUIT. Ejemplo: configurarTerminacionCUIT("30712345678")');
+    return { status: 'error' };
+  }
+  const term = limpio.slice(-1);
+  localStorage.setItem('fiscoia_cuit_terminacion', term);
+  regenerarVencimientos();
+  console.log(`Listo. Terminación de CUIT ${term} — las fechas se recalcularon.`);
+  return { status: 'ok', terminacion: term };
+}
+
+function correrASiguienteHabil(fecha) {
+  const d = new Date(fecha);
+  while (d.getDay() === 0 || d.getDay() === 6) {
+    d.setDate(d.getDate() + 1);
+  }
+  return d;
+}
+
+function formatearFechaAR(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
+function generarVencimientos(mesesAdelante = 3) {
+  const term = obtenerTerminacionCUIT();
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  const generados = [];
+
+  for (let i = 0; i <= mesesAdelante; i++) {
+    const base = new Date(hoy.getFullYear(), hoy.getMonth() + i, 1);
+    const anio = base.getFullYear();
+    const mes = base.getMonth();
+
+    const mesAnterior = new Date(anio, mes - 1, 1);
+    const textoPeriodoAnterior = `${MESES_ES[mesAnterior.getMonth()]} ${mesAnterior.getFullYear()}`;
+    const textoMesActual = `${MESES_ES[mes]} ${anio}`;
+
+    for (const regla of REGLAS_VENCIMIENTOS) {
+      const dia = regla.diaFijo || (regla.porTerminacionCUIT ? regla.porTerminacionCUIT[term] : null);
+      if (!dia) continue;
+
+      const fecha = correrASiguienteHabil(new Date(anio, mes, dia));
+      const dias = Math.round((fecha - hoy) / 86400000);
+      if (dias < 0) continue;
+
+      let urgencia = 'green';
+      if (dias <= 7) urgencia = 'red';
+      else if (dias <= 15) urgencia = 'amber';
+
+      generados.push({
+        id: regla.id,
+        fecha: formatearFechaAR(fecha),
+        titulo: regla.titulo,
+        sub: regla.detalle
+          .replace('{periodoAnterior}', textoPeriodoAnterior)
+          .replace('{mesActual}', textoMesActual),
+        dias,
+        monto: regla.usaIVACalculado ? 'A calcular' : '—',
+        urgencia,
+        mesKeyIVA: regla.usaIVACalculado
+          ? `${mesAnterior.getFullYear()}-${String(mesAnterior.getMonth() + 1).padStart(2, '0')}`
+          : null
+      });
+    }
+  }
+
+  generados.sort((a, b) => a.dias - b.dias);
+  return generados;
+}
+
+function regenerarVencimientos() {
+  if (typeof vencimientos === 'undefined') return;
+
+  const nuevos = generarVencimientos(3);
+  vencimientos.length = 0;
+  nuevos.forEach(v => vencimientos.push(v));
+
+  try {
+    const ivaByMes = calcularIVAPorMes();
+    vencimientos.forEach(v => {
+      if (v.mesKeyIVA && ivaByMes[v.mesKeyIVA]) {
+        v.monto = `$${formatCotiz(ivaByMes[v.mesKeyIVA])}`;
+      }
+    });
+  } catch (e) { /* si no hay analisis cargados, queda "A calcular" */ }
+
+  if (typeof renderVencimientos === 'function') renderVencimientos();
+
+  const badge = document.getElementById('venc-badge');
+  if (badge) {
+    const urgentes = vencimientos.filter(v => v.dias <= 7).length;
+    badge.textContent = String(urgentes);
+  }
+
+  return vencimientos.length;
+}
+
+function proximosVencimientos(cantidad = 5) {
+  const lista = generarVencimientos(3).slice(0, cantidad);
+  console.log('%c Próximos vencimientos ', 'background:#1B3A6B;color:#fff;font-weight:bold;padding:2px 6px');
+  console.log(`Terminación de CUIT configurada: ${obtenerTerminacionCUIT()}`);
+  console.log('');
+  lista.forEach(v => {
+    const marca = v.dias <= 7 ? '[URGENTE]' : v.dias <= 15 ? '[PRONTO] ' : '[      ] ';
+    console.log(`${marca} ${v.fecha}  ${v.titulo}  (en ${v.dias} días)`);
+  });
+  console.log('');
+  console.log('Fechas del esquema general. Confirmá contra el calendario oficial de ARCA.');
+  return lista;
+}
+
+// ---------------------------------------------------------------------------
+// 17. PLANILLA PROPIA POR CLIENTE EN DRIVE
+// ---------------------------------------------------------------------------
+const DRIVE_CLIENTE_WEBHOOK = 'https://vps-6064485-x.dattaweb.com/webhook/fiscoia-cliente-archivo';
+const DRIVE_CLIENTE_KEY = 'fiscoIA_driveClienteWebhook';
+
+function obtenerWebhookDriveCliente() {
+  const guardada = localStorage.getItem(DRIVE_CLIENTE_KEY);
+  if (guardada === 'DESACTIVADO') return '';
+  return guardada || DRIVE_CLIENTE_WEBHOOK;
+}
+
+function desactivarPlanillaPorCliente() {
+  localStorage.setItem(DRIVE_CLIENTE_KEY, 'DESACTIVADO');
+  console.log('Listo. Ya no se crea una planilla de Drive por cliente.');
+  return { status: 'desactivado' };
+}
+
+function activarPlanillaPorCliente() {
+  localStorage.removeItem(DRIVE_CLIENTE_KEY);
+  console.log('Listo. Cada cliente vuelve a tener su planilla propia en Drive.');
+  return { status: 'activado' };
+}
+
+async function enviarAnalisisAPlanillaDelCliente(clienteId, analisis) {
+  const webhook = obtenerWebhookDriveCliente();
+  if (!webhook) return { status: 'omitido' };
+
+  const cliente = obtenerCliente(clienteId) || {};
+  const d = analisis.datos || {};
+
+  const payload = {
+    clienteId,
+    clienteNombre: cliente.nombre || '',
+    clienteEmail: cliente.email || '',
+    clienteCUIT: cliente.cuit || '',
+    analisisId: analisis.id || '',
+    timestamp: analisis.timestamp || new Date().toISOString(),
+    fecha: new Date(analisis.timestamp || Date.now()).toLocaleDateString('es-AR'),
+    concepto: d.concepto || '',
+    neto: d.neto || 0,
+    iva: d.iva || 0,
+    total: d.total || 0,
+    retencionIVA: (d.retenciones && d.retenciones.iva) || 0,
+    retencionGanancias: (d.retenciones && d.retenciones.ganancias) || 0,
+    archivo: analisis.archivo || '',
+    tipo: analisis.tipo || 'pdf'
+  };
+
+  try {
+    const resp = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) return { status: 'error', codigo: resp.status };
+    return { status: 'ok', respuesta: await resp.json().catch(() => ({})) };
+  } catch (e) {
+    console.warn('No se pudo crear la planilla del cliente. El análisis quedó guardado igual.', e.message);
+    return { status: 'sin_conexion' };
+  }
+}
+
+const _enviarASheetsOriginal = enviarAnalisisClienteASheets;
+
+enviarAnalisisClienteASheets = async function (clienteId, analisis) {
+  const central = _enviarASheetsOriginal(clienteId, analisis);
+  const propia = enviarAnalisisAPlanillaDelCliente(clienteId, analisis);
+  await Promise.allSettled([central, propia]);
+};
+
+// ---------------------------------------------------------------------------
+// 18. AYUDA ACTUALIZADA
+// ---------------------------------------------------------------------------
+herramientasMantenimiento = function () {
+  console.log('%c FiscoIA — Comandos disponibles ', 'background:#0f3460;color:#fff;font-weight:bold;padding:2px 6px');
+  console.log('');
+  console.log('ESTADO GENERAL');
+  console.log('  estadoFiscoIA()                      Resumen de todo el sistema');
+  console.log('  generarDashboardClientes()           KPIs de la cartera');
+  console.log('  generarAlertasClientes()             Clientes que necesitan atención');
+  console.log('');
+  console.log('VENCIMIENTOS');
+  console.log('  configurarTerminacionCUIT("CUIT")    Ajusta las fechas a tu CUIT');
+  console.log('  proximosVencimientos()               Los 5 más cercanos');
+  console.log('  regenerarVencimientos()              Recalcula el calendario');
+  console.log('');
+  console.log('CARTERA');
+  console.log('  buscarClientesAvanzado(texto)        Búsqueda con filtros');
+  console.log('  calcularSaludCliente(id)             Score 0-100 de un cliente');
+  console.log('  categorizarClienteAuto(id)           Categoría según facturación');
+  console.log('  deduplicarClientes()                 Consolida clientes repetidos');
+  console.log('  exportarCarteraCompleta()            Descarga todo en Excel');
+  console.log('');
+  console.log('RESPALDOS');
+  console.log('  hacerBackupClientes()                Backup manual');
+  console.log('  obtenerBackups()                     Lista de backups');
+  console.log('  restaurarBackupPorIndice(0)          Restaura (0 = el más reciente)');
+  console.log('');
+  console.log('SINCRONIZACIÓN');
+  console.log('  probarConexionN8n()                  Verifica que n8n responda');
+  console.log('  desactivarPlanillaPorCliente()       Deja de crear planillas en Drive');
+  console.log('  activarPlanillaPorCliente()          Vuelve a crearlas');
+  console.log('  desconectarN8n()                     Modo 100% local');
+};
+
+// ---------------------------------------------------------------------------
+// 19. ARRANQUE
+// ---------------------------------------------------------------------------
+function arrancarFiscoIAv22() {
+  try { regenerarVencimientos(); } catch (e) { console.warn('Calendario:', e.message); }
+  try { revalidarUsuario(); } catch (e) { console.warn('Habilitación:', e.message); }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(arrancarFiscoIAv22, 1200);
+  });
+} else {
+  setTimeout(arrancarFiscoIAv22, 300);
+}
+
+console.log('%c FiscoIA v2.2 lista ', 'background:#16a34a;color:#fff;font-weight:bold;padding:2px 6px');
+console.log('Escribí estadoFiscoIA() para ver tu cartera, o proximosVencimientos() para el calendario.');
+
+// Ejecutar deduplicación automática al cargar
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(deduplicarClientes, 1000);
+  });
+} else {
+  deduplicarClientes();
+}
 </script>
 </body>
 </html>

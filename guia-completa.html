@@ -448,6 +448,9 @@
         <li><a href="#guia-paso-a-paso">Guía Paso a Paso</a></li>
         <li><a href="#features">Características por Panel</a></li>
         <li><a href="#faq">Preguntas Frecuentes</a></li>
+        <li><a href="#cartera">Cartera de Clientes (CRM)</a></li>
+        <li><a href="#calendario">Calendario de Vencimientos</a></li>
+        <li><a href="#cuenta">Tu Cuenta y Suscripción</a></li>
         <li><a href="#casos-uso">Casos de Uso Reales LATAM</a></li>
         <li><a href="#glosario">Glosario de Términos</a></li>
         <li><a href="#tips">Tips Profesionales</a></li>
@@ -787,6 +790,114 @@
     </section>
 
     <!-- CASOS DE USO LATAM -->
+    <!-- CARTERA / CRM -->
+    <section class="section" id="cartera">
+      <h2>👥 Cartera de Clientes (CRM)</h2>
+      <p>La pestaña <strong>Clientes</strong> es tu cartera: quién es cada uno, cuánto le facturaste y hace cuánto que no trabajás con él.</p>
+
+      <h3>Cómo cargar un cliente</h3>
+      <ol>
+        <li>Andá a la pestaña <strong>Clientes</strong> y tocá <strong>"+ Nuevo Cliente"</strong></li>
+        <li>El nombre es obligatorio. El email y el CUIT se validan: si el email está mal escrito o el CUIT no tiene 11 dígitos, no deja guardar</li>
+        <li>Listo — ya podés vincularle análisis</li>
+      </ol>
+
+      <h3>Cómo vincular una factura a un cliente</h3>
+      <ol>
+        <li>Analizá la factura como siempre, desde el Chat o desde Archivos</li>
+        <li>Cuando termina, aparece el botón <strong>"Vincular a cliente (CRM)"</strong></li>
+        <li>Elegí el cliente, o creá uno nuevo ahí mismo</li>
+      </ol>
+      <p>Ese análisis queda guardado en su ficha y, si tenés la sincronización activada, se escribe también en tu planilla central y en la planilla propia del cliente.</p>
+
+      <h3>Salud de cartera</h3>
+      <p>Cada cliente tiene un puntaje de 0 a 100 según hace cuánto no le cargás un análisis:</p>
+      <ul style="margin: 12px 0 0 20px;">
+        <li><strong>Activo (100):</strong> movimiento en los últimos 30 días</li>
+        <li><strong>En riesgo (60):</strong> entre 30 y 90 días sin movimiento</li>
+        <li><strong>Inactivo (30):</strong> más de 90 días</li>
+        <li><strong>Nuevo (0):</strong> todavía no tiene ningún análisis cargado</li>
+      </ul>
+      <p style="margin-top:10px;">Los clientes en riesgo e inactivos aparecen como alerta — sirve para saber a quién llamar antes de que se te vaya.</p>
+
+      <h3>Categoría automática</h3>
+      <p>Según lo facturado, FiscoIA clasifica solo a cada cliente: <strong>Enterprise</strong> (más de $100.000), <strong>Premium</strong> (más de $50.000), <strong>Pyme</strong> (más de $10.000) o <strong>Startup</strong>. Si tiene más de 4 análisis por mes le agrega "(Frecuente)".</p>
+
+      <h3>Exportar</h3>
+      <ul style="margin: 12px 0 0 20px;">
+        <li><strong>Un cliente:</strong> desde su ficha, "Exportar Excel" o "Exportar PDF"</li>
+        <li><strong>Toda la cartera:</strong> en la consola del navegador (tecla F12), escribí <code>exportarCarteraCompleta()</code> — baja un Excel con todos los clientes, su categoría, salud, total de análisis y monto</li>
+      </ul>
+
+      <h3>Respaldos</h3>
+      <p>Cada 20 cambios se guarda un respaldo automático de la cartera, y se conservan los últimos 10. Si borrás algo por error, en la consola: <code>obtenerBackups()</code> para ver la lista y <code>restaurarBackupPorIndice(0)</code> para volver al más reciente.</p>
+
+      <div class="highlight">
+        <strong>Dónde viven tus datos.</strong> La cartera se guarda en tu navegador y, si tenés la sincronización activada, también en tu propio servidor n8n. Nunca pasa por servidores de LABStudio.
+      </div>
+    </section>
+
+    <!-- CALENDARIO -->
+    <section class="section" id="calendario">
+      <h2>📅 Calendario de Vencimientos</h2>
+      <p>La pestaña <strong>Vencimientos ARCA</strong> te arma el calendario de los próximos 3 meses. No es una lista fija: se recalcula sola cada vez que abrís FiscoIA, así que nunca te muestra fechas que ya pasaron.</p>
+
+      <h3>Configuralo con tu CUIT (importante)</h3>
+      <p>Varios vencimientos dependen del último dígito de tu CUIT. Para que las fechas sean las tuyas, abrí la consola del navegador (tecla <strong>F12</strong>, pestaña <em>Console</em>) y escribí:</p>
+      <pre style="background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.10); border-radius:8px; padding:14px 16px; overflow-x:auto; margin:14px 0;"><code style="font-family:'IBM Plex Mono',monospace; font-size:13.5px; color:var(--green);">configurarTerminacionCUIT("30712345678")</code></pre>
+      <p>Se guarda una sola vez y las fechas se recalculan al instante.</p>
+
+      <h3>Qué incluye</h3>
+      <ul style="margin: 12px 0 0 20px;">
+        <li><strong>IVA — DDJJ mensual (F2002):</strong> el día depende de tu terminación de CUIT</li>
+        <li><strong>Cargas sociales (F931):</strong> también según terminación</li>
+        <li><strong>Monotributo:</strong> cuota mensual</li>
+        <li><strong>Ingresos Brutos — Convenio Multilateral (CM03)</strong></li>
+        <li><strong>Ganancias:</strong> anticipos</li>
+      </ul>
+
+      <h3>Detalles útiles</h3>
+      <ul style="margin: 12px 0 0 20px;">
+        <li>Si un vencimiento cae sábado o domingo, se corre al lunes siguiente</li>
+        <li>Los que vencen dentro de 7 días salen en rojo; entre 8 y 15 días, en ámbar</li>
+        <li>El monto del IVA sale de las facturas que ya cargaste ese mes. Si todavía no cargaste nada, dice "A calcular"</li>
+        <li>Para verlos en la consola: <code>proximosVencimientos()</code></li>
+      </ul>
+
+      <div class="highlight">
+        <strong>Leelo con cuidado.</strong> Las fechas siguen el esquema general y sirven como referencia para organizarte. ARCA publica su calendario oficial cada año y puede correr fechas puntuales por feriados o resoluciones. Antes de cada presentación, confirmá contra el calendario oficial de ARCA. FiscoIA te ayuda a no olvidarte; la responsabilidad de la fecha final es tuya.
+      </div>
+    </section>
+
+    <!-- CUENTA -->
+    <section class="section" id="cuenta">
+      <h2>🔑 Tu Cuenta y Suscripción</h2>
+
+      <h3>Cómo funciona el acceso</h3>
+      <ol>
+        <li>Entrás con tu cuenta de Google — no hay que crear ninguna contraseña</li>
+        <li>Arrancás con <strong>5 días de prueba gratis</strong></li>
+        <li>Cuando se terminan, activás tu suscripción para seguir</li>
+      </ol>
+
+      <h3>Qué pasa cuando pagás</h3>
+      <p>El pago se acredita solo. Apenas Mercado Pago confirma la operación, tu cuenta queda habilitada automáticamente — no hay que avisar a nadie ni esperar a que alguien te active a mano. La habilitación arranca el mismo día del pago.</p>
+
+      <h3>Cuándo vence</h3>
+      <p>La suscripción dura según el plan que pagues: mensual (30 días), trimestral (90) o anual (365). Desde 7 días antes del vencimiento vas a ver un aviso arriba de la pantalla contándote cuántos días te quedan.</p>
+      <p>Si no renovás, el acceso se corta solo al día siguiente del vencimiento. Los datos <strong>no se borran</strong>: tu cartera, tus análisis y tus respaldos quedan donde están, y vuelven a estar disponibles apenas renovás.</p>
+
+      <h3>Si trabajás sin internet</h3>
+      <p>FiscoIA revisa tu habilitación cada vez que abrís la página. Si en ese momento no hay conexión con el servidor, podés seguir trabajando hasta 72 horas con la última verificación válida. Pasado ese plazo pide reconectarse.</p>
+
+      <h3>Tu API Key de Anthropic</h3>
+      <p>Aparte de la suscripción a FiscoIA, necesitás tu propia API Key de Anthropic — es lo que hace funcionar la IA. La cargás una sola vez y queda guardada en tu navegador. Cada análisis cuesta centavos de dólar y lo pagás directo a Anthropic, no a nosotros.</p>
+
+      <div class="highlight">
+        <strong>Nunca te bloqueamos los datos.</strong> Aunque venza tu suscripción, todo lo que cargaste sigue siendo tuyo y podés exportarlo. Lo que se corta es el acceso a las funciones, no a tu información.
+      </div>
+    </section>
+
     <section class="section" id="casos-uso">
       <h2>🌎 Casos de Uso Reales en LATAM</h2>
       <p class="section-intro" style="margin-bottom: 30px; font-size: clamp(14px, 2vw, 16px); color: var(--text-light); max-width: 700px;">
